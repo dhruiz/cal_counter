@@ -8,6 +8,7 @@ import '../../domain/usecases/add_food_to_meal.dart';
 import '../../domain/usecases/create_meal_if_not_exists.dart';
 import '../providers/home_provider.dart';
 import '../providers/search_provider.dart';
+import '../providers/settings_provider.dart';
 
 // We need a provider for AddFoodToMeal and CreateMealIfNotExists
 // We can define them here or in home_provider.dart.
@@ -53,6 +54,41 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
       // If no meals, we default to creating "Comida_1"
       _isCreatingNewMeal = true;
     }
+    _prefillSuggestedQuantity();
+  }
+
+  /// Pre-rellena la cantidad con el máximo de gramos que no supera NINGUNA
+  /// meta diaria (kcal, grasas, carbos, proteínas): para cada límite se
+  /// calcula cuántos gramos caben en su restante (meta exacta, sin
+  /// tolerancia) y se sugiere el menor. Si ya no queda margen o el alimento
+  /// no aporta nada, el campo se deja vacío.
+  void _prefillSuggestedQuantity() {
+    final settings = ref.read(settingsProvider);
+    final settingsNotifier = ref.read(settingsProvider.notifier);
+    final home = ref.read(homeProvider);
+    final food = widget.food;
+
+    double? maxGrams;
+    void consider(double remaining, double per100) {
+      if (per100 <= 0) return; // este nutriente no limita
+      final grams = remaining * 100 / per100;
+      if (maxGrams == null || grams < maxGrams!) maxGrams = grams;
+    }
+
+    consider(settings.kcalTarget - home.totalKcal, food.kcalPer100);
+    consider(settingsNotifier.fatsRequired - home.totalFats, food.grasasPer100);
+    consider(settingsNotifier.carbsRequired - home.totalCarbs, food.carbsPer100);
+    consider(
+      settingsNotifier.proteinsRequired - home.totalProteins,
+      food.proteinsPer100,
+    );
+
+    if (maxGrams == null) return; // alimento sin valores nutricionales
+
+    final suggestion = maxGrams!.floor();
+    if (suggestion <= 0) return; // alguna meta ya alcanzada/superada
+
+    _quantityController.text = suggestion.toString();
   }
 
   @override
