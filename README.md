@@ -698,9 +698,13 @@ CREATE TABLE IF NOT EXISTS db_alimentos (
   kCal          REAL NOT NULL,          -- kcal por 100g
   grasas        REAL NOT NULL,          -- grasas en g por 100g
   carbohidratos REAL NOT NULL,          -- carbohidratos en g por 100g
-  proteinas     REAL NOT NULL           -- proteínas en g por 100g
+  proteinas     REAL NOT NULL,          -- proteínas en g por 100g
+  uso_count     INTEGER NOT NULL DEFAULT 0, -- nº de veces agregado a una comida
+  ultimo_uso    TEXT                    -- timestamp ISO8601 del último uso (nullable)
 );
 ```
+
+> Las columnas `uso_count` y `ultimo_uso` alimentan la lista **"Usados con frecuencia"** que `SearchView` muestra bajo el buscador cuando está vacío (orden `uso_count DESC, ultimo_uso DESC`). El contador se incrementa en `AddFoodPopup` al agregar un alimento a una comida, por lo que **persiste** aunque `ExportDayToCsv` vacíe `comidas`/`items_comida`. Como la BD precargada de assets no tiene estas columnas, `_createTables` ejecuta una migración idempotente (`PRAGMA table_info` + `ALTER TABLE ADD COLUMN`). `FoodModel` no las serializa, por lo que el formato TSV y export/import `.db` no cambian.
 
 ### Tabla `comidas`
 

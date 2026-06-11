@@ -14,6 +14,8 @@ abstract class LocalDataSource {
   Future<int> insertFood(FoodModel food);
   Future<int> updateFood(FoodModel food);
   Future<int> deleteFood(int id);
+  Future<void> incrementFoodUsage(int id);
+  Future<List<FoodModel>> getMostUsedFoods({int limit});
   Future<int> createMeal(String name, DateTime date);
   Future<List<Map<String, dynamic>>> getMealsByDate(DateTime date);
   Future<String?> getLastMealDate();
@@ -81,9 +83,16 @@ class LocalDataSourceImpl implements LocalDataSource {
         kCal REAL NOT NULL,
         grasas REAL NOT NULL,
         carbohidratos REAL NOT NULL,
-        proteinas REAL NOT NULL
+        proteinas REAL NOT NULL,
+        uso_count INTEGER NOT NULL DEFAULT 0,
+        ultimo_uso TEXT
       )
     ''');
+
+    // Migración idempotente: la BD precargada de assets existe sin estas columnas.
+    await _ensureColumn(db, 'db_alimentos', 'uso_count',
+        'INTEGER NOT NULL DEFAULT 0');
+    await _ensureColumn(db, 'db_alimentos', 'ultimo_uso', 'TEXT');
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS comidas (
@@ -105,6 +114,20 @@ class LocalDataSourceImpl implements LocalDataSource {
         kCal REAL NOT NULL
       )
     ''');
+  }
+
+  /// Añade [column] a [table] solo si aún no existe (ALTER idempotente).
+  Future<void> _ensureColumn(
+    Database db,
+    String table,
+    String column,
+    String definition,
+  ) async {
+    final info = await db.rawQuery('PRAGMA table_info($table)');
+    final exists = info.any((row) => row['name'] == column);
+    if (!exists) {
+      await db.execute('ALTER TABLE $table ADD COLUMN $column $definition');
+    }
   }
 
   @override
@@ -143,6 +166,27 @@ class LocalDataSourceImpl implements LocalDataSource {
   Future<int> deleteFood(int id) async {
     final db = await database;
     return await db.delete('db_alimentos', where: 'id = ?', whereArgs: [id]);
+  }
+
+  @override
+  Future<void> incrementFoodUsage(int id) async {
+    final db = await database;
+    await db.rawUpdate(
+      'UPDATE db_alimentos SET uso_count = uso_count + 1, ultimo_uso = ? WHERE id = ?',
+      [DateTime.now().toIso8601String(), id],
+    );
+  }
+
+  @override
+  Future<List<FoodModel>> getMostUsedFoods({int limit = 20}) async {
+    final db = await database;
+    final res = await db.query(
+      'db_alimentos',
+      where: 'uso_count > 0',
+      orderBy: 'uso_count DESC, ultimo_uso DESC',
+      limit: limit,
+    );
+    return res.map((e) => FoodModel.fromJson(e)).toList();
   }
 
   @override

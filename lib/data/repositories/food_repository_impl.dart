@@ -27,4 +27,14 @@ class FoodRepositoryImpl implements FoodRepository {
   Future<int> deleteFood(int id) async {
     return await localDataSource.deleteFood(id);
   }
+
+  @override
+  Future<void> incrementUsage(int foodId) async {
+    return await localDataSource.incrementFoodUsage(foodId);
+  }
+
+  @override
+  Future<List<Food>> getMostUsedFoods({int limit = 20}) async {
+    return await localDataSource.getMostUsedFoods(limit: limit);
+  }
 }

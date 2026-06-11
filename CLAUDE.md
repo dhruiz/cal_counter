@@ -31,7 +31,7 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`); `HomeView
 
 ## Modelo de datos (claves)
 
-- `db_alimentos`: macros **por 100g**. Columna `alimento` es `UNIQUE`. Nombres de columna exactos: `alimento`, `kCal`, `grasas`, `carbohidratos`, `proteinas`.
+- `db_alimentos`: macros **por 100g**. Columna `alimento` es `UNIQUE`. Nombres de columna exactos: `alimento`, `kCal`, `grasas`, `carbohidratos`, `proteinas`. Columnas de uso `uso_count` (INTEGER, default 0) y `ultimo_uso` (TEXT ISO8601, nullable) — alimentan la lista "más usados" de `SearchView`; persisten al vaciado de comidas. Migración idempotente vía `_ensureColumn` (PRAGMA + ALTER) en `_createTables`. `FoodModel.toJson` no las incluye, así que TSV/export/import no se ven afectados.
 - `items_comida`: macros **ya escalados** a la cantidad consumida (valores absolutos, no por 100g). Guarda el nombre del alimento **desnormalizado** (sin FK al alimento original). `comida_id` con `ON DELETE CASCADE`.
 - `comidas`: `fecha` se guarda como `String` `YYYY-MM-DD` (nunca timestamp). Nuevas comidas se auto-nombran `Comida_N`.
 - DB precargada (`assets/db/db_ctrl_calorias.db`, ~1700 alimentos) se copia a `getApplicationDocumentsDirectory()` en el primer arranque.
@@ -45,6 +45,7 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`); `HomeView
 - **`CheckNewDayOnStartup`** devuelve fecha (y dispara el diálogo de nuevo día) solo si `hasMealItems()==true` **y** la última fecha es anterior a hoy.
 - Export CSV diario y TSV de alimentos usan separador **TAB** (el CSV mantiene extensión `.csv` por compatibilidad). TSV header fijo: `id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas`; el `id` se ignora al importar, duplicados filtrados por `ConflictAlgorithm.ignore`. Importación de DB completa también usa `ignore`.
 - Export/import en Android 13+ usa SAF (`file_saver.saveAs` / `file_picker` con `withData: true`); evita permisos de almacenamiento manuales.
+- **Lista "más usados"** (`SearchView` con buscador vacío): `mostUsedFoodsProvider` (`FutureProvider.autoDispose`) lee `getMostUsedFoods` (orden `uso_count DESC`). El contador se incrementa en `AddFoodPopup._submit` vía `recordFoodUsageProvider` tras agregar a una comida (solo si `food.id != null`). `AddFoodToMeal` no se tocó. Invalidar `mostUsedFoodsProvider` tras alta/edición/baja/import de alimentos.
 
 ## Convenciones
 

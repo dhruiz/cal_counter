@@ -4,6 +4,8 @@ import '../../domain/entities/food.dart';
 import '../../domain/usecases/search_foods.dart';
 import '../../domain/usecases/export_database.dart';
 import '../../domain/usecases/import_database.dart';
+import '../../domain/usecases/record_food_usage.dart';
+import '../../domain/usecases/get_most_used_foods.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../../data/repositories/food_repository_impl.dart';
 import 'home_provider.dart'; // for localDataSourceProvider
@@ -14,6 +16,20 @@ final foodRepositoryProvider = Provider<FoodRepository>((ref) {
 
 final searchFoodsProvider = Provider<SearchFoods>((ref) {
   return SearchFoods(ref.watch(foodRepositoryProvider));
+});
+
+final recordFoodUsageProvider = Provider<RecordFoodUsage>((ref) {
+  return RecordFoodUsage(ref.watch(foodRepositoryProvider));
+});
+
+final getMostUsedFoodsProvider = Provider<GetMostUsedFoods>((ref) {
+  return GetMostUsedFoods(ref.watch(foodRepositoryProvider));
+});
+
+/// Lista de alimentos más usados (frecuencia desc). autoDispose → se recarga
+/// cada vez que se vuelve a entrar en SearchView, recogiendo los usos nuevos.
+final mostUsedFoodsProvider = FutureProvider.autoDispose<List<Food>>((ref) {
+  return ref.watch(getMostUsedFoodsProvider).call();
 });
 
 final exportDatabaseProvider = Provider<ExportDatabase>((ref) {

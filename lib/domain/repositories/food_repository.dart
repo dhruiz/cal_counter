@@ -6,4 +6,6 @@ abstract class FoodRepository {
   Future<int> insertFood(FoodModel food);
   Future<int> updateFood(FoodModel food);
   Future<int> deleteFood(int id);
+  Future<void> incrementUsage(int foodId);
+  Future<List<Food>> getMostUsedFoods({int limit});
 }

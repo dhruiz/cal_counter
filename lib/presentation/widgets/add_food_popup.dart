@@ -7,6 +7,7 @@ import '../../domain/entities/meal.dart';
 import '../../domain/usecases/add_food_to_meal.dart';
 import '../../domain/usecases/create_meal_if_not_exists.dart';
 import '../providers/home_provider.dart';
+import '../providers/search_provider.dart';
 
 // We need a provider for AddFoodToMeal and CreateMealIfNotExists
 // We can define them here or in home_provider.dart.
@@ -90,6 +91,12 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
 
     final addFood = ref.read(addFoodToMealProvider);
     await addFood(mealId: mealId, food: widget.food, quantity: quantity);
+
+    // Registra el uso para la lista de "más usados" (persistente en db_alimentos).
+    final foodId = widget.food.id;
+    if (foodId != null) {
+      await ref.read(recordFoodUsageProvider)(foodId);
+    }
 
     if (mounted) {
       Navigator.pop(context, true); // Return true to indicate success

@@ -94,4 +94,46 @@ void main() {
     expect(items.length, 1);
     expect(items.first['alimento'], 'Test Apple');
   });
+
+  test('most used foods are ranked by usage and exclude unused', () async {
+    await dataSource.initDb();
+
+    final apple = FoodModel(
+      name: 'USAGE_APPLE',
+      grasasPer100: 0.2,
+      carbsPer100: 14,
+      proteinsPer100: 0.3,
+      kcalPer100: 52,
+    );
+    final rice = FoodModel(
+      name: 'USAGE_RICE',
+      grasasPer100: 0.9,
+      carbsPer100: 28,
+      proteinsPer100: 2.7,
+      kcalPer100: 130,
+    );
+    // Never used → must be excluded from the most-used list.
+    final unused = FoodModel(
+      name: 'USAGE_UNUSED',
+      grasasPer100: 1,
+      carbsPer100: 1,
+      proteinsPer100: 1,
+      kcalPer100: 1,
+    );
+
+    final appleId = await dataSource.insertFood(apple);
+    final riceId = await dataSource.insertFood(rice);
+    await dataSource.insertFood(unused);
+
+    // Rice used twice, apple once → rice ranks first.
+    await dataSource.incrementFoodUsage(riceId);
+    await dataSource.incrementFoodUsage(riceId);
+    await dataSource.incrementFoodUsage(appleId);
+
+    final mostUsed = await dataSource.getMostUsedFoods();
+    final names = mostUsed.map((f) => f.name).toList();
+
+    expect(names, ['USAGE_RICE', 'USAGE_APPLE']);
+    expect(names, isNot(contains('USAGE_UNUSED')));
+  });
 }
