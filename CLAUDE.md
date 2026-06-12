@@ -44,7 +44,8 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`); `HomeView
 - **`ExportDayToCsv` vacía `comidas` e `items_comida`** tras un export exitoso (path no vacío). Efecto secundario deliberado; no quitarlo. Para un export sin vaciar, crear un use case nuevo.
 - **`CheckNewDayOnStartup`** devuelve fecha (y dispara el diálogo de nuevo día) solo si `hasMealItems()==true` **y** la última fecha es anterior a hoy.
 - Export CSV diario y TSV de alimentos usan separador **TAB** (el CSV mantiene extensión `.csv` por compatibilidad). TSV header fijo: `id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas`; el `id` se ignora al importar, duplicados filtrados por `ConflictAlgorithm.ignore`. Importación de DB completa también usa `ignore`.
-- Export/import en Android 13+ usa SAF (`file_saver.saveAs` / `file_picker` con `withData: true`); evita permisos de almacenamiento manuales.
+- Export/import en Android 13+ usa SAF (`FilePicker.saveFile` con `bytes:` / `FilePicker.pickFiles` con `withData: true`); evita permisos de almacenamiento manuales. `file_saver` se eliminó (aplicaba KGP y bloqueaba el toolchain); no reintroducirlo.
+- Toolchain Android anclado a AGP 8.13.1 + flags `android.builtInKotlin/newDsl=false`: Flutter 3.44 no soporta aún el DSL nuevo de AGP 9, y bajo AGP 9 `file_picker` deja de aplicar KGP y no compila. Revisar al actualizar Flutter.
 - **Lista "más usados"** (`SearchView` con buscador vacío): `mostUsedFoodsProvider` (`FutureProvider.autoDispose`) lee `getMostUsedFoods` (orden `uso_count DESC`). El contador se incrementa en `AddFoodPopup._submit` vía `recordFoodUsageProvider` tras agregar a una comida (solo si `food.id != null`). `AddFoodToMeal` no se tocó. Invalidar `mostUsedFoodsProvider` tras alta/edición/baja/import de alimentos.
 
 ## Convenciones

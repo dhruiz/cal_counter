@@ -152,7 +152,7 @@ class MealRepositoryImpl implements MealRepository {
     // Encode CSV string to bytes
     final bytes = Uint8List.fromList(utf8.encode(csv));
 
-    String? outputFile = await FilePicker.platform.saveFile(
+    String? outputFile = await FilePicker.saveFile(
       dialogTitle: 'Guardar reporte de comidas',
       fileName: fileName,
       type: FileType.custom,

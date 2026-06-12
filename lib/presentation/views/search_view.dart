@@ -82,7 +82,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
   Future<void> _exportDatabase() async {
     try {
       // Let user select destination directory
-      String? outputPath = await FilePicker.platform.getDirectoryPath();
+      String? outputPath = await FilePicker.getDirectoryPath();
 
       if (outputPath == null) {
         return; // User cancelled
@@ -131,7 +131,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
   Future<void> _importDatabase() async {
     try {
       // Let user select the database file to import
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['db'],
       );

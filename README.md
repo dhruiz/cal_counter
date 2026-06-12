@@ -543,7 +543,7 @@ Tipo: `ConsumerStatefulWidget`
 - Icono eliminar en alimento → confirmación → `FoodRepository.deleteFood`.
 - `FloatingActionButton` (+) → `FoodFormView` (modo creación).
 - Menú en `AppBar`: "Exportar DB" y "Importar DB".
-  - Exportar: usa `file_saver` para guardar el archivo exportado.
+  - Exportar: usa `FilePicker.saveFile` (con `bytes:`) para guardar el archivo exportado.
   - Importar: usa `file_picker` para seleccionar `.db`, luego `ImportDatabase`.
 
 #### `SettingsView` — `lib/presentation/views/settings_view.dart`
@@ -857,8 +857,7 @@ El paquete `permission_handler` gestiona los permisos de almacenamiento en tiemp
 | `equatable`          | `^2.0.7`  | Comparación de entidades de dominio   |
 | `shared_preferences` | `^2.3.5`  | Persistencia de settings y tema       |
 | `permission_handler` | `^11.3.1` | Permisos de almacenamiento en Android |
-| `file_picker`        | `^10.2.0` | Selección de archivos para importar   |
-| `file_saver`         | `^0.3.1`  | Guardado de archivos exportados       |
+| `file_picker`        | `^11.0.2` | Selección y guardado de archivos      |
 | `cupertino_icons`    | `^1.0.8`  | Iconos iOS (incluidos por defecto)    |
 
 ### Dev
@@ -925,7 +924,7 @@ Estas son las reglas de diseño que si se violan romperán la aplicación o su c
 
 15. **El TSV de `db_alimentos` usa header fijo**: `id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas`. La importación lo valida exactamente. Cambiar nombres de columnas o añadir/quitar campos rompe los archivos exportados previamente. Si se debe migrar el formato, mantener compatibilidad detectando el header.
 
-16. **SAF en Android 13+**: la app evita `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` en versiones modernas usando `file_saver.saveAs` y `file_picker.pickFiles(withData: true)`. No reintroducir manejo manual de paths absolutos ni añadir permisos al manifest sin justificación clara.
+16. **SAF en Android 13+**: la app evita `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` en versiones modernas usando `FilePicker.saveFile(bytes:)` y `FilePicker.pickFiles(withData: true)`. No reintroducir manejo manual de paths absolutos ni añadir permisos al manifest sin justificación clara.
 
 \*\*
 NOTA PERSONAL:

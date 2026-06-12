@@ -4,13 +4,16 @@ import 'package:cal_counter/data/datasources/local_data_source.dart';
 import 'package:cal_counter/data/repositories/meal_repository_impl.dart';
 import 'package:cal_counter/domain/entities/meal_item.dart';
 import 'package:file_picker/file_picker.dart';
+// FilePickerPlatform no se exporta desde file_picker.dart; es el único punto
+// de inyección para tests desde file_picker 11 (FilePicker pasó a ser final/static).
+import 'package:file_picker/src/platform/file_picker_platform_interface.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-class _FakeFilePicker extends FilePicker with MockPlatformInterfaceMixin {
+class _FakeFilePicker extends FilePickerPlatform with MockPlatformInterfaceMixin {
   _FakeFilePicker({required this.saveDir});
 
   final String saveDir;
@@ -52,7 +55,7 @@ void main() {
     dataSource = LocalDataSourceImpl();
     mealRepo = MealRepositoryImpl(dataSource);
     fakePicker = _FakeFilePicker(saveDir: testDir);
-    FilePicker.platform = fakePicker;
+    FilePickerPlatform.instance = fakePicker;
   });
 
   TestWidgetsFlutterBinding.ensureInitialized();
