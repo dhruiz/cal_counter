@@ -9,6 +9,13 @@ class AppStyles {
   static const Color semaphBlue = Color(0xFF1976D2);
   static const Color neutral = Color(0xFF757575);
 
+  // Colores de los anillos de progreso (HomeView)
+  static const Color ringKcal = semaphBlue;
+  static const Color ringFats = semaphOrange;
+  static const Color ringCarbs = Color(0xFF00897B);
+  static const Color ringProt = semaphGreen;
+  static const Color ringOver = semaphRed; // tramo de sobreingesta
+
   // Text Styles
   static const TextStyle heading1 = TextStyle(
     fontSize: 24,

@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/styles.dart';
 import '../providers/home_provider.dart';
 import '../providers/settings_provider.dart';
-import '../widgets/nutrient_card.dart';
+import '../widgets/nutrient_ring.dart';
 import '../widgets/meal_items_dialog.dart';
 import 'settings_view.dart';
 import 'search_view.dart';
@@ -91,26 +90,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
     }
   }
 
-  Color _computeColorForConsumed(
-    double target,
-    double consumed,
-    int tolerance,
-  ) {
-    const double epsilon = 0.01;
-    final double toleranceFactor = 1 + (tolerance / 100.0);
-
-    if (consumed <= target - epsilon) {
-      return AppStyles.semaphRed; // Under target
-    } else if (consumed > target - epsilon && consumed <= target + epsilon) {
-      return AppStyles.semaphGreen; // Exact target
-    } else if (consumed > target + epsilon &&
-        consumed <= target * toleranceFactor) {
-      return AppStyles.semaphOrange; // Over but within tolerance
-    } else {
-      return AppStyles.semaphRed; // Over tolerance
-    }
-  }
-
   Future<void> _exportFoodsTsv() async {
     try {
       final tsv = await ref.read(exportFoodsTsvProvider).call();
@@ -118,11 +97,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
       final timestamp = DateFormat(
         'yyyy-MM-dd_HH-mm-ss',
       ).format(DateTime.now());
-      final saved = await FileSaver.instance.saveAs(
-        name: 'db_alimentos_export_$timestamp',
+      // FilePicker.saveFile con bytes escribe el archivo vía SAF (igual que
+      // el export CSV de meal_repository_impl); sustituye a file_saver.
+      final saved = await FilePicker.saveFile(
+        dialogTitle: 'Exportar alimentos',
+        fileName: 'db_alimentos_export_$timestamp.tsv',
+        type: FileType.custom,
+        allowedExtensions: ['tsv'],
         bytes: bytes,
-        fileExtension: 'tsv',
-        mimeType: MimeType.other,
       );
       if (!mounted) return;
       if (saved == null || saved.isEmpty) return; // User cancelled
@@ -145,7 +127,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Future<void> _importFoodsTsv() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['tsv'],
         withData: true,
@@ -177,17 +159,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
     }
   }
 
-  Color _computeColorForRemaining(double remaining) {
-    if (remaining <= -10 || remaining >= 10) {
-      return AppStyles.semaphRed;
-    } else if ((remaining >= -9 && remaining <= -3) ||
-        (remaining >= 3 && remaining <= 9)) {
-      return AppStyles.semaphOrange;
-    } else {
-      return AppStyles.semaphBlue; // -2 to 2
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
@@ -205,12 +176,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final double consumedProt = homeState.totalProteins;
     final double consumedFats = homeState.totalFats;
     final double consumedCarbs = homeState.totalCarbs;
-
-    // Remaining
-    final double remKcal = targetKcal - consumedKcal;
-    final double remProt = targetProt - consumedProt;
-    final double remFats = targetFats - consumedFats;
-    final double remCarbs = targetCarbs - consumedCarbs;
 
     return Scaffold(
       appBar: AppBar(
@@ -263,87 +228,56 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildSectionTitle('Metas (Objetivo)'),
-                  _buildGrid([
-                    _buildCard('Kcal', targetKcal, '', AppStyles.neutral),
-                    _buildCard('Grasas', targetFats, 'g', AppStyles.neutral),
-                    _buildCard('Carbs', targetCarbs, 'g', AppStyles.neutral),
-                    _buildCard('Prot', targetProt, 'g', AppStyles.neutral),
-                  ]),
-                  const SizedBox(height: AppStyles.paddingMedium),
-
-                  _buildSectionTitle('Consumido'),
-                  _buildGrid([
-                    _buildCard(
-                      'Kcal',
-                      consumedKcal,
-                      '',
-                      _computeColorForConsumed(
-                        targetKcal,
-                        consumedKcal,
-                        settings.tolerancePercent,
+                  _buildSectionTitle('Progreso Diario'),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: NutrientRing(
+                          label: 'Calorías',
+                          consumed: consumedKcal,
+                          target: targetKcal,
+                          unit: 'kcal',
+                          color: AppStyles.ringKcal,
+                        ),
                       ),
-                    ),
-                    _buildCard(
-                      'Grasas',
-                      consumedFats,
-                      'g',
-                      _computeColorForConsumed(
-                        targetFats,
-                        consumedFats,
-                        settings.tolerancePercent,
+                      const SizedBox(width: AppStyles.paddingSmall),
+                      Expanded(
+                        child: NutrientRing(
+                          label: 'Grasas',
+                          consumed: consumedFats,
+                          target: targetFats,
+                          unit: 'g',
+                          color: AppStyles.ringFats,
+                        ),
                       ),
-                    ),
-                    _buildCard(
-                      'Carbs',
-                      consumedCarbs,
-                      'g',
-                      _computeColorForConsumed(
-                        targetCarbs,
-                        consumedCarbs,
-                        settings.tolerancePercent,
+                    ],
+                  ),
+                  const SizedBox(height: AppStyles.paddingSmall),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: NutrientRing(
+                          label: 'Carbohidratos',
+                          consumed: consumedCarbs,
+                          target: targetCarbs,
+                          unit: 'g',
+                          color: AppStyles.ringCarbs,
+                        ),
                       ),
-                    ),
-                    _buildCard(
-                      'Prot',
-                      consumedProt,
-                      'g',
-                      _computeColorForConsumed(
-                        targetProt,
-                        consumedProt,
-                        settings.tolerancePercent,
+                      const SizedBox(width: AppStyles.paddingSmall),
+                      Expanded(
+                        child: NutrientRing(
+                          label: 'Proteínas',
+                          consumed: consumedProt,
+                          target: targetProt,
+                          unit: 'g',
+                          color: AppStyles.ringProt,
+                        ),
                       ),
-                    ),
-                  ]),
-                  const SizedBox(height: AppStyles.paddingMedium),
-
-                  _buildSectionTitle('Restante'),
-                  _buildGrid([
-                    _buildCard(
-                      'Kcal',
-                      remKcal,
-                      '',
-                      _computeColorForRemaining(remKcal),
-                    ),
-                    _buildCard(
-                      'Grasas',
-                      remFats,
-                      'g',
-                      _computeColorForRemaining(remFats),
-                    ),
-                    _buildCard(
-                      'Carbs',
-                      remCarbs,
-                      'g',
-                      _computeColorForRemaining(remCarbs),
-                    ),
-                    _buildCard(
-                      'Prot',
-                      remProt,
-                      'g',
-                      _computeColorForRemaining(remProt),
-                    ),
-                  ]),
+                    ],
+                  ),
                   const SizedBox(height: AppStyles.paddingLarge),
 
                   ElevatedButton.icon(
@@ -384,35 +318,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Widget _buildGrid(List<Widget> children) {
-    return Row(
-      children: children
-          .map(
-            (c) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: c,
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-
-  Widget _buildCard(String label, double value, String unit, Color color) {
-    return NutrientCard(
-      label: label,
-      value: value.toStringAsFixed(0),
-      unit: unit,
-      valueColor: color,
-    );
-  }
-
   Widget _buildDailySummary(HomeState state) {
     return Card(
       child: ExpansionTile(
         title: const Text('Resumen del Día'),
-        initiallyExpanded: true,
+        initiallyExpanded: false,
         children: [
           if (state.meals.isEmpty)
             const Padding(
