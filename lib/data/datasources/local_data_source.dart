@@ -15,6 +15,7 @@ abstract class LocalDataSource {
   Future<int> updateFood(FoodModel food);
   Future<int> deleteFood(int id);
   Future<void> incrementFoodUsage(int id);
+  Future<void> resetFoodUsage(int id);
   Future<List<FoodModel>> getMostUsedFoods({int limit});
   Future<int> createMeal(String name, DateTime date);
   Future<List<Map<String, dynamic>>> getMealsByDate(DateTime date);
@@ -174,6 +175,15 @@ class LocalDataSourceImpl implements LocalDataSource {
     await db.rawUpdate(
       'UPDATE db_alimentos SET uso_count = uso_count + 1, ultimo_uso = ? WHERE id = ?',
       [DateTime.now().toIso8601String(), id],
+    );
+  }
+
+  @override
+  Future<void> resetFoodUsage(int id) async {
+    final db = await database;
+    await db.rawUpdate(
+      'UPDATE db_alimentos SET uso_count = 0, ultimo_uso = NULL WHERE id = ?',
+      [id],
     );
   }
 

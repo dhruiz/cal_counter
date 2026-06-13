@@ -5,6 +5,7 @@ import '../../domain/usecases/search_foods.dart';
 import '../../domain/usecases/export_database.dart';
 import '../../domain/usecases/import_database.dart';
 import '../../domain/usecases/record_food_usage.dart';
+import '../../domain/usecases/reset_food_usage.dart';
 import '../../domain/usecases/get_most_used_foods.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../../data/repositories/food_repository_impl.dart';
@@ -20,6 +21,10 @@ final searchFoodsProvider = Provider<SearchFoods>((ref) {
 
 final recordFoodUsageProvider = Provider<RecordFoodUsage>((ref) {
   return RecordFoodUsage(ref.watch(foodRepositoryProvider));
+});
+
+final resetFoodUsageProvider = Provider<ResetFoodUsage>((ref) {
+  return ResetFoodUsage(ref.watch(foodRepositoryProvider));
 });
 
 final getMostUsedFoodsProvider = Provider<GetMostUsedFoods>((ref) {

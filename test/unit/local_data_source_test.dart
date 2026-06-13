@@ -136,4 +136,41 @@ void main() {
     expect(names, ['USAGE_RICE', 'USAGE_APPLE']);
     expect(names, isNot(contains('USAGE_UNUSED')));
   });
+
+  test('resetFoodUsage removes a food from the most-used list', () async {
+    await dataSource.initDb();
+
+    final apple = FoodModel(
+      name: 'RESET_APPLE',
+      grasasPer100: 0.2,
+      carbsPer100: 14,
+      proteinsPer100: 0.3,
+      kcalPer100: 52,
+    );
+    final rice = FoodModel(
+      name: 'RESET_RICE',
+      grasasPer100: 0.9,
+      carbsPer100: 28,
+      proteinsPer100: 2.7,
+      kcalPer100: 130,
+    );
+
+    final appleId = await dataSource.insertFood(apple);
+    final riceId = await dataSource.insertFood(rice);
+
+    await dataSource.incrementFoodUsage(appleId);
+    await dataSource.incrementFoodUsage(riceId);
+
+    // Reset apple → desaparece de "más usados"; el alimento sigue existiendo.
+    await dataSource.resetFoodUsage(appleId);
+
+    final mostUsed = await dataSource.getMostUsedFoods();
+    final names = mostUsed.map((f) => f.name).toList();
+    expect(names, isNot(contains('RESET_APPLE')));
+    expect(names, contains('RESET_RICE'));
+
+    // El alimento reseteado sigue siendo buscable en el catálogo.
+    final found = await dataSource.searchFoods('RESET_APPLE');
+    expect(found.map((f) => f.name), contains('RESET_APPLE'));
+  });
 }

@@ -18,6 +18,11 @@ class SearchView extends ConsumerStatefulWidget {
 class _SearchViewState extends ConsumerState<SearchView> {
   final _searchController = TextEditingController();
 
+  /// Ids ya deslizados fuera de "más usados". Filtran el tile de inmediato
+  /// (sincrónico) mientras el reset en BD + recarga del provider terminan,
+  /// evitando el assert de Dismissible sobre la lista asíncrona.
+  final Set<int> _removedRecentIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -190,7 +195,10 @@ class _SearchViewState extends ConsumerState<SearchView> {
     final mostUsed = ref.watch(mostUsedFoodsProvider);
     return mostUsed.when(
       data: (foods) {
-        if (foods.isEmpty) {
+        final visible = foods
+            .where((f) => !_removedRecentIds.contains(f.id))
+            .toList();
+        if (visible.isEmpty) {
           return const Center(child: Text('Escribe para buscar'));
         }
         return ListView(
@@ -202,7 +210,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            ...foods.map(_buildFoodTile),
+            ...visible.map((f) => _buildFoodTile(f, inMostUsed: true)),
           ],
         );
       },
@@ -211,9 +219,35 @@ class _SearchViewState extends ConsumerState<SearchView> {
     );
   }
 
+  /// Quita un alimento de "más usados" al deslizar el tile (izq. o der.).
+  void _removeFromRecents(Food food) {
+    final id = food.id;
+    if (id == null) return;
+    // Oculta el tile de inmediato; luego persiste el reset y recarga la lista.
+    setState(() => _removedRecentIds.add(id));
+    ref.read(resetFoodUsageProvider).call(id).then((_) {
+      ref.invalidate(mostUsedFoodsProvider);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${food.name} quitado de recientes')),
+    );
+  }
+
+  /// Fondo rojo con icono que se revela al deslizar el tile.
+  Widget _swipeRemoveBackground(Alignment alignment) {
+    return Container(
+      color: Colors.red,
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: const Icon(Icons.delete_sweep, color: Colors.white),
+    );
+  }
+
   /// Tile reutilizable para un alimento (resultados de búsqueda y más usados).
-  Widget _buildFoodTile(Food food) {
-    return ListTile(
+  /// En la lista de más usados ([inMostUsed]) se envuelve en un [Dismissible]
+  /// para quitarlo de recientes deslizando hacia izquierda o derecha.
+  Widget _buildFoodTile(Food food, {bool inMostUsed = false}) {
+    final tile = ListTile(
       title: Text(food.name),
       subtitle: Text(
         '${food.kcalPer100} kcal | G: ${food.grasasPer100} | C: ${food.carbsPer100} | P: ${food.proteinsPer100} (por 100g)',
@@ -283,6 +317,17 @@ class _SearchViewState extends ConsumerState<SearchView> {
           }
         },
       ),
+    );
+
+    if (!inMostUsed || food.id == null) return tile;
+
+    return Dismissible(
+      key: ValueKey('recent_${food.id}'),
+      direction: DismissDirection.horizontal,
+      background: _swipeRemoveBackground(Alignment.centerLeft),
+      secondaryBackground: _swipeRemoveBackground(Alignment.centerRight),
+      onDismissed: (_) => _removeFromRecents(food),
+      child: tile,
     );
   }
 
