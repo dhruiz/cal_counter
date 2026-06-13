@@ -28,6 +28,9 @@ class MockMealRepository implements MealRepository {
   Future<void> updateMealItem(int id, double newCantidad) async {}
 
   @override
+  Future<void> updateMealName(int id, String name) async {}
+
+  @override
   Future<String> exportMealsByDateCSV(DateTime date) async => 'path/to/csv';
 
   @override

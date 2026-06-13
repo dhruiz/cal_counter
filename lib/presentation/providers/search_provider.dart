@@ -7,6 +7,7 @@ import '../../domain/usecases/import_database.dart';
 import '../../domain/usecases/record_food_usage.dart';
 import '../../domain/usecases/reset_food_usage.dart';
 import '../../domain/usecases/get_most_used_foods.dart';
+import '../../domain/usecases/save_meal_as_food.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../../data/repositories/food_repository_impl.dart';
 import 'home_provider.dart'; // for localDataSourceProvider
@@ -29,6 +30,10 @@ final resetFoodUsageProvider = Provider<ResetFoodUsage>((ref) {
 
 final getMostUsedFoodsProvider = Provider<GetMostUsedFoods>((ref) {
   return GetMostUsedFoods(ref.watch(foodRepositoryProvider));
+});
+
+final saveMealAsFoodProvider = Provider<SaveMealAsFood>((ref) {
+  return SaveMealAsFood(ref.watch(foodRepositoryProvider));
 });
 
 /// Lista de alimentos más usados (frecuencia desc). autoDispose → se recarga

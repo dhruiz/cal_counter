@@ -25,6 +25,7 @@ abstract class LocalDataSource {
   Future<void> deleteMeal(int id);
   Future<void> deleteMealItem(int id);
   Future<void> updateMealItem(int id, double newCantidad);
+  Future<void> updateMealName(int id, String name);
   Future<List<FoodModel>> getAllFoods();
   Future<void> exportDatabase(String destinationPath);
   Future<int> importDatabase(String sourcePath);
@@ -286,6 +287,17 @@ class LocalDataSourceImpl implements LocalDataSource {
         'carbohidratos': (item['carbohidratos'] as double) * ratio,
         'proteinas': (item['proteinas'] as double) * ratio,
       },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<void> updateMealName(int id, String name) async {
+    final db = await database;
+    await db.update(
+      'comidas',
+      {'nombre': name},
       where: 'id = ?',
       whereArgs: [id],
     );

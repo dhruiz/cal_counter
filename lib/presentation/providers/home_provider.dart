@@ -138,6 +138,11 @@ class HomeNotifier extends StateNotifier<HomeState> {
     await loadDailyData();
   }
 
+  Future<void> renameMeal(int id, String name) async {
+    await repository.updateMealName(id, name);
+    await loadDailyData();
+  }
+
   Future<void> refresh() async {
     await loadDailyData();
   }

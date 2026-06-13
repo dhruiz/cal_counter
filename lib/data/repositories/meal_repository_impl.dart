@@ -81,6 +81,11 @@ class MealRepositoryImpl implements MealRepository {
   }
 
   @override
+  Future<void> updateMealName(int id, String name) async {
+    await localDataSource.updateMealName(id, name);
+  }
+
+  @override
   Future<bool> hasMealItems() async {
     return await localDataSource.hasMealItems();
   }

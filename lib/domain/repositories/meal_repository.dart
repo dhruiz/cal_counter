@@ -11,6 +11,7 @@ abstract class MealRepository {
   Future<void> deleteMeal(int id);
   Future<void> deleteMealItem(int id);
   Future<void> updateMealItem(int id, double newCantidad);
+  Future<void> updateMealName(int id, String name);
   Future<bool> hasMealItems();
   Future<void> clearMealsAndItems();
 }
