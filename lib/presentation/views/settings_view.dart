@@ -93,30 +93,24 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     return value != null && value > 0 && value <= 60;
   }
 
-  void _calculateTDEE() {
-    if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor corrige los errores en el formulario'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    final weight = double.parse(_weightController.text);
-    final height = double.parse(_heightController.text);
-    final age = int.parse(_ageController.text);
+  /// Recalcula la kcal objetivo automáticamente a partir de los datos
+  /// personales, el factor de actividad y el objetivo de peso.
+  /// Silencioso: si faltan datos o son inválidos, no toca el campo.
+  void _recalculateTDEE() {
+    final weight = double.tryParse(_weightController.text);
+    if (weight == null || weight <= 0) return;
 
     double tmb;
-
     if (_isBodyFatValid()) {
-      // Scenario A: Katch-McArdle formula
+      // Katch-McArdle (solo requiere peso y % grasa)
       final bodyFat = double.parse(_bodyFatController.text);
       final lbm = weight * (1 - (bodyFat / 100));
       tmb = 370 + (21.6 * lbm);
     } else {
-      // Scenario B: Mifflin-St Jeor formula
+      // Mifflin-St Jeor (requiere altura y edad)
+      final height = double.tryParse(_heightController.text);
+      final age = int.tryParse(_ageController.text);
+      if (height == null || height <= 0 || age == null || age <= 0) return;
       final c = _selectedSex == 'male' ? 5.0 : -161.0;
       tmb = (10 * weight) + (6.25 * height) - (5 * age) + c;
     }
@@ -132,24 +126,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
       target = tdee * (1 + adjustment / 100);
     }
 
-    setState(() {
-      _kcalController.text = target.round().toString();
-    });
-
-    final goalLabel = _selectedGoal == 'lose'
-        ? 'déficit'
-        : _selectedGoal == 'gain'
-        ? 'superávit'
-        : 'mantenimiento';
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'TDEE: ${tdee.round()} kcal · Objetivo ($goalLabel): ${target.round()} kcal',
-        ),
-        backgroundColor: Colors.green,
-      ),
-    );
+    _kcalController.text = target.round().toString();
   }
 
   void _save() {
@@ -212,16 +189,19 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 controller: _weightController,
                 label: 'Peso (kg)',
                 isDecimal: true,
+                onValueChanged: _recalculateTDEE,
               ),
               _buildTextField(
                 controller: _heightController,
                 label: 'Altura (cm)',
                 isDecimal: true,
+                onValueChanged: _recalculateTDEE,
               ),
               _buildTextField(
                 controller: _ageController,
                 label: 'Edad (años)',
                 isDecimal: false,
+                onValueChanged: _recalculateTDEE,
               ),
               _buildTextField(
                 controller: _bodyFatController,
@@ -229,6 +209,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 isDecimal: true,
                 isRequired: false,
                 isBodyFat: true,
+                onValueChanged: _recalculateTDEE,
               ),
               const SizedBox(height: AppStyles.paddingSmall),
 
@@ -240,18 +221,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               _buildActivityDropdown(),
               const SizedBox(height: AppStyles.paddingMedium),
 
-              // Calculate TDEE button
-              OutlinedButton.icon(
-                onPressed: _calculateTDEE,
-                icon: const Icon(Icons.calculate),
-                label: const Text('Calcular TDEE'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-              const SizedBox(height: AppStyles.paddingMedium),
-
-              // Weight goal selector
+              // Weight goal selector (recálculo automático de TDEE)
               _buildGoalSelector(),
               const SizedBox(height: AppStyles.paddingLarge),
 
@@ -338,6 +308,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               : (Set<String> newSelection) {
                   setState(() {
                     _selectedSex = newSelection.first;
+                    _recalculateTDEE();
                   });
                 },
         ),
@@ -376,6 +347,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
       onChanged: (value) {
         setState(() {
           _selectedActivity = value!;
+          _recalculateTDEE();
         });
       },
       validator: (value) {
@@ -418,6 +390,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           onSelectionChanged: (Set<String> newSelection) {
             setState(() {
               _selectedGoal = newSelection.first;
+              _recalculateTDEE();
             });
           },
         ),
@@ -440,7 +413,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               if (n == null || n <= 0 || n > 50) return '1 - 50';
               return null;
             },
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() => _recalculateTDEE()),
           ),
         ],
       ],
@@ -454,6 +427,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     bool isTolerance = false,
     bool isRequired = true,
     bool isBodyFat = false,
+    VoidCallback? onValueChanged,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppStyles.paddingMedium),
@@ -493,7 +467,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
           return null;
         },
-        onChanged: (_) => setState(() {}), // Rebuild for conditional logic
+        onChanged: (_) => setState(() {
+          onValueChanged?.call();
+        }), // Rebuild + recálculo automático de TDEE cuando aplica
       ),
     );
   }
