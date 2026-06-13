@@ -15,6 +15,10 @@ class UserSettings extends Equatable {
   final String sex; // "male" or "female"
   final double activityFactor; // 1.2 to 1.9
 
+  // Weight goal fields
+  final String goal; // "lose" | "maintain" | "gain"
+  final int adjustmentPercent; // % déficit/superávit sobre el TDEE (0 = mantener)
+
   const UserSettings({
     required this.weightKg,
     required this.kcalTarget,
@@ -26,6 +30,8 @@ class UserSettings extends Equatable {
     required this.age,
     required this.sex,
     required this.activityFactor,
+    this.goal = 'maintain',
+    this.adjustmentPercent = 0,
   });
 
   // Defaults
@@ -41,6 +47,8 @@ class UserSettings extends Equatable {
       age: 30,
       sex: 'male',
       activityFactor: 1.2,
+      goal: 'maintain',
+      adjustmentPercent: 0,
     );
   }
 
@@ -55,6 +63,8 @@ class UserSettings extends Equatable {
     int? age,
     String? sex,
     double? activityFactor,
+    String? goal,
+    int? adjustmentPercent,
   }) {
     return UserSettings(
       weightKg: weightKg ?? this.weightKg,
@@ -67,6 +77,8 @@ class UserSettings extends Equatable {
       age: age ?? this.age,
       sex: sex ?? this.sex,
       activityFactor: activityFactor ?? this.activityFactor,
+      goal: goal ?? this.goal,
+      adjustmentPercent: adjustmentPercent ?? this.adjustmentPercent,
     );
   }
 
@@ -82,5 +94,7 @@ class UserSettings extends Equatable {
     age,
     sex,
     activityFactor,
+    goal,
+    adjustmentPercent,
   ];
 }

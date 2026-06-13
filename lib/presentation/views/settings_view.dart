@@ -30,6 +30,10 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   late String _selectedSex;
   late double _selectedActivity;
 
+  // Weight goal
+  late String _selectedGoal;
+  late TextEditingController _adjustmentController;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +65,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     _ageController = TextEditingController(text: settings.age.toString());
     _selectedSex = settings.sex;
     _selectedActivity = settings.activityFactor;
+
+    _selectedGoal = settings.goal;
+    _adjustmentController = TextEditingController(
+      text: settings.adjustmentPercent.toString(),
+    );
   }
 
   @override
@@ -73,6 +82,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     _bodyFatController.dispose();
     _heightController.dispose();
     _ageController.dispose();
+    _adjustmentController.dispose();
     super.dispose();
   }
 
@@ -113,13 +123,30 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
     final tdee = tmb * _selectedActivity;
 
+    // Ajuste por objetivo de peso: déficit (perder) o superávit (ganar)
+    final adjustment = int.tryParse(_adjustmentController.text) ?? 0;
+    double target = tdee;
+    if (_selectedGoal == 'lose') {
+      target = tdee * (1 - adjustment / 100);
+    } else if (_selectedGoal == 'gain') {
+      target = tdee * (1 + adjustment / 100);
+    }
+
     setState(() {
-      _kcalController.text = tdee.round().toString();
+      _kcalController.text = target.round().toString();
     });
+
+    final goalLabel = _selectedGoal == 'lose'
+        ? 'déficit'
+        : _selectedGoal == 'gain'
+        ? 'superávit'
+        : 'mantenimiento';
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('TDEE calculado: ${tdee.round()} kcal'),
+        content: Text(
+          'TDEE: ${tdee.round()} kcal · Objetivo ($goalLabel): ${target.round()} kcal',
+        ),
         backgroundColor: Colors.green,
       ),
     );
@@ -139,6 +166,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         age: int.parse(_ageController.text),
         sex: _selectedSex,
         activityFactor: _selectedActivity,
+        goal: _selectedGoal,
+        adjustmentPercent: int.tryParse(_adjustmentController.text) ?? 0,
       );
 
       ref.read(settingsProvider.notifier).updateSettings(newSettings);
@@ -220,6 +249,10 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
+              const SizedBox(height: AppStyles.paddingMedium),
+
+              // Weight goal selector
+              _buildGoalSelector(),
               const SizedBox(height: AppStyles.paddingLarge),
 
               _buildSectionTitle('Objetivos'),
@@ -349,6 +382,68 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         if (value == null) return 'Requerido';
         return null;
       },
+    );
+  }
+
+  Widget _buildGoalSelector() {
+    final isMaintain = _selectedGoal == 'maintain';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Objetivo de peso',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 8),
+        SegmentedButton<String>(
+          segments: const [
+            ButtonSegment(
+              value: 'lose',
+              label: Text('Perder'),
+              icon: Icon(Icons.trending_down),
+            ),
+            ButtonSegment(
+              value: 'maintain',
+              label: Text('Mantener'),
+              icon: Icon(Icons.trending_flat),
+            ),
+            ButtonSegment(
+              value: 'gain',
+              label: Text('Ganar'),
+              icon: Icon(Icons.trending_up),
+            ),
+          ],
+          selected: {_selectedGoal},
+          onSelectionChanged: (Set<String> newSelection) {
+            setState(() {
+              _selectedGoal = newSelection.first;
+            });
+          },
+        ),
+        if (!isMaintain) ...[
+          const SizedBox(height: AppStyles.paddingMedium),
+          TextFormField(
+            controller: _adjustmentController,
+            decoration: InputDecoration(
+              labelText: _selectedGoal == 'lose'
+                  ? 'Déficit calórico (%)'
+                  : 'Superávit calórico (%)',
+              border: const OutlineInputBorder(),
+              suffixText: '%',
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (value) {
+              if (_selectedGoal == 'maintain') return null;
+              final n = int.tryParse(value ?? '');
+              if (n == null || n <= 0 || n > 50) return '1 - 50';
+              return null;
+            },
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+      ],
     );
   }
 

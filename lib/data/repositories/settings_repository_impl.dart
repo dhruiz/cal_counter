@@ -13,6 +13,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
   static const String keyAge = 'age';
   static const String keySex = 'sex';
   static const String keyActivity = 'activity_factor';
+  static const String keyGoal = 'goal';
+  static const String keyAdjustment = 'adjustment_percent';
 
   @override
   Future<UserSettings> getSettings() async {
@@ -28,6 +30,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
       age: prefs.getInt(keyAge) ?? 30,
       sex: prefs.getString(keySex) ?? 'male',
       activityFactor: prefs.getDouble(keyActivity) ?? 1.2,
+      goal: prefs.getString(keyGoal) ?? 'maintain',
+      adjustmentPercent: prefs.getInt(keyAdjustment) ?? 0,
     );
   }
 
@@ -50,5 +54,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     await prefs.setInt(keyAge, settings.age);
     await prefs.setString(keySex, settings.sex);
     await prefs.setDouble(keyActivity, settings.activityFactor);
+    await prefs.setString(keyGoal, settings.goal);
+    await prefs.setInt(keyAdjustment, settings.adjustmentPercent);
   }
 }
