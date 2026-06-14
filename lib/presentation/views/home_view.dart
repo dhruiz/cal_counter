@@ -8,9 +8,9 @@ import '../../core/styles.dart';
 import '../providers/home_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/nutrient_ring.dart';
-import '../widgets/meal_items_dialog.dart';
 import 'settings_view.dart';
 import 'search_view.dart';
+import 'day_management_view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -296,9 +296,25 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       textStyle: const TextStyle(fontSize: 18),
                     ),
                   ),
-                  const SizedBox(height: AppStyles.paddingLarge),
+                  const SizedBox(height: AppStyles.paddingMedium),
 
-                  _buildDailySummary(homeState),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DayManagementView(),
+                        ),
+                      ).then((_) => ref.read(homeProvider.notifier).refresh());
+                    },
+                    icon: const Icon(Icons.restaurant_menu),
+                    label: const Text('Gestionar Día'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppStyles.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -314,145 +330,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
-      ),
-    );
-  }
-
-  Widget _buildDailySummary(HomeState state) {
-    return Card(
-      child: ExpansionTile(
-        title: const Text('Resumen del Día'),
-        initiallyExpanded: false,
-        children: [
-          if (state.meals.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('No hay comidas registradas hoy.'),
-            )
-          else
-            ...state.meals.map((meal) {
-              final items = state.mealItems[meal.id] ?? [];
-              double mealKcal = 0;
-              double mealFats = 0;
-              double mealCarbs = 0;
-              double mealProteins = 0;
-
-              for (var i in items) {
-                mealKcal += i.kcal;
-                mealFats += i.grasas;
-                mealCarbs += i.carbohidratos;
-                mealProteins += i.proteinas;
-              }
-
-              return ListTile(
-                title: Text(meal.name),
-                subtitle: Text(
-                  '${items.length} items - ${mealKcal.toStringAsFixed(0)} kcal\n'
-                  'G: ${mealFats.toStringAsFixed(1)}g  '
-                  'C: ${mealCarbs.toStringAsFixed(1)}g  '
-                  'P: ${mealProteins.toStringAsFixed(1)}g',
-                ),
-                onTap: () {
-                  // Show meal items dialog
-                  showDialog(
-                    context: context,
-                    builder: (ctx) =>
-                        MealItemsDialog(mealName: meal.name, items: items),
-                  );
-                },
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    // Confirm delete
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Eliminar Comida'),
-                        content: const Text(
-                          '¿Seguro que desea eliminar esta comida y sus items?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Cancelar'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(ctx);
-                              ref
-                                  .read(homeProvider.notifier)
-                                  .deleteMeal(meal.id!);
-                            },
-                            child: const Text('Eliminar'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              );
-            }),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton.icon(
-                  onPressed: () async {
-                    final export = ref.read(exportDayToCsvProvider);
-                    final path = await export(state.selectedDate);
-                    if (path.isNotEmpty) {
-                      ref.read(homeProvider.notifier).refresh();
-                    }
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Exportado a: $path')),
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.download),
-                  label: const Text('Exportar Día'),
-                ),
-                // "Eliminar día" button requested in prompt
-                TextButton.icon(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Eliminar Día'),
-                        content: const Text(
-                          '¿Seguro que desea eliminar TODAS las comidas de hoy?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Cancelar'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(ctx);
-                              for (var m in state.meals) {
-                                await ref
-                                    .read(homeProvider.notifier)
-                                    .deleteMeal(m.id!);
-                              }
-                            },
-                            child: const Text('Eliminar Todo'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.delete_forever, color: Colors.red),
-                  label: const Text(
-                    'Eliminar Día',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
