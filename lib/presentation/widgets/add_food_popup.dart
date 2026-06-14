@@ -89,6 +89,12 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     if (suggestion <= 0) return; // alguna meta ya alcanzada/superada
 
     _quantityController.text = suggestion.toString();
+    // Pre-selecciona todo el valor sugerido: con el campo enfocado
+    // (autofocus) el usuario puede sobrescribirlo de inmediato o aceptarlo.
+    _quantityController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _quantityController.text.length,
+    );
   }
 
   @override
@@ -150,6 +156,7 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
           children: [
             TextFormField(
               controller: _quantityController,
+              autofocus: true,
               decoration: const InputDecoration(
                 labelText: 'Cantidad (g)',
                 suffixText: 'g',
