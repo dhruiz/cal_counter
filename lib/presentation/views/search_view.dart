@@ -243,6 +243,78 @@ class _SearchViewState extends ConsumerState<SearchView> {
     );
   }
 
+  /// Menú de acciones (long-press) sobre un alimento: editar o eliminar.
+  void _showFoodActions(Food food) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                food.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const Divider(height: 0),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _editFood(food);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Eliminar'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _deleteFood(food);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _editFood(Food food) async {
+    final updated = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => FoodFormView(foodToEdit: food)),
+    );
+    if (updated == true) {
+      _refreshSearch();
+    }
+  }
+
+  Future<void> _deleteFood(Food food) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar Alimento'),
+        content: Text('¿Eliminar ${food.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await ref.read(foodRepositoryProvider).deleteFood(food.id!);
+      _refreshSearch();
+    }
+  }
+
   /// Tile reutilizable para un alimento (resultados de búsqueda y más usados).
   /// En la lista de más usados ([inMostUsed]) se envuelve en un [Dismissible]
   /// para quitarlo de recientes deslizando hacia izquierda o derecha.
@@ -272,51 +344,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
           navigator.pop(); // Close search view
         }
       },
-      trailing: PopupMenuButton(
-        itemBuilder: (context) => [
-          const PopupMenuItem(value: 'edit', child: Text('Editar')),
-          const PopupMenuItem(
-            value: 'delete',
-            child: Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-        onSelected: (value) async {
-          if (value == 'edit') {
-            final updated = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => FoodFormView(foodToEdit: food),
-              ),
-            );
-            if (updated == true) {
-              _refreshSearch();
-            }
-          } else if (value == 'delete') {
-            final confirm = await showDialog<bool>(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: const Text('Eliminar Alimento'),
-                content: Text('¿Eliminar ${food.name}?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, false),
-                    child: const Text('Cancelar'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx, true),
-                    child: const Text('Eliminar'),
-                  ),
-                ],
-              ),
-            );
-
-            if (confirm == true) {
-              await ref.read(foodRepositoryProvider).deleteFood(food.id!);
-              _refreshSearch();
-            }
-          }
-        },
-      ),
+      onLongPress: () => _showFoodActions(food),
     );
 
     if (!inMostUsed || food.id == null) return tile;

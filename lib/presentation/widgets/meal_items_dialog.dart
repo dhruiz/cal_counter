@@ -31,50 +31,73 @@ class MealItemsDialog extends ConsumerWidget {
                   final item = items[index];
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: ListTile(
-                      title: Text(
-                        item.alimento,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            'Cantidad: ${item.cantidad.toStringAsFixed(1)}g',
-                            style: const TextStyle(fontSize: 13),
+                    // Stack para anclar los íconos a las esquinas derechas:
+                    // Editar (arriba) y Eliminar (abajo). El contenido reserva
+                    // espacio a la derecha vía contentPadding.
+                    child: Stack(
+                      children: [
+                        ListTile(
+                          contentPadding: const EdgeInsets.fromLTRB(
+                            16,
+                            8,
+                            48,
+                            8,
                           ),
-                          Text(
-                            '${item.kcal.toStringAsFixed(0)} kcal\n'
-                            'G: ${item.grasas.toStringAsFixed(1)}g\n'
-                            'C: ${item.carbohidratos.toStringAsFixed(1)}g\n'
-                            'P: ${item.proteinas.toStringAsFixed(1)}g',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                          title: Text(
+                            item.alimento,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              Text(
+                                'Cantidad: ${item.cantidad.toStringAsFixed(1)}g',
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              Text(
+                                '${item.kcal.toStringAsFixed(0)} kcal\n'
+                                'G: ${item.grasas.toStringAsFixed(1)}g\n'
+                                'C: ${item.carbohidratos.toStringAsFixed(1)}g\n'
+                                'P: ${item.proteinas.toStringAsFixed(1)}g',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: IconButton(
                             icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
                               _showEditQuantityDialog(context, ref, item);
                             },
                             tooltip: 'Editar cantidad',
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              _showDeleteConfirmation(context, ref, item);
-                            },
-                            tooltip: 'Eliminar',
+                        ),
+                        // Eliminar: ancla la parte superior del ícono en la
+                        // línea de 3/4 de la tarjeta (justo encima del 1/4
+                        // inferior). Alignment.y=0.5 → top = 0.75*(alto-icono).
+                        Positioned.fill(
+                          child: Align(
+                            alignment: const Alignment(1.0, 0.5),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                _showDeleteConfirmation(context, ref, item);
+                              },
+                              tooltip: 'Eliminar',
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 },
