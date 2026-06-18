@@ -263,7 +263,21 @@ class DayManagementView extends ConsumerWidget {
       return;
     }
 
-    final controller = TextEditingController(text: meal.name);
+    final nameController = TextEditingController(text: meal.name);
+
+    // Peso sugerido = suma de los pesos de cada ingrediente. Editable porque
+    // ingredientes como arroz crudo cambian de peso al cocinarse y falsearían
+    // el valor por 100g de la preparación.
+    final suggestedGrams = items.fold<double>(0, (sum, i) => sum + i.cantidad);
+    final weightController = TextEditingController(
+      text: _formatGrams(suggestedGrams),
+    );
+    // Resaltar el peso y dejar el foco/teclado sobre él para editarlo rápido.
+    weightController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: weightController.text.length,
+    );
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -273,15 +287,27 @@ class DayManagementView extends ConsumerWidget {
           children: [
             const Text(
               'Se calculará el valor nutricional por 100g a partir del total '
-              'de la comida y su peso.',
+              'de la comida y su peso. Ajusta el peso si la preparación cambió '
+              'al cocinarse.',
               style: TextStyle(fontSize: 13),
             ),
             const SizedBox(height: AppStyles.paddingSmall),
             TextField(
-              controller: controller,
-              autofocus: true,
+              controller: nameController,
               decoration: const InputDecoration(
                 labelText: 'Nombre del alimento',
+              ),
+            ),
+            const SizedBox(height: AppStyles.paddingSmall),
+            TextField(
+              controller: weightController,
+              autofocus: true,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Peso total de la preparación',
+                suffixText: 'g',
               ),
             ),
           ],
@@ -293,15 +319,22 @@ class DayManagementView extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
-              final name = controller.text.trim();
+              final name = nameController.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   const SnackBar(content: Text('El nombre no puede estar vacío')),
                 );
                 return;
               }
+              final totalGrams = double.tryParse(weightController.text);
+              if (totalGrams == null || totalGrams <= 0) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(content: Text('Ingrese un peso válido')),
+                );
+                return;
+              }
               Navigator.pop(ctx);
-              await _saveMealAsFood(context, ref, name, items);
+              await _saveMealAsFood(context, ref, name, items, totalGrams);
             },
             child: const Text('Guardar'),
           ),
@@ -310,11 +343,16 @@ class DayManagementView extends ConsumerWidget {
     );
   }
 
+  /// Formatea gramos sin decimales si es entero; con 1 decimal en caso contrario.
+  String _formatGrams(double g) =>
+      g == g.roundToDouble() ? g.toStringAsFixed(0) : g.toStringAsFixed(1);
+
   Future<void> _saveMealAsFood(
     BuildContext context,
     WidgetRef ref,
     String name,
     List<MealItem> items,
+    double totalGrams,
   ) async {
     // ¿Ya existe un alimento con ese nombre? (coincidencia exacta).
     final matches = await ref.read(foodRepositoryProvider).searchFoods(name);
@@ -345,7 +383,9 @@ class DayManagementView extends ConsumerWidget {
     }
 
     try {
-      await ref.read(saveMealAsFoodProvider).call(name: name, items: items);
+      await ref
+          .read(saveMealAsFoodProvider)
+          .call(name: name, items: items, totalGrams: totalGrams);
       ref.invalidate(mostUsedFoodsProvider);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
