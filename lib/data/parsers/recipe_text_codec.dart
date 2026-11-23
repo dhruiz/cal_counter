@@ -461,7 +461,7 @@ class RecipeTextCodec {
     b
       ..writeln()
       ..writeln('INGREDIENTES:');
-    for (final i in r.ingredientes) {
+    for (final i in r.lineas) {
       b.writeln('- $i');
     }
     final pasos = r.pasos;
@@ -563,12 +563,12 @@ class _RecipeDraft {
     if (name.isEmpty && ingredientes.isEmpty && pasos.isEmpty) return null;
     String? clean(String? s) =>
         (s == null || s.trim().isEmpty) ? null : s.trim();
-    return Recipe(
+    return Recipe.desdeLineas(
       nombre: name.isEmpty ? 'Receta importada $index' : name,
       categoria: clean(categoria),
       porciones: porciones,
       tiempoMin: tiempoMin,
-      ingredientes: List.unmodifiable(ingredientes),
+      lineas: List.unmodifiable(ingredientes),
       elaboracion: pasos.join('\n'),
       notas: clean(notas.join('\n')),
       favorita: favorita,

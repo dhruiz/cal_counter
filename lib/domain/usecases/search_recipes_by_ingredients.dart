@@ -28,7 +28,7 @@ class SearchRecipesByIngredients {
       final faltantes = <String>[];
       var porUsuario = 0;
 
-      for (final linea in recipe.ingredientes) {
+      for (final linea in recipe.lineas) {
         final parsed = parseIngredientLine(linea);
         if (parsed.opcional || parsed.tokens.isEmpty) continue;
         if (availability.coveredByUser(linea)) {

@@ -5,10 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final search = SearchRecipesByIngredients();
 
-  const tortilla = Recipe(
+  final tortilla = Recipe.desdeLineas(
     id: 1,
     nombre: 'Tortilla de patatas',
-    ingredientes: [
+    lineas: [
       '4 huevos',
       '500 g de patatas',
       '1 cebolla (opcional)',
@@ -16,15 +16,15 @@ void main() {
       'Aceite de oliva',
     ],
   );
-  const ensalada = Recipe(
+  final ensalada = Recipe.desdeLineas(
     id: 2,
     nombre: 'Ensalada',
-    ingredientes: ['2 tomates', '1 pepino', '1 cebolla', 'Sal'],
+    lineas: ['2 tomates', '1 pepino', '1 cebolla', 'Sal'],
   );
-  const flan = Recipe(
+  final flan = Recipe.desdeLineas(
     id: 3,
     nombre: 'Flan',
-    ingredientes: ['4 huevos', '500 ml de leche', '150 g de azúcar'],
+    lineas: ['4 huevos', '500 ml de leche', '150 g de azúcar'],
   );
   final all = [ensalada, flan, tortilla];
 

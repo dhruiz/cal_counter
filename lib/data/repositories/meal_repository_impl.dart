@@ -1,125 +1,173 @@
 import 'dart:convert';
 
-import 'dart:typed_data';
 import 'package:csv/csv.dart';
+import 'package:drift/drift.dart';
 import 'package:file_picker/file_picker.dart';
+
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/meal_item.dart';
 import '../../domain/repositories/meal_repository.dart';
-import '../datasources/local_data_source.dart';
+import '../db/app_database.dart';
+import '../db/mappers.dart';
 
+/// Comidas del día sobre Drift.
 class MealRepositoryImpl implements MealRepository {
-  final LocalDataSource localDataSource;
+  final AppDatabase db;
 
-  MealRepositoryImpl(this.localDataSource);
+  MealRepositoryImpl(this.db);
+
+  Meal _meal(ComidaRow r) =>
+      Meal(id: r.id, name: r.nombre, date: parseDay(r.fecha));
 
   @override
-  Future<int> createMeal(String name, DateTime date) async {
-    return await localDataSource.createMeal(name, date);
-  }
+  Future<int> createMeal(String name, DateTime date) => db
+      .into(db.comidas)
+      .insert(ComidasCompanion.insert(nombre: name, fecha: dayKey(date)));
 
   @override
   Future<List<Meal>> getMealsByDate(DateTime date) async {
-    final result = await localDataSource.getMealsByDate(date);
-    return result
-        .map(
-          (e) => Meal(
-            id: e['id'],
-            name: e['nombre'],
-            date: DateTime.parse(e['fecha']),
-          ),
-        )
-        .toList();
+    final rows =
+        await (db.select(db.comidas)
+              ..where((c) => c.fecha.equals(dayKey(date)))
+              ..orderBy([(c) => OrderingTerm.asc(c.id)]))
+            .get();
+    return rows.map(_meal).toList();
   }
+
+  @override
+  Stream<List<MealWithItems>> watchDay(DateTime date) => db
+      .customSelect(
+        'SELECT * FROM comidas WHERE fecha = ? ORDER BY id',
+        variables: [Variable.withString(dayKey(date))],
+        readsFrom: {db.comidas, db.itemsComida},
+      )
+      .map((r) => db.comidas.map(r.data))
+      .watch()
+      .asyncMap((meals) async {
+        if (meals.isEmpty) return const <MealWithItems>[];
+        final ids = meals.map((m) => m.id).toList();
+        final items =
+            await (db.select(db.itemsComida)
+                  ..where((i) => i.comidaId.isIn(ids))
+                  ..orderBy([(i) => OrderingTerm.asc(i.id)]))
+                .get();
+        final byMeal = <int, List<MealItem>>{};
+        for (final i in items) {
+          byMeal.putIfAbsent(i.comidaId, () => []).add(mealItemFromRow(i));
+        }
+        return [
+          for (final m in meals) MealWithItems(_meal(m), byMeal[m.id] ?? []),
+        ];
+      });
 
   @override
   Future<DateTime?> getLastMealDate() async {
-    final dateStr = await localDataSource.getLastMealDate();
-    if (dateStr != null) {
-      return DateTime.parse(dateStr);
-    }
-    return null;
+    final row =
+        await (db.select(db.comidas)
+              ..orderBy([(c) => OrderingTerm.desc(c.fecha)])
+              ..limit(1))
+            .getSingleOrNull();
+    return row == null ? null : parseDay(row.fecha);
   }
 
   @override
-  Future<int> addItemToMeal(MealItem item) async {
-    return await localDataSource.addItemToMeal(item);
-  }
+  Future<int> addItemToMeal(MealItem item) => db
+      .into(db.itemsComida)
+      .insert(
+        ItemsComidaCompanion.insert(
+          comidaId: item.mealId,
+          alimentoId: Value(item.alimentoId),
+          nombre: item.alimento,
+          cantidad: item.cantidad,
+          kcal: item.kcal,
+          proteinas: item.proteinas,
+          grasas: item.grasas,
+          carbohidratos: item.carbohidratos,
+        ),
+      );
 
   @override
   Future<List<MealItem>> getMealItems(int mealId) async {
-    final result = await localDataSource.getMealItems(mealId);
-    return result
-        .map(
-          (e) => MealItem(
-            id: e['id'],
-            mealId: e['comida_id'],
-            alimento: e['alimento'],
-            cantidad: e['cantidad'],
-            grasas: e['grasas'],
-            carbohidratos: e['carbohidratos'],
-            proteinas: e['proteinas'],
-            kcal: e['kCal'],
-          ),
-        )
-        .toList();
+    final rows =
+        await (db.select(db.itemsComida)
+              ..where((i) => i.comidaId.equals(mealId))
+              ..orderBy([(i) => OrderingTerm.asc(i.id)]))
+            .get();
+    return rows.map(mealItemFromRow).toList();
   }
 
   @override
   Future<void> deleteMeal(int id) async {
-    await localDataSource.deleteMeal(id);
+    // Las claves foráneas están activas: sus items se borran en cascada.
+    await (db.delete(db.comidas)..where((c) => c.id.equals(id))).go();
   }
 
   @override
   Future<void> deleteMealItem(int id) async {
-    await localDataSource.deleteMealItem(id);
+    await (db.delete(db.itemsComida)..where((i) => i.id.equals(id))).go();
   }
 
   @override
-  Future<void> updateMealItem(int id, double newCantidad) async {
-    await localDataSource.updateMealItem(id, newCantidad);
+  Future<void> updateMealItem(int id, double newCantidad) {
+    return db.transaction(() async {
+      final item = await (db.select(
+        db.itemsComida,
+      )..where((i) => i.id.equals(id))).getSingleOrNull();
+      if (item == null || newCantidad <= 0) return;
+      // Proporción sobre lo ya guardado: NO se re-consulta el alimento base.
+      final ratio = newCantidad / item.cantidad;
+      await (db.update(db.itemsComida)..where((i) => i.id.equals(id))).write(
+        ItemsComidaCompanion(
+          cantidad: Value(newCantidad),
+          kcal: Value(item.kcal * ratio),
+          grasas: Value(item.grasas * ratio),
+          carbohidratos: Value(item.carbohidratos * ratio),
+          proteinas: Value(item.proteinas * ratio),
+        ),
+      );
+    });
   }
 
   @override
   Future<void> updateMealName(int id, String name) async {
-    await localDataSource.updateMealName(id, name);
+    await (db.update(db.comidas)..where((c) => c.id.equals(id))).write(
+      ComidasCompanion(nombre: Value(name)),
+    );
   }
 
   @override
   Future<bool> hasMealItems() async {
-    return await localDataSource.hasMealItems();
+    final res = await db
+        .customSelect('SELECT EXISTS(SELECT 1 FROM items_comida) AS hay')
+        .getSingle();
+    return res.read<bool>('hay');
   }
 
   @override
   Future<void> clearMealsAndItems() async {
-    await localDataSource.clearMealsAndItems();
+    await db.transaction(() async {
+      await db.delete(db.itemsComida).go();
+      await db.delete(db.comidas).go();
+    });
   }
 
-  @override
-  Future<String> exportMealsByDateCSV(DateTime date) async {
+  /// Contenido del CSV diario (separador TAB).
+  Future<String> buildDayCsv(DateTime date) async {
     final meals = await getMealsByDate(date);
-    List<List<dynamic>> rows = [];
-
-    // Header
-    rows.add([
-      'nombre_comida',
-      'cantidad',
-      'alimento',
-      'grasas',
-      'carbos',
-      'proteinas',
-      'kcal',
-    ]);
-
-    // Track daily totals
-    double totalGrasas = 0;
-    double totalCarbos = 0;
-    double totalProteinas = 0;
-    double totalKcal = 0;
-
-    for (var meal in meals) {
-      final items = await getMealItems(meal.id!);
-      for (var item in items) {
+    final rows = <List<dynamic>>[
+      [
+        'nombre_comida',
+        'cantidad',
+        'alimento',
+        'grasas',
+        'carbos',
+        'proteinas',
+        'kcal',
+      ],
+    ];
+    double g = 0, c = 0, p = 0, k = 0;
+    for (final meal in meals) {
+      for (final item in await getMealItems(meal.id!)) {
         rows.add([
           meal.name,
           item.cantidad.toStringAsFixed(1),
@@ -129,48 +177,36 @@ class MealRepositoryImpl implements MealRepository {
           item.proteinas.toStringAsFixed(1),
           item.kcal.toStringAsFixed(1),
         ]);
-
-        // Accumulate totals
-        totalGrasas += item.grasas;
-        totalCarbos += item.carbohidratos;
-        totalProteinas += item.proteinas;
-        totalKcal += item.kcal;
+        g += item.grasas;
+        c += item.carbohidratos;
+        p += item.proteinas;
+        k += item.kcal;
       }
     }
-
-    // Add totals row
     rows.add([
       '',
       '',
       'Total',
-      totalGrasas.toStringAsFixed(1),
-      totalCarbos.toStringAsFixed(1),
-      totalProteinas.toStringAsFixed(1),
-      totalKcal.toStringAsFixed(1),
+      g.toStringAsFixed(1),
+      c.toStringAsFixed(1),
+      p.toStringAsFixed(1),
+      k.toStringAsFixed(1),
     ]);
+    return const ListToCsvConverter(fieldDelimiter: '\t').convert(rows);
+  }
 
-    String csv = const ListToCsvConverter(fieldDelimiter: '\t').convert(rows);
-
-    final dateStr = date.toIso8601String().split('T')[0];
-    final fileName = 'comidas_$dateStr.csv';
-
-    // Encode CSV string to bytes
+  @override
+  Future<String> exportMealsByDateCSV(DateTime date) async {
+    final csv = await buildDayCsv(date);
     final bytes = Uint8List.fromList(utf8.encode(csv));
-
-    String? outputFile = await FilePicker.saveFile(
+    final out = await FilePicker.saveFile(
       dialogTitle: 'Guardar reporte de comidas',
-      fileName: fileName,
+      fileName: 'comidas_${dayKey(date)}.csv',
       type: FileType.custom,
       allowedExtensions: ['csv'],
       bytes: bytes,
     );
-
-    if (outputFile != null) {
-      // On Android/iOS, saveFile with bytes writes the file.
-      // We don't need to write it again manually, which avoids permission issues.
-      return outputFile;
-    }
-
-    return '';
+    // Con `bytes`, saveFile ya escribe el archivo (SAF en Android).
+    return out ?? '';
   }
 }

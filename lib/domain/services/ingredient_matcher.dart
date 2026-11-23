@@ -131,6 +131,22 @@ Set<String> keyTokens(String text) {
   return out;
 }
 
+/// Variantes equivalentes de una palabra para buscar: ella misma, su
+/// singular y sus sinónimos regionales ("papas" → {papas, papa, patata}).
+Set<String> searchVariants(String word) {
+  final n = normalizeText(word).replaceAll(' ', '');
+  if (n.isEmpty) return const {};
+  final s = singularize(n);
+  final canon = _synonyms[s] ?? s;
+  return {
+    n,
+    s,
+    canon,
+    for (final e in _synonyms.entries)
+      if (e.value == canon) e.key,
+  };
+}
+
 /// Dos ingredientes coinciden si los tokens de uno contienen a los del otro:
 /// "pollo" ↔ "pechuga de pollo", "aceite" ↔ "aceite de oliva".
 bool tokensMatch(Set<String> a, Set<String> b) {

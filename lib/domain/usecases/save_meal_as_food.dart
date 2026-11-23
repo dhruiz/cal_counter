@@ -1,21 +1,20 @@
+import '../entities/food.dart';
 import '../entities/meal_item.dart';
+import '../entities/nutrition_facts.dart';
+import '../errors/domain_errors.dart';
 import '../repositories/food_repository.dart';
-import '../../data/models/food_model.dart';
 
-/// Guarda una comida completa como un alimento en `db_alimentos`.
+/// Guarda una comida completa como un alimento "preparado" del repertorio.
 ///
-/// Toma los valores nutricionales totales de los items (ya escalados a la
-/// cantidad consumida) y el peso total en gramos, y los proratea a "por 100g":
-/// `valorPor100 = total / gramosTotales * 100`. Los valores resultantes se
-/// redondean a 2 decimales.
+/// Toma los valores totales de los items (ya escalados a la cantidad
+/// consumida) y el peso total, y los proratea a "por 100 g":
+/// `valorPor100 = total / gramosTotales * 100`, redondeado a 2 decimales.
 ///
-/// `totalGrams` permite indicar el peso real de la preparación (p. ej. el peso
-/// ya cocinado, que difiere de la suma de los ingredientes crudos). Si es
-/// `null` se usa la suma de los pesos de los items.
+/// `totalGrams` permite indicar el peso real de la preparación (p. ej. ya
+/// cocinada). Si es `null` se usa la suma de los pesos de los items.
 ///
-/// `insertFood` usa `ConflictAlgorithm.replace`, así que un alimento con el
-/// mismo nombre (columna UNIQUE) se sobrescribe. La confirmación de
-/// sobrescritura se decide en la UI antes de llamar aquí.
+/// Con [sobrescribir] = un alimento existente, se ACTUALIZA ese alimento
+/// (conserva su id, sus vínculos y su uso); nunca se borra y reinserta.
 class SaveMealAsFood {
   final FoodRepository repository;
 
@@ -25,13 +24,9 @@ class SaveMealAsFood {
     required String name,
     required List<MealItem> items,
     double? totalGrams,
+    Food? sobrescribir,
   }) async {
-    double summedGrams = 0;
-    double kcal = 0;
-    double fats = 0;
-    double carbs = 0;
-    double proteins = 0;
-
+    double summedGrams = 0, kcal = 0, fats = 0, carbs = 0, proteins = 0;
     for (final item in items) {
       summedGrams += item.cantidad;
       kcal += item.kcal;
@@ -42,21 +37,27 @@ class SaveMealAsFood {
 
     final grams = totalGrams ?? summedGrams;
     if (grams <= 0) {
-      throw Exception('La comida no tiene ingredientes con peso.');
+      throw const ValidationException(
+        'La comida no tiene ingredientes con peso.',
+      );
     }
 
-    final factor = 100.0 / grams;
-    final food = FoodModel(
-      name: name,
-      kcalPer100: _round2(kcal * factor),
-      grasasPer100: _round2(fats * factor),
-      carbsPer100: _round2(carbs * factor),
-      proteinsPer100: _round2(proteins * factor),
+    final nutricion = NutritionFacts.basica(
+      kcal: kcal,
+      proteinas: proteins,
+      grasas: fats,
+      carbohidratos: carbs,
+    ).escalada(100.0 / grams).redondeada();
+
+    final base =
+        sobrescribir ??
+        Food(nombre: name.trim(), tipo: FoodType.preparado);
+    return repository.saveFood(
+      base.copyWith(
+        nombre: name.trim(),
+        nutricion: nutricion,
+        origenNutricion: NutritionSource.calculado,
+      ),
     );
-
-    return await repository.insertFood(food);
   }
-
-  /// Redondea a 2 decimales para no almacenar precisión irreal.
-  double _round2(double v) => (v * 100).roundToDouble() / 100;
 }

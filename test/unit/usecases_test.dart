@@ -1,6 +1,8 @@
 import 'package:cal_counter/domain/entities/food.dart';
 import 'package:cal_counter/domain/entities/meal.dart';
 import 'package:cal_counter/domain/entities/meal_item.dart';
+import 'package:cal_counter/domain/entities/nutrition_facts.dart';
+import 'package:cal_counter/domain/errors/domain_errors.dart';
 import 'package:cal_counter/domain/repositories/meal_repository.dart';
 import 'package:cal_counter/domain/usecases/add_food_to_meal.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,6 +42,9 @@ class MockMealRepository implements MealRepository {
   Future<List<Meal>> getMealsByDate(DateTime date) async => [];
 
   @override
+  Stream<List<MealWithItems>> watchDay(DateTime date) => const Stream.empty();
+
+  @override
   Future<DateTime?> getLastMealDate() async => null;
 
   @override
@@ -61,13 +66,15 @@ void main() {
   });
 
   test('AddFoodToMeal calculates nutrients correctly', () async {
-    final food = Food(
+    const food = Food(
       id: 1,
-      name: 'Test Food',
-      grasasPer100: 10,
-      carbsPer100: 20,
-      proteinsPer100: 30,
-      kcalPer100: 100,
+      nombre: 'Test Food',
+      nutricion: NutritionFacts.basica(
+        grasas: 10,
+        carbohidratos: 20,
+        proteinas: 30,
+        kcal: 100,
+      ),
     );
 
     await addFoodToMeal(
@@ -84,5 +91,31 @@ void main() {
     expect(item.carbohidratos, 30.0); // 20 * 1.5
     expect(item.proteinas, 45.0); // 30 * 1.5
     expect(item.kcal, 150.0); // 100 * 1.5
+  });
+
+  test('AddFoodToMeal no registra un alimento pendiente', () async {
+    const pendiente = Food(id: 2, nombre: 'Yogur nuevo');
+    expect(
+      () => addFoodToMeal(mealId: 1, food: pendiente, quantity: 100),
+      throwsA(isA<ValidationException>()),
+    );
+    expect(mockRepository.items, isEmpty);
+  });
+
+  test('AddFoodToMeal guarda el vínculo y el nombre con marca', () async {
+    const food = Food(
+      id: 7,
+      nombre: 'Leche',
+      marca: 'Vaca',
+      nutricion: NutritionFacts.basica(
+        kcal: 46,
+        proteinas: 3,
+        grasas: 1.5,
+        carbohidratos: 4.7,
+      ),
+    );
+    await addFoodToMeal(mealId: 1, food: food, quantity: 200);
+    expect(mockRepository.items.single.alimentoId, 7);
+    expect(mockRepository.items.single.alimento, 'Leche · Vaca');
   });
 }
