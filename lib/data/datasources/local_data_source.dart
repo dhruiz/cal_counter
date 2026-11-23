@@ -7,10 +7,15 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/food_model.dart';
 import '../../domain/entities/meal_item.dart';
+import 'module_tables.dart';
 
 abstract class LocalDataSource {
+  /// Conexión compartida (singleton). La usan también los data sources de
+  /// recetas, productos y listas de compra, que viven en la misma BD.
+  Future<Database> get database;
   Future<void> initDb();
   Future<List<FoodModel>> searchFoods(String query);
+  Future<FoodModel?> getFoodById(int id);
   Future<int> insertFood(FoodModel food);
   Future<int> updateFood(FoodModel food);
   Future<int> deleteFood(int id);
@@ -40,6 +45,7 @@ class LocalDataSourceImpl implements LocalDataSource {
   static Database? _database;
   final String dbName = 'db_ctrl_calorias.db';
 
+  @override
   Future<Database> get database async {
     if (_database != null) return _database!;
     await initDb();
@@ -116,6 +122,16 @@ class LocalDataSourceImpl implements LocalDataSource {
         kCal REAL NOT NULL
       )
     ''');
+
+    // sqflite no activa `PRAGMA foreign_keys`, así que el ON DELETE CASCADE de
+    // items_comida nunca actuó y versiones anteriores de deleteMeal dejaban
+    // items huérfanos. Limpieza idempotente en cada apertura.
+    await db.execute(
+      'DELETE FROM items_comida WHERE comida_id NOT IN (SELECT id FROM comidas)',
+    );
+
+    // Recetas, productos/compras y listas de compra (module_tables.dart).
+    await createModuleTables(db);
   }
 
   /// Añade [column] a [table] solo si aún no existe (ALTER idempotente).
@@ -141,6 +157,18 @@ class LocalDataSourceImpl implements LocalDataSource {
       whereArgs: ['%$query%'],
     );
     return res.map((e) => FoodModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<FoodModel?> getFoodById(int id) async {
+    final db = await database;
+    final res = await db.query(
+      'db_alimentos',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    return res.isEmpty ? null : FoodModel.fromJson(res.first);
   }
 
   @override
@@ -251,7 +279,12 @@ class LocalDataSourceImpl implements LocalDataSource {
   @override
   Future<void> deleteMeal(int id) async {
     final db = await database;
-    await db.delete('comidas', where: 'id = ?', whereArgs: [id]);
+    // Sin foreign keys activas el CASCADE no actúa: se borran los items de la
+    // comida explícitamente en la misma transacción.
+    await db.transaction((txn) async {
+      await txn.delete('items_comida', where: 'comida_id = ?', whereArgs: [id]);
+      await txn.delete('comidas', where: 'id = ?', whereArgs: [id]);
+    });
   }
 
   @override
@@ -450,7 +483,11 @@ class LocalDataSourceImpl implements LocalDataSource {
   @override
   Future<bool> hasMealItems() async {
     final db = await database;
-    final res = await db.rawQuery('SELECT COUNT(*) AS c FROM items_comida');
+    // Solo cuentan items de comidas existentes (defensa ante huérfanos).
+    final res = await db.rawQuery(
+      'SELECT COUNT(*) AS total FROM items_comida i '
+      'JOIN comidas c ON c.id = i.comida_id',
+    );
     final count = Sqflite.firstIntValue(res) ?? 0;
     return count > 0;
   }

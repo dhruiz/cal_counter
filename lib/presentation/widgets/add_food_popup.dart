@@ -27,12 +27,43 @@ class AddFoodPopup extends ConsumerStatefulWidget {
   final List<Meal> availableMeals;
   final DateTime selectedDate;
 
+  /// Cantidad inicial en gramos (p. ej. la porción de una receta). Si es null
+  /// se sugiere el máximo que cabe en las metas restantes.
+  final double? initialQuantity;
+
   const AddFoodPopup({
     super.key,
     required this.food,
     required this.availableMeals,
     required this.selectedDate,
+    this.initialQuantity,
   });
+
+  /// Abre el popup sobre el día actual del contador (desde recetas o
+  /// productos) y refresca [homeProvider] si se agregó. Devuelve true si se
+  /// agregó.
+  static Future<bool> showForToday(
+    BuildContext context,
+    WidgetRef ref,
+    Food food, {
+    double? initialQuantity,
+  }) async {
+    final homeState = ref.read(homeProvider);
+    final added = await showDialog<bool>(
+      context: context,
+      builder: (_) => AddFoodPopup(
+        food: food,
+        availableMeals: homeState.meals,
+        selectedDate: homeState.selectedDate,
+        initialQuantity: initialQuantity,
+      ),
+    );
+    if (added == true) {
+      await ref.read(homeProvider.notifier).refresh();
+      return true;
+    }
+    return false;
+  }
 
   @override
   ConsumerState<AddFoodPopup> createState() => _AddFoodPopupState();
@@ -54,7 +85,18 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
       // If no meals, we default to creating "Comida_1"
       _isCreatingNewMeal = true;
     }
-    _prefillSuggestedQuantity();
+    final initial = widget.initialQuantity;
+    if (initial != null && initial > 0) {
+      _quantityController.text = initial == initial.roundToDouble()
+          ? initial.toInt().toString()
+          : initial.toString();
+      _quantityController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _quantityController.text.length,
+      );
+    } else {
+      _prefillSuggestedQuantity();
+    }
   }
 
   /// Pre-rellena la cantidad con el máximo de gramos que no supera NINGUNA

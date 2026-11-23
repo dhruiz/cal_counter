@@ -173,4 +173,60 @@ void main() {
     final found = await dataSource.searchFoods('RESET_APPLE');
     expect(found.map((f) => f.name), contains('RESET_APPLE'));
   });
+
+  test(
+    'deleteMeal borra también sus items (sin depender de CASCADE)',
+    () async {
+      await dataSource.initDb();
+      final date = DateTime(2023, 10, 25);
+      final keepId = await dataSource.createMeal('Comida_1', date);
+      final deleteId = await dataSource.createMeal('Comida_2', date);
+      MealItem item(int mealId) => MealItem(
+        mealId: mealId,
+        alimento: 'X',
+        cantidad: 100,
+        grasas: 1,
+        carbohidratos: 1,
+        proteinas: 1,
+        kcal: 10,
+      );
+      await dataSource.addItemToMeal(item(keepId));
+      await dataSource.addItemToMeal(item(deleteId));
+      await dataSource.addItemToMeal(item(deleteId));
+
+      await dataSource.deleteMeal(deleteId);
+
+      final db = await dataSource.database;
+      final rows = await db.query('items_comida');
+      expect(rows.map((r) => r['comida_id']), [keepId]);
+
+      await dataSource.deleteMeal(keepId);
+      expect(await db.query('items_comida'), isEmpty);
+      expect(await dataSource.hasMealItems(), isFalse);
+    },
+  );
+
+  test(
+    'items huérfanos: hasMealItems los ignora y se limpian al abrir',
+    () async {
+      await dataSource.initDb();
+      final db = await dataSource.database;
+      // Simula un huérfano dejado por versiones anteriores de deleteMeal.
+      await db.insert('items_comida', {
+        'comida_id': 999999,
+        'cantidad': 100,
+        'alimento': 'Huérfano',
+        'grasas': 1,
+        'carbohidratos': 1,
+        'proteinas': 1,
+        'kCal': 10,
+      });
+      expect(await dataSource.hasMealItems(), isFalse);
+
+      await dataSource.close();
+      await dataSource.initDb();
+      final reopened = await dataSource.database;
+      expect(await reopened.query('items_comida'), isEmpty);
+    },
+  );
 }

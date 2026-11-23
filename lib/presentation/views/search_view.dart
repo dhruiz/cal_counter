@@ -5,8 +5,12 @@ import '../../core/styles.dart';
 import '../../domain/entities/food.dart';
 import '../providers/search_provider.dart';
 import '../providers/home_provider.dart';
+import '../providers/products_provider.dart';
 import '../widgets/add_food_popup.dart';
+import 'barcode_scanner_view.dart';
 import 'food_form_view.dart';
+import 'food_picker_view.dart';
+import 'product_form_view.dart';
 
 class SearchView extends ConsumerStatefulWidget {
   const SearchView({super.key});
@@ -315,6 +319,102 @@ class _SearchViewState extends ConsumerState<SearchView> {
     }
   }
 
+  /// Abre [AddFoodPopup] y, si se agregó, cierra la búsqueda.
+  Future<void> _openAddPopup(Food food) async {
+    final homeState = ref.read(homeProvider);
+    // Capture navigator before async gap.
+    final navigator = Navigator.of(context);
+
+    final added = await showDialog<bool>(
+      context: context,
+      builder: (_) => AddFoodPopup(
+        food: food,
+        availableMeals: homeState.meals,
+        selectedDate: homeState.selectedDate,
+      ),
+    );
+
+    if (added == true) {
+      if (!mounted) return;
+      navigator.pop(); // Close search view
+    }
+  }
+
+  Future<bool> _confirm(String title, String message, String ok) async {
+    final res = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(ok),
+          ),
+        ],
+      ),
+    );
+    return res == true;
+  }
+
+  /// Registrar ingesta escaneando el envase: busca el producto por código y
+  /// abre el alimento vinculado. Si el producto no existe o no está
+  /// vinculado, ofrece registrarlo/vincularlo en el momento.
+  Future<void> _scanProduct() async {
+    final code = await BarcodeScannerView.scan(
+      context,
+      title: 'Escanear envase',
+    );
+    if (code == null || !mounted) return;
+    final productRepo = ref.read(productRepositoryProvider);
+    var product = await productRepo.getProductByBarcode(code);
+    if (!mounted) return;
+
+    if (product == null) {
+      final create = await _confirm(
+        'Producto no registrado',
+        'El código $code no está en tus productos. ¿Quieres registrarlo y '
+            'vincularlo a un alimento del contador?',
+        'Registrar',
+      );
+      if (!create || !mounted) return;
+      final id = await Navigator.push<int>(
+        context,
+        MaterialPageRoute(builder: (_) => ProductFormView(codigoBarras: code)),
+      );
+      if (id == null || !mounted) return;
+      product = await productRepo.getProduct(id);
+      if (product == null || !mounted) return;
+    }
+
+    final alimentoId = product.alimentoId;
+    Food? food = alimentoId == null
+        ? null
+        : await ref.read(foodRepositoryProvider).getFoodById(alimentoId);
+    if (!mounted) return;
+    if (food == null) {
+      final link = await _confirm(
+        'Sin alimento vinculado',
+        '"${product.nombre}" no está vinculado a ningún alimento del contador. '
+            '¿Quieres elegirlo ahora? La próxima vez bastará con escanear.',
+        'Elegir alimento',
+      );
+      if (!link || !mounted) return;
+      food = await FoodPickerView.pick(context, initialQuery: product.nombre);
+      if (food == null || !mounted) return;
+      await ref
+          .read(productsProvider.notifier)
+          .saveProduct(product.copyWith(alimentoId: food.id));
+      _refreshSearch();
+      if (!mounted) return;
+    }
+    await _openAddPopup(food);
+  }
+
   /// Tile reutilizable para un alimento (resultados de búsqueda y más usados).
   /// En la lista de más usados ([inMostUsed]) se envuelve en un [Dismissible]
   /// para quitarlo de recientes deslizando hacia izquierda o derecha.
@@ -325,25 +425,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
         '${food.kcalPer100} kcal | G: ${food.grasasPer100} | C: ${food.carbsPer100} | P: ${food.proteinsPer100} (por 100g)',
         style: AppStyles.labelText,
       ),
-      onTap: () async {
-        final homeState = ref.read(homeProvider);
-        // Capture navigator before async gap.
-        final navigator = Navigator.of(context);
-
-        final added = await showDialog<bool>(
-          context: context,
-          builder: (_) => AddFoodPopup(
-            food: food,
-            availableMeals: homeState.meals,
-            selectedDate: homeState.selectedDate,
-          ),
-        );
-
-        if (added == true) {
-          if (!mounted) return;
-          navigator.pop(); // Close search view
-        }
-      },
+      onTap: () => _openAddPopup(food),
       onLongPress: () => _showFoodActions(food),
     );
 
@@ -384,6 +466,11 @@ class _SearchViewState extends ConsumerState<SearchView> {
         backgroundColor: AppStyles.primary,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _scanProduct,
+            tooltip: 'Escanear envase',
+          ),
           IconButton(
             icon: const Icon(Icons.storage),
             onPressed: _showDatabaseOptions,
