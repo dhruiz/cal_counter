@@ -15,6 +15,9 @@ abstract class ProductRepository {
   /// Compras de un producto, de la más reciente a la más antigua.
   Future<List<Purchase>> getPurchases(int productoId);
   Future<int> addPurchase(Purchase purchase);
+
+  /// Corrige una compra ya registrada (p. ej. el precio desde el carrito).
+  Future<void> updatePurchase(Purchase purchase);
   Future<void> deletePurchase(int id);
 
   /// Establecimientos usados, del más reciente al más antiguo.

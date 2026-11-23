@@ -117,12 +117,24 @@ class ShoppingLocalDataSourceImpl implements ShoppingLocalDataSource {
     );
   }
 
+  /// Valores al marcar/desmarcar. Desmarcar saca el artículo del carrito
+  /// (precio pagado y vínculo a la compra) pero NO borra la fila de `compras`:
+  /// reutilizar una lista no debe perder historial de precios.
+  static Map<String, Object?> _boughtValues(bool comprado) => comprado
+      ? {'comprado': 1}
+      : {
+          'comprado': 0,
+          'unidades': 1,
+          'precio_pagado': null,
+          'compra_id': null,
+        };
+
   @override
   Future<void> setItemBought(int itemId, bool comprado) async {
     final db = await core.database;
     await db.update(
       'items_lista_compra',
-      {'comprado': comprado ? 1 : 0},
+      _boughtValues(comprado),
       where: 'id = ?',
       whereArgs: [itemId],
     );
@@ -149,7 +161,7 @@ class ShoppingLocalDataSourceImpl implements ShoppingLocalDataSource {
     final db = await core.database;
     await db.update(
       'items_lista_compra',
-      {'comprado': comprado ? 1 : 0},
+      _boughtValues(comprado),
       where: 'lista_id = ?',
       whereArgs: [listaId],
     );

@@ -120,6 +120,12 @@ class FakeProductRepository implements ProductRepository {
   }
 
   @override
+  Future<void> updatePurchase(Purchase purchase) async {
+    final idx = purchases.indexWhere((c) => c.id == purchase.id);
+    if (idx >= 0) purchases[idx] = purchase;
+  }
+
+  @override
   Future<void> deletePurchase(int id) async =>
       purchases.removeWhere((c) => c.id == id);
 
@@ -193,6 +199,9 @@ class FakeShoppingListRepository implements ShoppingListRepository {
           productoId: i.productoId,
           comprado: i.comprado,
           orden: i.orden,
+          unidades: i.unidades,
+          precioPagado: i.precioPagado,
+          compraId: i.compraId,
           precioReferencia: p?.ultimaCompra?.precio,
           establecimientoReferencia: p?.ultimaCompra?.establecimiento,
         ),
@@ -205,33 +214,41 @@ class FakeShoppingListRepository implements ShoppingListRepository {
     return res;
   }
 
-  ShoppingItem _copy(ShoppingItem i, {int? id, bool? comprado}) => ShoppingItem(
-    id: id ?? i.id,
-    listaId: i.listaId,
-    texto: i.texto,
-    cantidad: i.cantidad,
-    productoId: i.productoId,
-    comprado: comprado ?? i.comprado,
-    orden: id ?? i.orden,
-  );
+  /// Copia "como se guardaría": sin datos de referencia.
+  ShoppingItem _stored(ShoppingItem i, {required int id, required int orden}) =>
+      ShoppingItem(
+        id: id,
+        listaId: i.listaId,
+        texto: i.texto,
+        cantidad: i.cantidad,
+        productoId: i.productoId,
+        comprado: i.comprado,
+        orden: orden,
+        unidades: i.unidades,
+        precioPagado: i.precioPagado,
+        compraId: i.compraId,
+      );
+
+  ShoppingItem _setBought(ShoppingItem i, bool comprado) =>
+      i.copyWith(comprado: comprado, limpiarCarrito: !comprado);
 
   @override
   Future<int> addItem(ShoppingItem item) async {
     final id = _nextItem++;
-    items.add(_copy(item, id: id));
+    items.add(_stored(item, id: id, orden: id));
     return id;
   }
 
   @override
   Future<void> updateItem(ShoppingItem item) async {
     final idx = items.indexWhere((i) => i.id == item.id);
-    items[idx] = _copy(item, id: item.id);
+    items[idx] = _stored(item, id: item.id!, orden: items[idx].orden);
   }
 
   @override
   Future<void> setItemBought(int itemId, bool comprado) async {
     final idx = items.indexWhere((i) => i.id == itemId);
-    items[idx] = _copy(items[idx], comprado: comprado);
+    items[idx] = _setBought(items[idx], comprado);
   }
 
   @override
@@ -246,7 +263,7 @@ class FakeShoppingListRepository implements ShoppingListRepository {
   Future<void> setAllBought(int listaId, bool comprado) async {
     for (var k = 0; k < items.length; k++) {
       if (items[k].listaId == listaId) {
-        items[k] = _copy(items[k], comprado: comprado);
+        items[k] = _setBought(items[k], comprado);
       }
     }
   }

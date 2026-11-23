@@ -32,6 +32,10 @@ class ProductRepositoryImpl implements ProductRepository {
       dataSource.addPurchase(purchase);
 
   @override
+  Future<void> updatePurchase(Purchase purchase) =>
+      dataSource.updatePurchase(purchase);
+
+  @override
   Future<void> deletePurchase(int id) => dataSource.deletePurchase(id);
 
   @override

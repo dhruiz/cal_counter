@@ -11,6 +11,7 @@ abstract class ProductLocalDataSource {
   Future<void> deleteProduct(int id);
   Future<List<Purchase>> getPurchases(int productoId);
   Future<int> addPurchase(Purchase purchase);
+  Future<void> updatePurchase(Purchase purchase);
   Future<void> deletePurchase(int id);
   Future<List<String>> getStores();
   Future<int> purgePurchasesBefore(DateTime fecha);
@@ -131,6 +132,17 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   Future<int> addPurchase(Purchase purchase) async {
     final db = await core.database;
     return db.insert('compras', PurchaseModel.toMap(purchase));
+  }
+
+  @override
+  Future<void> updatePurchase(Purchase purchase) async {
+    final db = await core.database;
+    await db.update(
+      'compras',
+      PurchaseModel.toMap(purchase),
+      where: 'id = ?',
+      whereArgs: [purchase.id],
+    );
   }
 
   @override

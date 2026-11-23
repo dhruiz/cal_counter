@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cal_counter/data/datasources/local_data_source.dart';
+import 'package:cal_counter/data/datasources/module_tables.dart';
 import 'package:cal_counter/data/datasources/product_local_data_source.dart';
 import 'package:cal_counter/data/datasources/recipe_local_data_source.dart';
 import 'package:cal_counter/data/datasources/shopping_local_data_source.dart';
@@ -11,6 +12,9 @@ import 'package:cal_counter/domain/entities/product.dart';
 import 'package:cal_counter/domain/entities/recipe.dart';
 import 'package:cal_counter/domain/entities/shopping_list.dart';
 import 'package:cal_counter/domain/usecases/add_ingredients_to_shopping_list.dart';
+import 'package:cal_counter/domain/usecases/add_product_to_cart.dart';
+import 'package:cal_counter/domain/usecases/remove_from_cart.dart';
+import 'package:cal_counter/domain/usecases/update_cart_item.dart';
 import 'package:cal_counter/domain/usecases/export_price_history_csv.dart';
 import 'package:cal_counter/domain/usecases/import_recipes.dart';
 import 'package:cal_counter/domain/usecases/purge_old_purchases.dart';
@@ -278,6 +282,201 @@ void main() {
           ('Patatas', '500 g'),
           ('Huevos', '4'),
         ]);
+      },
+    );
+  });
+
+  group('modo carrito', () {
+    test(
+      'migración añade las columnas del carrito a una tabla antigua',
+      () async {
+        final db = await core.database;
+        await db.execute('DROP TABLE items_lista_compra');
+        await db.execute('''
+        CREATE TABLE items_lista_compra (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          lista_id INTEGER NOT NULL,
+          texto TEXT NOT NULL,
+          cantidad TEXT,
+          producto_id INTEGER,
+          comprado INTEGER NOT NULL DEFAULT 0,
+          orden INTEGER NOT NULL
+        )
+      ''');
+        await db.insert('items_lista_compra', {
+          'lista_id': 1,
+          'texto': 'Antiguo',
+          'orden': 1,
+        });
+        await createModuleTables(db);
+        final cols = (await db.rawQuery(
+          'PRAGMA table_info(items_lista_compra)',
+        )).map((r) => r['name']).toSet();
+        expect(cols, containsAll(['unidades', 'precio_pagado', 'compra_id']));
+        final item = (await shopping.getItems(1)).single;
+        expect(item.unidades, 1);
+        expect(item.precioPagado, isNull);
+      },
+    );
+
+    test('AddProductToCart: marca, registra, suma unidades y crea', () async {
+      final leche = await products.saveProduct(
+        const Product(codigoBarras: '111', nombre: 'Leche entera'),
+      );
+      final cafe = await products.saveProduct(
+        const Product(codigoBarras: '222', nombre: 'Café'),
+      );
+      final lista = await shopping.createList('Súper');
+      // Texto sin vincular que coincide por tokens con el producto.
+      await shopping.addItem(ShoppingItem(listaId: lista, texto: 'Leche'));
+      final add = AddProductToCart(shopping, products);
+      final lecheP = (await products.getProduct(leche))!;
+      final cafeP = (await products.getProduct(cafe))!;
+
+      var item = await add(
+        listaId: lista,
+        producto: lecheP,
+        precio: 1.049,
+        establecimiento: ' Súper  Centro ',
+      );
+      expect(item.texto, 'Leche'); // marcó el artículo existente
+      expect(item.productoId, leche);
+      expect(item.comprado, isTrue);
+      expect(item.precioPagado, 1.05);
+      var compras = await products.getPurchases(leche);
+      expect(compras.single.establecimiento, 'Súper Centro');
+      expect(item.compraId, compras.single.id);
+
+      // Segundo escaneo: más unidades, sin nueva compra; precio corregido.
+      item = await add(
+        listaId: lista,
+        producto: lecheP,
+        precio: 1.10,
+        unidades: 2,
+        establecimiento: 'Súper Centro',
+      );
+      expect(item.unidades, 3);
+      compras = await products.getPurchases(leche);
+      expect(compras.length, 1);
+      expect(compras.single.precio, 1.10);
+
+      // No estaba en la lista: se añade ya comprado.
+      item = await add(
+        listaId: lista,
+        producto: cafeP,
+        precio: 3.2,
+        establecimiento: 'Súper Centro',
+      );
+      final items = await shopping.getItems(lista);
+      expect(items.length, 2);
+      expect(items.every((i) => i.comprado), isTrue);
+      expect(items.firstWhere((i) => i.texto == 'Café').subtotal, 3.2);
+
+      expect(
+        () => add(
+          listaId: lista,
+          producto: cafeP,
+          precio: 0,
+          establecimiento: 'X',
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test(
+      'marcado a mano sin precio: fija las unidades en vez de sumar',
+      () async {
+        final pan = await products.saveProduct(const Product(nombre: 'Pan'));
+        final lista = await shopping.createList('Súper');
+        final id = await shopping.addItem(
+          ShoppingItem(listaId: lista, texto: 'Pan', productoId: pan),
+        );
+        await shopping.setItemBought(id, true);
+        final item = await AddProductToCart(shopping, products)(
+          listaId: lista,
+          producto: (await products.getProduct(pan))!,
+          precio: 1,
+          unidades: 2,
+          establecimiento: 'Panadería',
+        );
+        expect(item.unidades, 2);
+      },
+    );
+
+    test('UpdateCartItem corrige la compra; RemoveFromCart la borra', () async {
+      final leche = await products.saveProduct(const Product(nombre: 'Leche'));
+      final lista = await shopping.createList('Súper');
+      final add = AddProductToCart(shopping, products);
+      final item = await add(
+        listaId: lista,
+        producto: (await products.getProduct(leche))!,
+        precio: 1,
+        establecimiento: 'A',
+        fecha: DateTime(2026, 11, 20),
+      );
+
+      final updated = await UpdateCartItem(shopping, products)(
+        item: item,
+        precio: 1.25,
+        unidades: 4,
+      );
+      expect(updated.subtotal, 5.0);
+      final compra = (await products.getPurchases(leche)).single;
+      expect(compra.precio, 1.25);
+      expect(compra.fecha, DateTime(2026, 11, 20)); // conserva fecha y tienda
+      expect(compra.establecimiento, 'A');
+
+      await RemoveFromCart(shopping, products)(updated);
+      expect(await products.getPurchases(leche), isEmpty);
+      final back = (await shopping.getItems(lista)).single;
+      expect(back.comprado, isFalse);
+      expect(back.precioPagado, isNull);
+      expect(back.unidades, 1);
+    });
+
+    test(
+      'desmarcar todo saca del carrito pero conserva el historial',
+      () async {
+        final leche = await products.saveProduct(
+          const Product(nombre: 'Leche'),
+        );
+        final lista = await shopping.createList('Semana');
+        await AddProductToCart(shopping, products)(
+          listaId: lista,
+          producto: (await products.getProduct(leche))!,
+          precio: 1,
+          unidades: 2,
+          establecimiento: 'A',
+        );
+        await shopping.setAllBought(lista, false);
+        final item = (await shopping.getItems(lista)).single;
+        expect(item.comprado, isFalse);
+        expect(item.precioPagado, isNull);
+        expect(item.compraId, isNull);
+        expect(item.unidades, 1);
+        expect((await products.getPurchases(leche)).length, 1);
+      },
+    );
+
+    test(
+      'artículo sin producto: el precio cuenta pero no va al historial',
+      () async {
+        final lista = await shopping.createList('Mercado');
+        final id = await shopping.addItem(
+          ShoppingItem(listaId: lista, texto: 'Manzanas'),
+        );
+        final item = (await shopping.getItems(
+          lista,
+        )).firstWhere((i) => i.id == id);
+        final updated = await UpdateCartItem(shopping, products)(
+          item: item,
+          precio: 2.4,
+          unidades: 1,
+        );
+        expect(updated.comprado, isTrue);
+        expect(updated.subtotal, 2.4);
+        final db = await core.database;
+        expect(await db.query('compras'), isEmpty);
       },
     );
   });
