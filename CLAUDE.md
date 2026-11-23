@@ -20,6 +20,7 @@ flutter build apk --release                 # build/app/outputs/flutter-apk/app-
 - Tests de base de datos: `memoryDb()` de `test/helpers/test_db.dart` (Drift `NativeDatabase.memory()`, mismo esquema que en el móvil). Sin FFI ni rutas.
 - Tests de widgets: app real con `ProviderScope(overrides: [appDatabaseProvider.overrideWithValue(db)])`. Para leer la base de datos desde un `testWidgets` usar `tester.runAsync(...)`. Al final, `pumpWidget(SizedBox())` para cancelar los streams. Las listas largas necesitan `scrollUntilVisible`.
 - `CartModeView.scannerBuilder` permite sustituir la cámara. `labelRecognizerProvider` permite sustituir el OCR.
+- Entorno sin Flutter (contenedor en la nube): ver `docs/TRASPASO.md` §5 para instalar el SDK. Tras `dart format`, revertir `lib/domain/entities/user_settings.dart` (el formateador lo cambia y no es parte del trabajo).
 
 ## Arquitectura
 
@@ -28,7 +29,7 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
 - **`lib/domain/`**: Dart puro (solo `equatable`). Contiene entidades, interfaces de repositorio (las listas devuelven `Stream`), `TransactionRunner`, servicios puros y casos de uso (cada uno una clase con un único `call(...)`). **No importa nada de `data/`.**
 - **`lib/data/`**:
   - `db/`: esquema Drift en `tables.dart`, `app_database.dart` (+ `.g.dart`) y `mappers.dart`.
-  - `repositories/`: implementaciones Drift.
+  - `repositories/`: implementaciones Drift (alimentos, comidas, recetas, listas, compras, `category_repository_impl` y `scale_repository_impl`).
   - `backup/`: códecs de repertorio, TSV, respaldo completo y `.db` antiguo.
   - `ocr/`: ML Kit.
   - `parsers/`: recetas desde texto.
@@ -58,7 +59,9 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
 - **`ingredientes_receta`**: `texto` original siempre, más `alimento_id`/`cantidad`/`unidad` opcionales (`g`, `ml` o nombre de una porción). Al editar una receta, las líneas con el mismo texto conservan su vínculo.
 - **`items_comida`**: valores **ya escalados** y nombre copiado (histórico), más un `alimento_id` informativo. Editar la cantidad aplica `ratio = nueva/anterior` sobre lo guardado.
 - **Búsqueda**: FTS5 (`alimentos_fts`, triggers) por prefijo, sin tildes, con singular y sinónimos (`searchVariants`). 8–14 dígitos se buscan como código.
-- **Esquema**: cambiarlo exige subir `schemaVersion`, añadir la migración en `MigrationStrategy`, ejecutar `build_runner` y escribir tests.
+- **Categorías** (v2): `categorias` (`nombre` único NOCASE, `orden` general) y `alimentos.categoria_id` (`SET NULL`). `orden_pasillos` (PK tienda + categoría) guarda el orden propio de una tienda; sin filas se usa el general. 13 categorías por defecto (`defaultCategories`), sembradas con `sembrarCategorias`.
+- **Báscula** (v2): `establecimientos.formato_bascula` (`'precio'|'peso'|NULL`) y `longitud_clave` (6 o 7). `codigos_bascula` (único por tienda + `clave`) apunta a la presentación "Al peso" del alimento. `compras.peso_g` es el peso real de la compra.
+- **Esquema actual: v2** (`schemaVersion = 2`). Cambiarlo exige subir `schemaVersion`, añadir la migración en `onUpgrade` (`if (from < N)`), ejecutar `build_runner` y escribir tests. El test de migración v1→v2 parte de `test/fixtures/schema_v1.sql` y compara con una instalación nueva.
 
 ## Lógica de negocio crítica
 
@@ -74,7 +77,19 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
   - Respaldo completo (`cal_counter/respaldo`) que reemplaza todo y guarda antes una copia automática.
   - TSV ampliado; acepta la cabecera antigua de 6 columnas.
   - `.db` antiguo (`LegacyData`) y migración de la instalación anterior (`MigrateLegacyData`), sin tocar el archivo original.
-  - Los formatos ya compartidos no deben romperse.
+  - Los formatos ya compartidos no deben romperse: solo campos **añadidos y opcionales**.
+  - **La categoría viaja por nombre**, nunca por id: campo `categoria` del repertorio (se crea en destino si no existe; un alimento local solo la toma si no tenía), columna final `categoria` del TSV y tablas `categorias`/`orden_pasillos`/`codigos_bascula` en el respaldo. Al restaurar un respaldo v1 se resiembran las categorías y se reclasifican los alimentos.
+- **Categorías y pasillos** (`category_guesser.dart`, `aisle_grouping.dart`, `CategoryRepository`):
+  - `FoodRepository.saveFood(food, {adivinarCategoria = true})` asigna al insertar la categoría de `guessCategoryName` si `categoriaId` es null. El formulario pasa `adivinarCategoria: false` (muestra la sugerencia y decide el usuario).
+  - Filtro: `search`/`watchSearch(categoriaId:)`; `kSinCategoria = 0` = sin categoría.
+  - `groupByAisle`: un artículo vinculado usa la categoría de su alimento, el texto libre se clasifica por nombre y "Otros" va al final. Listas y "Te falta" del modo carrito se agrupan así.
+  - Gasto por categoría: `PurchaseRepository.spendingByCategory(desde)`.
+- **Etiquetas de báscula** (`scale_barcode.dart`, `scale_labels.dart`, `ScaleRepository`): EAN-13 con prefijo `2`. Clave = 7 primeros dígitos (6 si la tienda lleva dígito de control del precio en la 7ª); valor = cifras 8–12, importe en céntimos o peso en gramos según la tienda.
+  - Se aprende **por tienda**: formato (primera etiqueta), producto (`LinkScaleCode` → presentación "Al peso") y clave de 6 (`useShortKeys`, si dos bandejas solo difieren en la cifra 7 y el usuario confirma).
+  - Formato peso: importe = peso × último €/kg (`lastPricePerKiloCent`); la primera vez se pide.
+  - `AddToCart(alPeso: true, pesoG:)` acumula varios paquetes en una sola compra (importe y peso sumados, 1 unidad). `PurchaseRecord.precioPorKiloCent` usa `peso_g` si existe.
+  - En casa, `FoodFlows.scanAtHome` la reconoce en cualquier tienda y con formato peso precarga los gramos.
+  - **Un código de báscula nunca se guarda como `codigo_barras`** de una presentación.
 - **Catálogo base**: `assets/semilla/alimentos_base.json` (678 alimentos, uuid v5 determinista).
 - **OCR**: `NutritionLabelParser` (Dart puro, con tests) y `MlKitLabelRecognizer`. Los valores se revisan (`LabelReviewSheet`) y pasan al formulario: **nunca se guardan sin confirmar**.
 - **Precios**: mostrar con `AppUtils.formatPrecioCent` ("1,05 €"); campos con `suffixText: '€'`; leer con `parsePrecioCent` (coma o punto).
@@ -91,4 +106,5 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
 
 - **Idioma español** en la interfaz, columnas de la base de datos, claves de SharedPreferences y comentarios. No mezclar idiomas. Nombres de clases en inglés (`Food`, `Recipe`...), campos en español.
 - Al añadir campos a `UserSettings`: añadir su clave en `SettingsRepositoryImpl` tanto en `getSettings()` (con default de `UserSettings.initial()`) como en `saveSettings()`.
-- Tema global solo vía `themeProvider`; estilos centralizados en `lib/core/styles.dart` (`AppStyles`). Avisos con `InfoBanner` y alimentos con `FoodTile`/`PendingChip` (`widgets/food_widgets.dart`).
+- Tema global solo vía `themeProvider`; estilos centralizados en `lib/core/styles.dart` (`AppStyles`). Avisos con `InfoBanner` y alimentos con `FoodTile`/`PendingChip` (`widgets/food_widgets.dart`). Categorías con `CategoryDropdown`/`pickCategory` (`widgets/category_widgets.dart`).
+- **Diálogos con campos de texto: usar `DialogControllers`** (`widgets/dialog_controllers.dart`). Liberar un `TextEditingController` justo después de `await showDialog` provoca "used after being disposed" mientras el diálogo aún se cierra.

@@ -30,11 +30,14 @@ Cuatro pestañas (`MainShell`, `NavigationBar` + `IndexedStack`):
 | Pestaña | Contenido |
 |---|---|
 | **Calorías** | Anillos de kcal, grasas, carbohidratos y proteínas frente a los objetivos; *Agregar ingesta* (buscar por texto o escanear) y *Gestionar día* (editar cantidades, renombrar, guardar una comida como alimento, exportar el día). |
-| **Alimentos** | El repertorio: búsqueda sin tildes o por código de barras, filtros (pendientes, envasados, genéricos, preparados, archivados), insignia con los **pendientes de completar** y ficha de cada alimento (tabla nutricional, porciones caseras, presentaciones y códigos, precios por tienda y €/kg, recetas que lo usan). |
+| **Alimentos** | El repertorio: búsqueda sin tildes o por código de barras, filtros (pendientes, envasados, genéricos, preparados, archivados) y **filtro por categoría**, insignia con los **pendientes de completar** y ficha de cada alimento (tabla nutricional, categoría, porciones caseras, presentaciones y códigos, precios por tienda y €/kg, recetas que lo usan). |
 | **Recetas** | Búsqueda por los ingredientes que tienes; ingredientes vinculados a alimentos con cantidad → **nutrición calculada** por porción y por 100 g, con la lista de lo que falta para calcularla y una acción directa para cada cosa; modo cocina; importar desde texto/plantilla/JSON/CSV. |
-| **Compras** | Listas de compra con precio de referencia, **modo carrito** (escanear lo que metes en el carrito con total en vivo) e historial de precios exportable. |
+| **Compras** | Listas de compra con precio de referencia y **agrupadas por pasillos** (orden general o el de una tienda), **modo carrito** (escanear lo que metes en el carrito con total en vivo, incluidas las **etiquetas de báscula** de los frescos al peso) e historial de precios exportable con el **gasto por categoría**. |
 
-**Ajustes → Datos y respaldos**: compartir el repertorio, respaldo completo, TSV, importar `.db` antiguos y añadir el catálogo base.
+**Ajustes**:
+
+- **Datos y respaldos**: compartir el repertorio, respaldo completo, TSV, importar `.db` antiguos y añadir el catálogo base.
+- **Categorías y pasillos**: crear, renombrar, borrar y ordenar las categorías arrastrando; orden general u orden propio de cada tienda.
 
 ---
 
@@ -71,11 +74,13 @@ lib/
   core/            estilos (AppStyles), utilidades (formato de precios y números), constantes
   domain/          Dart puro (solo equatable)
     entities/      Food, FoodPortion, FoodPackage, NutritionFacts, Purchase, Store,
-                   ShoppingList/Item, Recipe/RecipeIngredient, Meal/MealItem,
+                   Category, ShoppingList/Item, Recipe/RecipeIngredient, Meal/MealItem,
                    Repertoire, UserSettings…
     repositories/  interfaces (las listas devuelven Stream) + TransactionRunner
+                   (incluye CategoryRepository y ScaleRepository)
     services/      barcode (GTIN), money (céntimos), quantity_parser, nutrition_calculator,
-                   nutrition_label_parser (OCR), ingredient_matcher, cart_matching, dates
+                   nutrition_label_parser (OCR), ingredient_matcher, cart_matching,
+                   category_guesser, aisle_grouping, scale_barcode, dates
     usecases/      una clase con un único call(...) por acción
   data/
     db/            tables.dart (esquema Drift), app_database.dart (+ .g.dart), mappers.dart
@@ -85,7 +90,7 @@ lib/
     parsers/       recipe_text_codec (importar recetas desde texto)
   presentation/
     providers/     core_providers.dart (BD, repositorios, casos de uso) y uno por módulo
-    views/, widgets/
+    views/, widgets/  (dialog_controllers: controladores de texto de los diálogos)
 ```
 
 - **Un solo punto de creación de la base de datos**: `appDatabaseProvider` (en `core_providers.dart`), que la cierra al desecharse. En tests se sustituye por una en memoria con `ProviderScope(overrides: [appDatabaseProvider.overrideWithValue(db)])`.
@@ -98,9 +103,13 @@ lib/
 
 ## Modelo de datos
 
-Esquema v1 (`lib/data/db/tables.dart`). Las **claves foráneas están activas** (`PRAGMA foreign_keys = ON` en cada apertura). Los días se guardan como `TEXT 'YYYY-MM-DD'`, las marcas de tiempo en ISO 8601 y el dinero en **céntimos** (`INTEGER`).
+Esquema **v2** (`lib/data/db/tables.dart`, `schemaVersion = 2`). Las **claves foráneas están activas** (`PRAGMA foreign_keys = ON` en cada apertura). Los días se guardan como `TEXT 'YYYY-MM-DD'`, las marcas de tiempo en ISO 8601 y el dinero en **céntimos** (`INTEGER`).
 
 ```
+categorias ──< orden_pasillos >── establecimientos ──< codigos_bascula >── presentaciones
+    │
+    │ categoria_id (SET NULL)
+    ▼
 alimentos ──< porciones
     │  └────< presentaciones (código de barras) ──< compras >── establecimientos
     │                                                 ▲
@@ -111,11 +120,14 @@ alimentos ──< porciones
 
 | Tabla | Qué guarda |
 |---|---|
-| `alimentos` | El repertorio. `uuid` único (identidad para compartir), `nombre` + `marca` (únicos juntos, sin distinguir mayúsculas; marca `''` = genérico), `tipo` (`generico`/`envasado`/`preparado`), `unidad` (`g`/`ml`). Tabla nutricional **por 100 g/ml** con 8 nutrientes (`kcal`, `proteinas`, `grasas`, `grasas_saturadas`, `carbohidratos`, `azucares`, `fibra`, `sal`); **`NULL` = desconocido** (no es lo mismo que 0). `nutricion_origen` (`manual`, `etiqueta_ocr`, `importado`, `calculado`), `uso_count`/`ultimo_uso` (lista de "más usados"), `archivado`. |
+| `categorias` | Secciones del súper (v2): `nombre` único sin distinguir mayúsculas y `orden` general de los pasillos. Al instalar (y al migrar desde v1) se crean 13 por defecto: Frutas y verduras, Panadería, Carnicería, Pescadería, Charcutería y quesos, Lácteos y huevos, Despensa, Desayuno y dulces, Bebidas, Congelados, Platos preparados, Limpieza, Higiene y cuidado personal. |
+| `alimentos` | El repertorio. `uuid` único (identidad para compartir), `nombre` + `marca` (únicos juntos, sin distinguir mayúsculas; marca `''` = genérico), `tipo` (`generico`/`envasado`/`preparado`), `unidad` (`g`/`ml`), `categoria_id` (v2, opcional, `SET NULL` al borrar la categoría). Tabla nutricional **por 100 g/ml** con 8 nutrientes (`kcal`, `proteinas`, `grasas`, `grasas_saturadas`, `carbohidratos`, `azucares`, `fibra`, `sal`); **`NULL` = desconocido** (no es lo mismo que 0). `nutricion_origen` (`manual`, `etiqueta_ocr`, `importado`, `calculado`), `uso_count`/`ultimo_uso` (lista de "más usados"), `archivado`. |
 | `porciones` | Equivalencias caseras: "1 diente = 5 g", "1 vaso = 250 ml". Sirven para registrar rápido y para calcular recetas con "2 dientes de ajo". |
-| `presentaciones` | Formato comercial de un alimento: `codigo_barras` (GTIN normalizado, único, `NULL` = granel), `descripcion` ("Brick 1 L"), `contenido` neto (para el precio por kg o litro). Un alimento puede tener varias. |
-| `establecimientos` | Tiendas, sin duplicados por mayúsculas. |
-| `compras` | Historial de precios: presentación, tienda, fecha, `precio_cent` unitario y `unidades`. `ON DELETE RESTRICT`: una presentación con compras no se borra, se archiva. |
+| `presentaciones` | Formato comercial de un alimento: `codigo_barras` (GTIN normalizado, único, `NULL` = granel), `descripcion` ("Brick 1 L"), `contenido` neto (para el precio por kg o litro). Un alimento puede tener varias. Los frescos de báscula usan una presentación **"Al peso"** sin código. |
+| `establecimientos` | Tiendas, sin duplicados por mayúsculas. v2: `formato_bascula` (`'precio'`, `'peso'` o `NULL` = aún sin aprender) y `longitud_clave` (6 o 7, por defecto 7) de sus etiquetas de báscula. |
+| `orden_pasillos` | Orden propio de los pasillos de una tienda (v2). PK `establecimiento_id + categoria_id`, `orden`. Sin filas, la tienda usa el orden general de `categorias`. |
+| `codigos_bascula` | Etiquetas de báscula aprendidas (v2): en cada tienda, la `clave` (parte fija del código) apunta a una `presentacion_id`. Única por tienda + clave. |
+| `compras` | Historial de precios: presentación, tienda, fecha, `precio_cent` unitario y `unidades`. v2: `peso_g` (peso real de la compra, para el €/kg de los frescos al peso). `ON DELETE RESTRICT`: una presentación con compras no se borra, se archiva. |
 | `listas_compra` / `items_lista` | Listas y artículos (`alimento_id` opcional, `texto`, `cantidad`, `comprado`). En el carrito, `compra_id` apunta a la compra: unidades y precio se leen de ella, **no se copian**. |
 | `recetas` / `ingredientes_receta` | Receta (`uuid`, porciones, `peso_final_g` cocinado, `alimento_id` del alimento "preparado" que la representa) e ingredientes: `texto` original siempre, más `alimento_id`, `cantidad` y `unidad` (`g`, `ml` o nombre de una porción) opcionales. |
 | `comidas` / `items_comida` | Registro del día. Los items guardan el nombre y los macros **ya escalados** (histórico inmutable) y un `alimento_id` informativo. |
@@ -130,6 +142,13 @@ alimentos ──< porciones
 - **Códigos de barras**: se normalizan antes de guardar o buscar (solo dígitos; UPC-A de 12 → EAN-13 con un 0 delante). Se valida el dígito de control, pero se permite guardar un código que no cuadre (códigos internos de tienda).
 - **Búsqueda**: FTS5 por prefijo de palabra, sin tildes, con singular y sinónimos regionales (`papas` → patata). Si lo escrito son 8–14 dígitos, se busca por código.
 - **Purga del historial**: al abrir la app (y antes de exportarlo) se borran las compras de más de 3 meses, **salvo la última de cada presentación**.
+- **Categoría automática**: al insertar un alimento sin categoría, `FoodRepositoryImpl.saveFood` le asigna la que sugiere su nombre (`guessCategoryName`). El formulario pasa `adivinarCategoria: false` porque ya muestra la sugerencia en vivo y el usuario decide. Borrar una categoría deja sus alimentos sin categoría.
+- **Códigos de báscula**: un EAN-13 que empieza por `2` (`isVariableMeasure`) **nunca** se guarda como `codigo_barras` de una presentación; se guarda su clave en `codigos_bascula`, ligada a la tienda.
+
+### Migraciones
+
+- **v1 → v2** (`onUpgrade`, `from < 2`): crea `categorias`, `orden_pasillos` y `codigos_bascula`; añade `alimentos.categoria_id`, `establecimientos.formato_bascula`, `establecimientos.longitud_clave` y `compras.peso_g`; crea los índices nuevos; siembra las categorías por defecto (`sembrarCategorias`) y clasifica los alimentos existentes por su nombre (`clasificarAlimentos`). `onCreate` siembra las categorías igual. Las claves foráneas se desactivan durante la migración y se reactivan en `beforeOpen`.
+- El test de migración parte de un volcado del esquema v1 con datos (`test/fixtures/schema_v1.sql`) y compara el resultado con una instalación nueva.
 
 ---
 
@@ -141,6 +160,8 @@ alimentos ──< porciones
 |---|---|---|
 | Modo carrito / lista (**tienda**) | Ficha de precio | Aviso **"Producto no registrado"** y alta mínima: nombre, marca, presentación, contenido y precio. Crea un alimento **pendiente**, su presentación y la compra en una transacción (`RegisterFoodInStore`). **Nunca pide la tabla nutricional.** También permite "Es otra presentación de uno que ya tengo". |
 | Agregar ingesta, Alimentos, vincular ingrediente (**casa**) | Abre o usa el alimento; si está pendiente, ofrece completarlo | Alta completa con tabla nutricional (y lectura de etiqueta) u "otra presentación de…" (`FoodFlows.foodForBarcode`) |
+| Etiqueta de báscula en el **modo carrito** | Importe leído o calculado con el €/kg (ver [Etiquetas de báscula](#etiquetas-de-báscula-frescos-al-peso)) | Se elige o crea el alimento y la tienda aprende la etiqueta |
+| Etiqueta de báscula en **casa** (`FoodFlows.scanAtHome`) | Se reconoce en cualquier tienda (`findAnyStore`); si la tienda usa formato peso, "Agregar ingesta" precarga los gramos | Aviso "aún sin aprender: escanéala una vez en el modo carrito" y se elige el alimento a mano. No se da de alta ningún código |
 
 Siempre se puede escribir el código a mano.
 
@@ -151,7 +172,36 @@ Siempre se puede escribir el código a mano.
 - Desmarcar quita `compra_id` y conserva la compra. "Quitar del carrito" borra la compra.
 - Total del carrito = Σ unidades × precio de las compras enlazadas.
 - Un pendiente sin vincular ("Fruta") se mete en el carrito eligiendo o creando su alimento: todo lo que se compra entra en el repertorio.
+- **Al peso** (`AddToCart(alPeso: true, pesoG:)`): varios paquetes del mismo producto se acumulan en **una sola compra** (importe y peso sumados, 1 unidad). `PurchaseRecord.precioPorKiloCent` usa `compras.peso_g` si existe y, si no, el contenido de la presentación.
+- La sección "Te falta" se agrupa por pasillos con el orden de la tienda actual.
 - Al terminar se avisa de los productos nuevos que quedaron sin tabla nutricional.
+
+### Categorías y orden de pasillos
+
+- **Sugerencia por nombre** (`category_guesser.dart`): cada categoría por defecto tiene palabras clave y frases. Las frases tienen prioridad sobre las palabras sueltas; entre palabras gana la categoría con más coincidencias y, a igualdad, la de la palabra que aparece antes en el nombre ("Leche de coco" → Lácteos y huevos).
+- **Agrupar por pasillos** (`groupByAisle`, en `aisle_grouping.dart`): un artículo vinculado usa la categoría de su alimento; uno de texto libre se clasifica por su nombre; lo que no encaja va a "Otros", al final. Dentro de cada grupo se respeta el orden de la lista.
+- **Orden general y por tienda** (`CategoryRepository`): `reorder` guarda el orden general o el de una tienda; `resetStoreOrder` vuelve al general.
+- **Dónde se ve**:
+  - **Categorías y pasillos** (`CategoriesView`): reordenar arrastrando, selector "General / tienda", crear, renombrar, borrar y "Usar el general". Se abre desde Ajustes y desde el menú de la lista.
+  - Formulario de alimento: categoría sugerida en vivo. Ficha: chip para cambiarla (`pickCategory`, `CategoryDropdown` en `widgets/category_widgets.dart`).
+  - Pestaña Alimentos: chip de filtro por categoría (`kSinCategoria = 0` muestra los que no tienen).
+  - Lista de compra: "Agrupar por pasillos" y "Ordenar por los pasillos de…" una tienda.
+  - Historial de precios: tarjeta **"Gasto por categoría"** de los últimos 30 días o 3 meses (`PurchaseRepository.spendingByCategory`).
+
+### Etiquetas de báscula (frescos al peso)
+
+Una etiqueta de báscula es un EAN-13 que empieza por `2` (`ScaleLabel.parse`, en `scale_barcode.dart`):
+
+- **Clave** (identifica el producto en la tienda): los primeros 7 dígitos, o 6 si la tienda usa un dígito de control del precio en la posición 7.
+- **Valor**: siempre las cifras 8 a 12. Según la tienda es el **importe** en céntimos o el **peso** en gramos.
+
+El mismo código significa cosas distintas en tiendas distintas, así que formato y productos se **aprenden por tienda** (`ScaleRepository`). En el modo carrito (`CartModeView._onScaleLabel`):
+
+1. Primera etiqueta de una tienda: pregunta "¿importe X € o peso Y kg?" y guarda el formato (`setScaleFormat`).
+2. Producto desconocido: se elige o crea con `FoodPickerView` y `LinkScaleCode` lo asocia a su presentación "Al peso" (creada si no existe).
+3. Si otra bandeja difiere solo en la cifra 7, pregunta si es el mismo producto. Con un "sí", la tienda pasa a claves de 6 dígitos (`useShortKeys`, que recorta las claves ya aprendidas).
+4. Formato peso: importe = peso × último €/kg de esa presentación en la tienda (`lastPricePerKiloCent`, `priceForWeight`). La primera vez se pide el importe.
+5. `CartPriceSheet(alPeso: true)` pide el "Importe del paquete" sin unidades, y la compra se registra con su `peso_g`.
 
 ### Recetas conectadas (`nutrition_calculator.dart`, `recipe_food.dart`)
 
@@ -176,14 +226,16 @@ Todo se guarda y se abre con el selector del sistema (SAF en Android, sin permis
 
 | Formato | Contenido | Al importar |
 |---|---|---|
-| **Repertorio** `.json` (`RepertoireCodec`) | Alimentos con porciones y presentaciones; recetas opcionales (con los ingredientes vinculados por `uuid`). **Sin datos personales**: ni comidas, ni compras, ni precios, ni uso, ni ajustes. | **Fusiona** (`ImportRepertoire`) |
-| **Respaldo completo** `.json` (`FullBackupService`) | Todas las tablas tal cual + ajustes (SharedPreferences) | **Reemplaza** todo, en una transacción, después de guardar una copia automática del estado actual (`respaldo_automatico_*.json` en documentos) |
-| **TSV** (`FoodsTsvCodec`) | `uuid nombre marca tipo unidad codigos kcal grasas grasas_saturadas carbohidratos azucares fibra proteinas sal` (TAB; celdas vacías = desconocido) | Fusiona. **También acepta la cabecera antigua** `id alimento kCal grasas carbohidratos proteinas` |
+| **Repertorio** `.json` (`RepertoireCodec`) | Alimentos con porciones, presentaciones y categoría (por nombre); recetas opcionales (con los ingredientes vinculados por `uuid`). **Sin datos personales**: ni comidas, ni compras, ni precios, ni uso, ni ajustes. | **Fusiona** (`ImportRepertoire`) |
+| **Respaldo completo** `.json` (`FullBackupService`) | Todas las tablas tal cual (incluidas `categorias`, `orden_pasillos` y `codigos_bascula`) + ajustes (SharedPreferences) | **Reemplaza** todo, en una transacción, después de guardar una copia automática del estado actual (`respaldo_automatico_*.json` en documentos). Un respaldo anterior a v2 se restaura y después se siembran las categorías y se clasifican los alimentos |
+| **TSV** (`FoodsTsvCodec`) | `uuid nombre marca tipo unidad codigos kcal grasas grasas_saturadas carbohidratos azucares fibra proteinas sal categoria` (TAB; celdas vacías = desconocido) | Fusiona. Acepta archivos sin la columna `categoria` y **también la cabecera antigua** `id alimento kCal grasas carbohidratos proteinas` |
 | **`.db` antiguo** (`LegacyData`) | `db_alimentos` de versiones anteriores | Fusiona los alimentos |
 | Recetas `.txt`/JSON/CSV (`RecipeTextCodec`) | Recetas sueltas | Omite las que ya existen por nombre |
 | CSV diario / historial de precios | Exportación (TAB, extensión `.csv`) | — |
 
-Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, "exportado", "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "nutricion": {..., "origen"}, "porciones": [...], "presentaciones": [...]}], "recetas": [...]}`. Los campos desconocidos se ignoran y las versiones mayores más nuevas se rechazan con un mensaje claro.
+Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, "exportado", "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "categoria", "nutricion": {..., "origen"}, "porciones": [...], "presentaciones": [...]}], "recetas": [...]}`. Los campos desconocidos se ignoran y las versiones mayores más nuevas se rechazan con un mensaje claro.
+
+**Categorías en el intercambio**: viajan siempre **por nombre**, nunca por id. `categoria` es un campo opcional (añadido sin cambiar la versión del formato); si la categoría no existe en el destino, se crea. Al fusionar, un alimento local conserva su categoría y solo toma la importada si no tenía ninguna.
 
 **Fusión** (`ImportRepertoire`, todo en una transacción y con vista previa):
 
@@ -287,10 +339,18 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
   - respaldo completo
   - lectura del `.db` de la v1.2 (`test/fixtures/`) y migración completa de una instalación antigua
 - `test/unit/nutrition_label_parser_test.dart`: 14 etiquetas: una y dos columnas, ruido de OCR, solo kJ, multilingüe, ración, sodio, trazas, incoherencias, agrupación por geometría y peso neto.
+- `test/unit/phase7_test.dart`:
+  - adivinador de categorías e instalación nueva con categorías
+  - **migración v1 → v2 con datos** (desde `test/fixtures/schema_v1.sql`, comparando el esquema con una instalación nueva)
+  - asignación automática, filtro por categoría, orden por tienda, crear/renombrar/borrar categorías
+  - agrupación por pasillos y gasto por categoría
+  - categoría en repertorio, TSV y respaldo
+  - etiquetas de báscula: parseo, lectura, aprendizaje por tienda, carrito acumulado y clave de 6 dígitos
 - `test/widget/`:
   - `modules_smoke_test.dart`: recorre la app real sobre una base de datos en memoria: alimentos, agregar ingesta, recetas con vinculación automática, compras y modo carrito con cámara simulada.
   - `onboarding_test.dart`: primer arranque.
   - `label_review_test.dart`: revisión de la lectura de etiquetas.
+  - `phase7_widget_test.dart`: lista agrupada por pasillos, categoría sugerida y filtro; flujo completo de báscula en el modo carrito; pantalla de categorías.
 - Integración continua (`.github/workflows/ci.yml`): `flutter analyze` y `flutter test` en cada push y pull request.
 
 ---
@@ -314,6 +374,9 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 15. **Idioma español** en la interfaz, en las columnas de la base de datos, en las claves de SharedPreferences y en los comentarios.
 16. **`UserSettings`**: cada campo nuevo necesita su clave en `SettingsRepositoryImpl.getSettings()` (con valor por defecto) y en `saveSettings()`.
 17. **Tema** solo con `themeProvider`. Estilos centralizados en `AppStyles`.
+18. **Códigos de báscula**: un EAN-13 con prefijo `2` nunca se guarda como `codigo_barras` de una presentación. Su clave va en `codigos_bascula`, por tienda.
+19. **Categorías por nombre** en repertorios, TSV y respaldos; nunca por id.
+20. **Diálogos con campos de texto**: crear los controladores con `DialogControllers` (`widgets/dialog_controllers.dart`). Liberarlos justo después de `await showDialog` provoca "used after being disposed" mientras el diálogo aún se cierra.
 
 \*\*
 NOTA PERSONAL:

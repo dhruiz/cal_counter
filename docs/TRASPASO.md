@@ -3,6 +3,12 @@
 > Documento para continuar el trabajo en otra sesión. Fecha: 2026-11-23.
 > Rama: `claude/database-tables-recipes-kyqj0h`. Léelo junto con `CLAUDE.md`,
 > `README.md` y `docs/PLAN_REDISENO_BD.md`.
+>
+> **Actualización (sesión siguiente):** la fase 7 ya está documentada,
+> verificada y subida a la rama `claude/traspaso-md-continuation-77gbi5`, que
+> continúa `claude/database-tables-recipes-kyqj0h` sin reescribir su historia.
+> No queda nada pendiente de este plan (ver §4). Las secciones 5 y 6 siguen
+> vigentes para preparar el entorno y respetar las decisiones.
 
 ## 1. Contexto
 
@@ -16,7 +22,7 @@ Fases y estado:
 | Fase | Contenido | Estado |
 |---|---|---|
 | 0–6 | Drift + esquema v1, repertorio, compras, recetas, import/export, migración, OCR | ✅ Hecho, commit y push (último: `8fa48b1`) |
-| **7** | **Categorías y orden de pasillo + etiquetas de báscula (peso/precio variable)** | 🟡 **Código y tests terminados, falta documentar, commit y push** |
+| **7** | **Categorías y orden de pasillo + etiquetas de báscula (peso/precio variable)** | ✅ Código y tests (`2872624`), documentación en el commit siguiente |
 
 El usuario pidió explícitamente la fase 7 completa ("haz ambas").
 
@@ -128,9 +134,17 @@ Liberar un `TextEditingController` justo después de `await showDialog` provoca 
   - flujo completo de báscula en el modo carrito
   - pantalla de categorías
 
-## 4. Lo que falta (en orden)
+## 4. Lo que faltaba (todo hecho en la sesión siguiente)
 
-1. **Documentar la fase 7**:
+Pendiente de verdad, fuera de este contenedor:
+
+- **Probar un APK real** en el móvil. Aquí no hay SDK de Android porque
+  `dl.google.com` está bloqueado.
+- Crear un PR solo si el usuario lo pide.
+
+Lista original, ya completada:
+
+1. ✅ **Documentar la fase 7**:
    - `README.md`:
      - Tabla de pestañas/funciones: categorías y pasillos, báscula.
      - Modelo de datos: tablas y columnas v2.
@@ -140,8 +154,8 @@ Liberar un `TextEditingController` justo después de `await showDialog` provoca 
      - Reglas: no guardar códigos de báscula como `codigo_barras`; usar `DialogControllers`.
    - `CLAUDE.md`: resumir lo anterior en "Modelo de datos (claves)" y "Lógica de negocio crítica". Añadir `category_repository`, `scale_repository` y `DialogControllers`. El esquema actual es **v2**.
    - `docs/PLAN_REDISENO_BD.md`: marcar la fase 7 como implementada; quitar la nota de "Fase 7 pendiente" de la cabecera.
-2. `flutter analyze` y `flutter test`. Commit (ver mensaje sugerido en §7) y `git push -u origin claude/database-tables-recipes-kyqj0h`.
-3. Responder al usuario con un resumen en español. Recordarle que **sigue sin probarse un APK real**: en el contenedor no hay SDK de Android, porque `dl.google.com` está bloqueado.
+2. ✅ `flutter analyze` y `flutter test`. Commit y push (a `claude/traspaso-md-continuation-77gbi5`, la rama asignada a la sesión siguiente).
+3. ✅ Responder al usuario con un resumen en español. Recordarle que **sigue sin probarse un APK real**: en el contenedor no hay SDK de Android, porque `dl.google.com` está bloqueado.
 4. El usuario **no ha pedido PR**. No crear PR salvo que lo pida.
 
 ## 5. Preparar el entorno en una sesión nueva

@@ -1,14 +1,15 @@
 # Plan de rediseño: `alimentos` como núcleo de la aplicación
 
-> Estado: **implementado** (fases 0–6) en la rama `claude/database-tables-recipes-kyqj0h`.
+> Estado: **implementado** (fases 0–7) en la rama `claude/database-tables-recipes-kyqj0h`.
 > Fecha: 2026-11-23. Decisiones aprobadas: todas las recomendadas en la sección 14.
 >
 > Notas de la implementación:
 > - Fase 0: no se pudo compilar el APK en el entorno de desarrollo (sin SDK de
 >   Android); se verificaron versiones y scripts de Gradle de cada plugin.
 >   `google_mlkit_text_recognition` queda anclado a 0.16.x (0.17+ exige AGP 9).
-> - Fase 7 (categorías y orden de pasillo, códigos de peso variable) queda
->   pendiente; `isVariableMeasure` ya detecta esos códigos.
+> - Fase 7: categorías con orden de pasillo (general y por tienda) y etiquetas
+>   de báscula aprendidas por tienda. Esquema v2 con migración desde v1
+>   (ver 4.2 y 6). El detalle de uso está en el `README.md`.
 > - El catálogo base tenía dos nombres que solo se distinguían por un signo
 >   ("16%" y "- 16%"); el segundo se renombró a "menos de 16%".
 
@@ -107,6 +108,8 @@ categorias ─┐ (opcional)
 ```
 
 12 tablas, más la tabla virtual de búsqueda `alimentos_fts`. `categorias` es opcional (Fase 7).
+
+**Implementado (esquema v2, Fase 7):** 14 tablas. `categorias` pasa a ser obligatoria (se siembra con 13 categorías por defecto) y se añaden `orden_pasillos` (orden propio de cada tienda) y `codigos_bascula` (etiquetas de báscula aprendidas por tienda). Ver el final de 4.2.
 
 ### 4.2 Definición de las tablas (SQL equivalente al que generará Drift)
 
@@ -265,6 +268,38 @@ CREATE TABLE categorias (
 );
 ```
 
+**Implementado en el esquema v2 (Fase 7)**, además de `categorias`:
+
+```sql
+ALTER TABLE alimentos        ADD COLUMN categoria_id INTEGER
+  REFERENCES categorias(id) ON DELETE SET NULL;
+ALTER TABLE establecimientos ADD COLUMN formato_bascula TEXT
+  CHECK (formato_bascula IN ('precio','peso'));      -- NULL = sin aprender
+ALTER TABLE establecimientos ADD COLUMN longitud_clave INTEGER NOT NULL DEFAULT 7
+  CHECK (longitud_clave IN (6,7));
+ALTER TABLE compras          ADD COLUMN peso_g REAL CHECK (peso_g > 0);  -- frescos al peso
+
+-- Orden de los pasillos de una tienda; sin filas se usa categorias.orden.
+CREATE TABLE orden_pasillos (
+  establecimiento_id INTEGER NOT NULL REFERENCES establecimientos(id) ON DELETE CASCADE,
+  categoria_id       INTEGER NOT NULL REFERENCES categorias(id)       ON DELETE CASCADE,
+  orden              INTEGER NOT NULL,
+  PRIMARY KEY (establecimiento_id, categoria_id)
+);
+
+-- Etiquetas de báscula: la parte fija del código identifica una
+-- presentación "Al peso" en cada tienda.
+CREATE TABLE codigos_bascula (
+  id                 INTEGER PRIMARY KEY,
+  establecimiento_id INTEGER NOT NULL REFERENCES establecimientos(id) ON DELETE CASCADE,
+  clave              TEXT    NOT NULL,
+  presentacion_id    INTEGER NOT NULL REFERENCES presentaciones(id)   ON DELETE CASCADE,
+  UNIQUE (establecimiento_id, clave)
+);
+```
+
+La migración v1 → v2 crea las tablas y columnas, siembra las categorías por defecto y clasifica los alimentos existentes por su nombre.
+
 Los ajustes del usuario siguen en SharedPreferences y entran en el respaldo completo.
 
 ### 4.3 Por qué separar `alimentos` y `presentaciones`
@@ -338,6 +373,7 @@ Un alimento sin tabla completa **no se registra con ceros**. Al elegirlo se abre
 - **Búsqueda por texto:** si lo escrito son solo dígitos con longitud de GTIN (8, 12, 13 o 14), se busca primero el código exacto y después por texto.
 - Siempre se puede escribir el código a mano (como ahora).
 - **Más adelante (Fase 7):** los códigos de peso variable de la sección de frescos (EAN-13 que empiezan por `2`, con el precio o el peso incrustado). Se identifican por los primeros dígitos y se lee el precio del propio código.
+  - **Implementado:** la clave son los 7 primeros dígitos (6 si la tienda usa dígito de control del precio en la posición 7) y el valor, las cifras 8 a 12. Como el formato cambia de un supermercado a otro, se aprende **por tienda**: si el valor es importe o peso (primera etiqueta), qué producto es cada clave y si la clave es de 6 dígitos. Con formato peso, el importe se calcula con el último €/kg de ese producto en la tienda. Varios paquetes del mismo producto se suman en una compra. En casa, la etiqueta se reconoce y precarga los gramos. Un código de báscula nunca se guarda como código de barras de una presentación.
 
 ### 6.1 Avisos de datos pendientes en casa
 - **Contador** en la pestaña Alimentos ("3 pendientes") y filtro **"Pendientes de completar"**, ordenado por prioridad: usados en recetas, después comprados recientemente, después el resto.
@@ -509,7 +545,7 @@ Cada fase deja la app compilando y usable, con sus tests.
 | **4. Recetas** | Ingredientes vinculados con cantidad, vinculación asistida, cálculo de nutrición, tarjeta de pendientes, modo cocina, registrar porción y alimento preparado. | Una receta con todos sus ingredientes completos muestra kcal por porción; si falta algo, lo lista con su acción. |
 | **5. Datos** | Repertorio JSON con fusión y vista previa, respaldo completo, TSV ampliado + legado, importador de `.db` antiguo, catálogo base, primer arranque y migración de la instalación actual. | Exportar → importar en una base vacía da los mismos datos; importar dos veces no duplica nada. |
 | **6. OCR** | Captura, ML Kit, parser con textos reales, pantalla de revisión. | Al menos el 80 % de las etiquetas de prueba sin corrección manual en los 4 macros. |
-| **7. Pulido (opcional)** | Categorías y orden de pasillo, códigos de peso variable, rendimiento, accesibilidad, limpieza del código antiguo, documentación final. | — |
+| **7. Pulido (opcional)** | Categorías y orden de pasillo, códigos de peso variable, rendimiento, accesibilidad, limpieza del código antiguo, documentación final. **Implementado:** categorías y pasillos (general y por tienda), etiquetas de báscula, esquema v2 con migración probada, documentación. | Migrar una base v1 con datos da el mismo esquema que una instalación nueva; una etiqueta de báscula aprendida en una tienda se reconoce en el carrito y en casa. |
 
 ---
 
