@@ -1,7 +1,16 @@
 # Plan de rediseño: `alimentos` como núcleo de la aplicación
 
-> Estado: **propuesta pendiente de aprobación**. Nada de esto está implementado.
-> Fecha: 2026-11-23 · Rama: `claude/database-tables-recipes-kyqj0h`
+> Estado: **implementado** (fases 0–6) en la rama `claude/database-tables-recipes-kyqj0h`.
+> Fecha: 2026-11-23. Decisiones aprobadas: todas las recomendadas en la sección 14.
+>
+> Notas de la implementación:
+> - Fase 0: no se pudo compilar el APK en el entorno de desarrollo (sin SDK de
+>   Android); se verificaron versiones y scripts de Gradle de cada plugin.
+>   `google_mlkit_text_recognition` queda anclado a 0.16.x (0.17+ exige AGP 9).
+> - Fase 7 (categorías y orden de pasillo, códigos de peso variable) queda
+>   pendiente; `isVariableMeasure` ya detecta esos códigos.
+> - El catálogo base tenía dos nombres que solo se distinguían por un signo
+>   ("16%" y "- 16%"); el segundo se renombró a "menos de 16%".
 
 ## 0. Resumen
 

@@ -1,1116 +1,319 @@
-# cal_counter — Calorie Counter App
+# cal_counter — alimentos, calorías, recetas y compras
 
-Aplicación Flutter de seguimiento de calorías y macronutrientes. Interfaz y datos completamente en **español**. Diseñada para Android (primario), con soporte potencial para otras plataformas Flutter.
+Aplicación Flutter (Android primario) para llevar las calorías y macros del día, guardar recetas y hacer la compra, todo alrededor de **un único repertorio de alimentos**. Interfaz y datos en **español**. Todo funciona en local, sin servicios online: el escáner de códigos y el OCR de etiquetas se ejecutan en el móvil.
 
----
-
-## Tabla de contenidos
-
-1. [Descripción general](#descripción-general)
-2. [Entorno y versiones](#entorno-y-versiones)
-3. [Estructura del proyecto](#estructura-del-proyecto)
-4. [Arquitectura](#arquitectura)
-5. [Capa de Dominio — entidades, repositorios, casos de uso](#capa-de-dominio)
-6. [Capa de Datos — base de datos, modelos, implementaciones](#capa-de-datos)
-7. [Capa de Presentación — providers, vistas, widgets](#capa-de-presentación)
-8. [Estilos y constantes](#estilos-y-constantes)
-9. [Flujo de navegación](#flujo-de-navegación)
-10. [Esquema de la base de datos SQLite](#esquema-de-la-base-de-datos-sqlite)
-11. [Persistencia de configuración (SharedPreferences)](#persistencia-de-configuración-sharedpreferences)
-12. [Lógica de negocio crítica](#lógica-de-negocio-crítica)
-13. [Módulos: Recetas, Listas de compra y Productos](#módulos-recetas-listas-de-compra-y-productos)
-14. [Configuración Android](#configuración-android)
-15. [Dependencias](#dependencias)
-16. [Cómo ejecutar el proyecto](#cómo-ejecutar-el-proyecto)
-17. [Convenciones y reglas que NO deben romperse](#convenciones-y-reglas-que-no-deben-romperse)
+> El diseño y las decisiones de este modelo están en [`docs/PLAN_REDISENO_BD.md`](docs/PLAN_REDISENO_BD.md).
 
 ---
 
-## Descripción general
+## Índice
 
-**cal_counter** es un contador de calorías y macronutrientes diario. El usuario:
-
-- Busca alimentos en una base de datos SQLite precargada con ~1700 alimentos en español.
-- Agrega alimentos a "comidas" del día (Comida_1, Comida_2, etc.).
-- Ve en tiempo real los totales diarios de kcal, grasas, carbohidratos y proteínas.
-- Compara lo consumido contra sus metas personales con un sistema de semáforo de colores.
-- Configura sus metas personales y calcula su TDEE automáticamente.
-- Exporta el día a CSV (vacía las tablas tras éxito).
-- Exporta/importa la lista de alimentos (`db_alimentos`) en formato TSV mediante SAF (Android 13+).
-
-Además, en pestañas independientes (barra inferior), la app incluye:
-
-- **Recetas**: repertorio personal con búsqueda por los ingredientes que el usuario tiene a mano, importación desde texto pegado / plantilla `.txt` / `.csv` / `.json` y vínculo opcional con el contador de calorías.
-- **Compras**: listas de compra con precio de referencia, total estimado y modo "escanear en el súper".
-- **Productos**: alta por código de barras (cámara), historial de precios por establecimiento (3 meses) y exportación CSV.
-
-Ver [Módulos: Recetas, Listas de compra y Productos](#módulos-recetas-listas-de-compra-y-productos).
+1. [Qué hace](#qué-hace)
+2. [Entorno y comandos](#entorno-y-comandos)
+3. [Arquitectura](#arquitectura)
+4. [Modelo de datos](#modelo-de-datos)
+5. [Flujos principales](#flujos-principales)
+6. [Exportar, importar y compartir](#exportar-importar-y-compartir)
+7. [OCR de etiquetas](#ocr-de-etiquetas)
+8. [Calorías: objetivos, TDEE y día](#calorías-objetivos-tdee-y-día)
+9. [Configuración Android](#configuración-android)
+10. [Dependencias](#dependencias)
+11. [Pruebas](#pruebas)
+12. [Reglas que no deben romperse](#reglas-que-no-deben-romperse)
 
 ---
 
-## Entorno y versiones
+## Qué hace
 
-| Componente         | Versión                                        |
-| ------------------ | ---------------------------------------------- |
-| Flutter SDK        | `^3.8.1` (Dart SDK `^3.8.1`)                   |
-| Versión de la app  | `1.0.0+1`                                      |
-| Android minSdk     | Valor de `flutter.minSdkVersion`               |
-| Android targetSdk  | Valor de `flutter.targetSdkVersion`            |
-| Android compileSdk | Valor de `flutter.compileSdkVersion`           |
-| Android NDK        | 27.0                                           |
-| Kotlin             | compatible con Gradle Kotlin DSL               |
-| Java               | 11 (sourceCompatibility y targetCompatibility) |
-| Material Design    | Material 3 (`useMaterial3: true`)              |
+Cuatro pestañas (`MainShell`, `NavigationBar` + `IndexedStack`):
+
+| Pestaña | Contenido |
+|---|---|
+| **Calorías** | Anillos de kcal, grasas, carbohidratos y proteínas frente a los objetivos; *Agregar ingesta* (buscar por texto o escanear) y *Gestionar día* (editar cantidades, renombrar, guardar una comida como alimento, exportar el día). |
+| **Alimentos** | El repertorio: búsqueda sin tildes o por código de barras, filtros (pendientes, envasados, genéricos, preparados, archivados), insignia con los **pendientes de completar** y ficha de cada alimento (tabla nutricional, porciones caseras, presentaciones y códigos, precios por tienda y €/kg, recetas que lo usan). |
+| **Recetas** | Búsqueda por los ingredientes que tienes; ingredientes vinculados a alimentos con cantidad → **nutrición calculada** por porción y por 100 g, con la lista de lo que falta para calcularla y una acción directa para cada cosa; modo cocina; importar desde texto/plantilla/JSON/CSV. |
+| **Compras** | Listas de compra con precio de referencia, **modo carrito** (escanear lo que metes en el carrito con total en vivo) e historial de precios exportable. |
+
+**Ajustes → Datos y respaldos**: compartir el repertorio, respaldo completo, TSV, importar `.db` antiguos y añadir el catálogo base.
 
 ---
 
-## Estructura del proyecto
+## Entorno y comandos
 
-```
-cal_counter/
-├── assets/
-│   └── db/
-│       └── db_ctrl_calorias.db        ← Base de datos SQLite precargada (~1700 alimentos)
-├── lib/
-│   ├── main.dart                      ← Entry point. Inicializa locale 'es', ProviderScope
-│   ├── core/
-│   │   ├── constants.dart             ← AppConstants (appName, dbName)
-│   │   ├── styles.dart                ← AppStyles (colores, temas, paddings)
-│   │   └── utils.dart                 ← Utilidades generales
-│   ├── domain/
-│   │   ├── entities/
-│   │   │   ├── food.dart              ← Entidad Food (macros por 100g)
-│   │   │   ├── meal.dart              ← Entidad Meal (comida del día)
-│   │   │   ├── meal_item.dart         ← Entidad MealItem (alimento en comida)
-│   │   │   └── user_settings.dart     ← Entidad UserSettings con defaults y copyWith
-│   │   ├── repositories/
-│   │   │   ├── food_repository.dart   ← Interfaz abstracta para alimentos
-│   │   │   ├── meal_repository.dart   ← Interfaz abstracta para comidas
-│   │   │   └── settings_repository.dart ← Interfaz abstracta para configuración
-│   │   └── usecases/
-│   │       ├── add_food_to_meal.dart
-│   │       ├── check_new_day_on_startup.dart
-│   │       ├── create_meal_if_not_exists.dart
-│   │       ├── export_database.dart
-│   │       ├── export_day_csv.dart
-│   │       ├── export_foods_tsv.dart
-│   │       ├── import_database.dart
-│   │       ├── import_foods_tsv.dart
-│   │       └── search_foods.dart
-│   ├── data/
-│   │   ├── datasources/
-│   │   │   └── local_data_source.dart ← Clase abstracta + LocalDataSourceImpl (SQLite)
-│   │   ├── models/
-│   │   │   └── food_model.dart        ← Extiende Food; serializa JSON ↔ entidad
-│   │   └── repositories/
-│   │       ├── food_repository_impl.dart
-│   │       ├── meal_repository_impl.dart
-│   │       └── settings_repository_impl.dart ← Usa SharedPreferences
-│   └── presentation/
-│       ├── providers/
-│       │   ├── home_provider.dart     ← HomeState + HomeNotifier + providers de infraestructura
-│       │   ├── search_provider.dart   ← SearchNotifier (debounce 200ms) + providers
-│       │   ├── settings_provider.dart ← SettingsNotifier + cálculos derivados
-│       │   └── theme_provider.dart    ← ThemeNotifier (light/dark con persistencia)
-│       ├── views/
-│       │   ├── home_view.dart         ← Pantalla principal (semáforo + resumen)
-│       │   ├── search_view.dart       ← Búsqueda de alimentos + gestión de DB
-│       │   ├── settings_view.dart     ← Configuración personal + cálculo TDEE
-│       │   └── food_form_view.dart    ← Crear / editar alimento
-│       └── widgets/
-│           ├── add_food_popup.dart    ← Dialog para agregar alimento a comida
-│           ├── meal_items_dialog.dart ← Dialog con items de una comida (editar/eliminar)
-│           └── nutrient_card.dart     ← Card reutilizable (label + valor + color)
-├── android/
-│   ├── app/
-│   │   ├── build.gradle.kts
-│   │   └── src/main/
-│   │       └── AndroidManifest.xml
-│   └── build.gradle.kts
-├── pubspec.yaml
-├── pubspec.lock
-└── analysis_options.yaml
+| Componente | Versión |
+|---|---|
+| Flutter | 3.44 (Dart 3.12) |
+| Base de datos | Drift 2.35 sobre SQLite 3.5x **incluida en la app** (paquete `sqlite3`, con FTS5) |
+| Android | AGP 8.13.1, `android.builtInKotlin=false`, `android.newDsl=false` (ver [Configuración Android](#configuración-android)) |
+
+```bash
+flutter pub get
+dart run build_runner build          # regenera lib/data/db/app_database.g.dart tras tocar tables.dart
+flutter analyze
+flutter test                         # todos los tests
+flutter test test/unit/backup_test.dart
+flutter test --name "modo carrito"
+flutter build apk --release          # build/app/outputs/flutter-apk/app-release.apk
 ```
 
-Archivos de los módulos de recetas, compras y productos:
+Si el build falla por caché: `flutter clean && flutter pub get && flutter build apk --release`.
 
-```
-lib/
-├── domain/
-│   ├── entities/        recipe.dart, recipe_match.dart, product.dart (Product + Purchase),
-│   │                    price_stats.dart, shopping_list.dart (ShoppingList + ShoppingItem)
-│   ├── repositories/    recipe_repository.dart, product_repository.dart, shopping_list_repository.dart
-│   ├── services/        ingredient_matcher.dart (normalizar/comparar ingredientes), dates.dart
-│   └── usecases/        search_recipes_by_ingredients, import_recipes, add_ingredients_to_shopping_list,
-│                        register_purchase, get_price_stats, purge_old_purchases, export_price_history_csv
-├── data/
-│   ├── datasources/     module_tables.dart (DDL), recipe_/product_/shopping_local_data_source.dart
-│   ├── models/          recipe_model.dart, product_model.dart, shopping_model.dart
-│   ├── parsers/         recipe_text_codec.dart (import txt/json/csv, export txt, plantilla)
-│   └── repositories/    recipe_/product_/shopping_list_repository_impl.dart
-└── presentation/
-    ├── providers/       recipes_provider.dart, products_provider.dart, shopping_provider.dart
-    ├── views/           main_shell.dart (barra inferior), recipes_view, recipe_detail_view,
-    │                    recipe_form_view, recipe_import_view, shopping_lists_view,
-    │                    shopping_list_detail_view, products_view, product_detail_view,
-    │                    product_form_view, barcode_scanner_view, food_picker_view, product_picker_view
-    └── widgets/         recipe_card, purchase_dialog, add_to_shopping_list_dialog, empty_state
-```
+El archivo generado `app_database.g.dart` se versiona en el repositorio: solo hay que regenerarlo al cambiar el esquema.
 
 ---
 
 ## Arquitectura
 
-El proyecto implementa **Clean Architecture** con tres capas claramente separadas:
+Clean Architecture en tres capas; las dependencias apuntan al dominio.
 
 ```
-Presentación  →  Dominio  ←  Datos
-(Riverpod)       (puro)      (SQLite + SharedPreferences)
+lib/
+  core/            estilos (AppStyles), utilidades (formato de precios y números), constantes
+  domain/          Dart puro (solo equatable)
+    entities/      Food, FoodPortion, FoodPackage, NutritionFacts, Purchase, Store,
+                   ShoppingList/Item, Recipe/RecipeIngredient, Meal/MealItem,
+                   Repertoire, UserSettings…
+    repositories/  interfaces (las listas devuelven Stream) + TransactionRunner
+    services/      barcode (GTIN), money (céntimos), quantity_parser, nutrition_calculator,
+                   nutrition_label_parser (OCR), ingredient_matcher, cart_matching, dates
+    usecases/      una clase con un único call(...) por acción
+  data/
+    db/            tables.dart (esquema Drift), app_database.dart (+ .g.dart), mappers.dart
+    repositories/  implementaciones Drift
+    backup/        repertoire_codec (JSON), foods_tsv_codec, full_backup, legacy_db
+    ocr/           mlkit_text_recognizer
+    parsers/       recipe_text_codec (importar recetas desde texto)
+  presentation/
+    providers/     core_providers.dart (BD, repositorios, casos de uso) y uno por módulo
+    views/, widgets/
 ```
 
-- **Dominio**: Solo Dart puro. Entidades, interfaces de repositorios y casos de uso. Sin dependencias de Flutter ni de paquetes externos (excepto `equatable`).
-- **Datos**: Implementa las interfaces del dominio. Gestiona `sqflite`, `shared_preferences`, `path_provider`, CSV.
-- **Presentación**: Consume los providers de Riverpod. Widgets Flutter. No accede directamente a la capa de datos.
-
-**Estado global**: Riverpod `StateNotifierProvider`. No existe `setState` a nivel de app; solo se usa dentro de widgets de formulario donde es semánticamente correcto.
+- **Un solo punto de creación de la base de datos**: `appDatabaseProvider` (en `core_providers.dart`), que la cierra al desecharse. En tests se sustituye por una en memoria con `ProviderScope(overrides: [appDatabaseProvider.overrideWithValue(db)])`.
+- **Reactividad**: los repositorios exponen `watch…()` (streams de Drift). Las pantallas se actualizan solas después de cualquier escritura, sin `refresh()` ni `invalidate` manuales. `HomeNotifier`, `ShoppingItemsNotifier` y `RecipesNotifier` se suscriben a esos streams.
+- **Transacciones**: los casos de uso que escriben en varias tablas reciben un `TransactionRunner` (Drift `transaction`). Ejemplos: alta en tienda, carrito, importación, migración.
+- **Riverpod 2.6**: el código nuevo usa `StreamProvider`, `Provider` y `StateNotifier` cuando hace falta estado de pantalla.
+- **Navegación imperativa** (`Navigator.push`/`pop` + `MaterialPageRoute`). La raíz es `StartupGate`, que muestra la bienvenida la primera vez o `MainShell`.
 
 ---
 
-## Capa de Dominio
+## Modelo de datos
 
-### Entidades
+Esquema v1 (`lib/data/db/tables.dart`). Las **claves foráneas están activas** (`PRAGMA foreign_keys = ON` en cada apertura). Los días se guardan como `TEXT 'YYYY-MM-DD'`, las marcas de tiempo en ISO 8601 y el dinero en **céntimos** (`INTEGER`).
 
-#### `Food` — `lib/domain/entities/food.dart`
-
-Representa un alimento con sus valores nutricionales **por 100 gramos**.
-
-```dart
-class Food extends Equatable {
-  final int? id;
-  final String name;          // nombre del alimento (UNIQUE en DB)
-  final double grasasPer100;  // grasas en g por 100g
-  final double carbsPer100;   // carbohidratos en g por 100g
-  final double proteinsPer100;// proteínas en g por 100g
-  final double kcalPer100;    // kilocalorías por 100g
-}
+```
+alimentos ──< porciones
+    │  └────< presentaciones (código de barras) ──< compras >── establecimientos
+    │                                                 ▲
+    ├──< ingredientes_receta >── recetas              │ compra_id (carrito)
+    ├──< items_lista >── listas_compra ───────────────┘
+    └──< items_comida (copia + vínculo) >── comidas
 ```
 
-#### `Meal` — `lib/domain/entities/meal.dart`
+| Tabla | Qué guarda |
+|---|---|
+| `alimentos` | El repertorio. `uuid` único (identidad para compartir), `nombre` + `marca` (únicos juntos, sin distinguir mayúsculas; marca `''` = genérico), `tipo` (`generico`/`envasado`/`preparado`), `unidad` (`g`/`ml`). Tabla nutricional **por 100 g/ml** con 8 nutrientes (`kcal`, `proteinas`, `grasas`, `grasas_saturadas`, `carbohidratos`, `azucares`, `fibra`, `sal`); **`NULL` = desconocido** (no es lo mismo que 0). `nutricion_origen` (`manual`, `etiqueta_ocr`, `importado`, `calculado`), `uso_count`/`ultimo_uso` (lista de "más usados"), `archivado`. |
+| `porciones` | Equivalencias caseras: "1 diente = 5 g", "1 vaso = 250 ml". Sirven para registrar rápido y para calcular recetas con "2 dientes de ajo". |
+| `presentaciones` | Formato comercial de un alimento: `codigo_barras` (GTIN normalizado, único, `NULL` = granel), `descripcion` ("Brick 1 L"), `contenido` neto (para el precio por kg o litro). Un alimento puede tener varias. |
+| `establecimientos` | Tiendas, sin duplicados por mayúsculas. |
+| `compras` | Historial de precios: presentación, tienda, fecha, `precio_cent` unitario y `unidades`. `ON DELETE RESTRICT`: una presentación con compras no se borra, se archiva. |
+| `listas_compra` / `items_lista` | Listas y artículos (`alimento_id` opcional, `texto`, `cantidad`, `comprado`). En el carrito, `compra_id` apunta a la compra: unidades y precio se leen de ella, **no se copian**. |
+| `recetas` / `ingredientes_receta` | Receta (`uuid`, porciones, `peso_final_g` cocinado, `alimento_id` del alimento "preparado" que la representa) e ingredientes: `texto` original siempre, más `alimento_id`, `cantidad` y `unidad` (`g`, `ml` o nombre de una porción) opcionales. |
+| `comidas` / `items_comida` | Registro del día. Los items guardan el nombre y los macros **ya escalados** (histórico inmutable) y un `alimento_id` informativo. |
+| `alimentos_fts` | Índice FTS5 (`unicode61 remove_diacritics 2`) sobre nombre y marca, mantenido por triggers. |
 
-Representa una comida del día (contenedor de items).
+### Reglas del modelo
 
-```dart
-class Meal extends Equatable {
-  final int? id;
-  final String name;    // "Comida_1", "Comida_2", etc.
-  final DateTime date;  // fecha de la comida (solo la parte de fecha, sin hora)
-}
-```
-
-#### `MealItem` — `lib/domain/entities/meal_item.dart`
-
-Representa un alimento específico dentro de una comida, con sus macros **ya escalados** a la cantidad consumida.
-
-```dart
-class MealItem extends Equatable {
-  final int? id;
-  final int mealId;           // FK a Meal.id
-  final double cantidad;      // gramos consumidos
-  final String alimento;      // nombre del alimento (copia desnormalizada)
-  final double grasas;        // grasas escaladas (no por 100g)
-  final double carbohidratos; // carbs escalados
-  final double proteinas;     // proteínas escaladas
-  final double kcal;          // kcal escaladas
-}
-```
-
-> **IMPORTANTE**: `MealItem` almacena los macros ya calculados para la cantidad concreta. Al editar la cantidad se recalcula usando el ratio `newCantidad / oldCantidad` directamente sobre los valores almacenados (no se re-consulta el alimento base).
-
-#### `UserSettings` — `lib/domain/entities/user_settings.dart`
-
-Configuración personal del usuario. Se persiste completa en `SharedPreferences`.
-
-```dart
-class UserSettings extends Equatable {
-  final double weightKg;         // Peso en kg
-  final int kcalTarget;          // Meta calórica diaria
-  final double proteinsPerKg;    // Proteínas objetivo (g por kg de peso)
-  final double fatsPerKg;        // Grasas objetivo (g por kg de peso)
-  final int tolerancePercent;    // % de tolerancia sobre el objetivo (0-100)
-  final double? bodyFatPercent;  // % grasa corporal (null → usar Mifflin-St Jeor)
-  final double heightCm;         // Altura en cm
-  final int age;                 // Edad en años
-  final String sex;              // "male" o "female"
-  final double activityFactor;   // 1.2 | 1.375 | 1.55 | 1.725 | 1.9
-}
-```
-
-**Valores por defecto** (`UserSettings.initial()`):
-
-| Campo            | Default |
-| ---------------- | ------- |
-| weightKg         | 70.0    |
-| kcalTarget       | 2000    |
-| proteinsPerKg    | 1.5     |
-| fatsPerKg        | 0.5     |
-| tolerancePercent | 10      |
-| bodyFatPercent   | null    |
-| heightCm         | 170.0   |
-| age              | 30      |
-| sex              | "male"  |
-| activityFactor   | 1.2     |
-
-### Interfaces de repositorios (abstractas)
-
-#### `FoodRepository`
-
-```dart
-abstract class FoodRepository {
-  Future<List<Food>> searchFoods(String query);
-  Future<int> insertFood(Food food);
-  Future<int> updateFood(Food food);
-  Future<int> deleteFood(int id);
-}
-```
-
-#### `MealRepository`
-
-```dart
-abstract class MealRepository {
-  Future<int> createMeal(String name, DateTime date);
-  Future<List<Meal>> getMealsByDate(DateTime date);
-  Future<DateTime?> getLastMealDate();
-  Future<int> addItemToMeal(MealItem item);
-  Future<List<MealItem>> getMealItems(int mealId);
-  Future<void> deleteMeal(int id);
-  Future<void> deleteMealItem(int id);
-  Future<void> updateMealItem(int id, double newCantidad);
-  Future<String> exportMealsByDateCSV(DateTime date);
-  Future<bool> hasMealItems();           // ¿hay al menos un item en items_comida?
-  Future<void> clearMealsAndItems();     // vacía las tablas comidas e items_comida
-}
-```
-
-#### `SettingsRepository`
-
-```dart
-abstract class SettingsRepository {
-  Future<UserSettings> getSettings();
-  Future<void> saveSettings(UserSettings settings);
-}
-```
-
-### Casos de uso
-
-Cada caso de uso es una clase con un único método `call(...)`.
-
-| Caso de uso             | Descripción                                                                                                                                                                                 |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SearchFoods`           | Delegación directa a `FoodRepository.searchFoods`                                                                                                                                           |
-| `AddFoodToMeal`         | Calcula macros escalados y llama a `MealRepository.addItemToMeal`                                                                                                                           |
-| `CreateMealIfNotExists` | Consulta si existe comida con ese nombre en esa fecha; si no, la crea                                                                                                                       |
-| `CheckNewDayOnStartup`  | Devuelve la última `DateTime` de comidas **solo si** `hasMealItems()` es `true` y la fecha es anterior a hoy. En cualquier otro caso devuelve `null`.                                       |
-| `ExportDayToCsv`        | Llama a `MealRepository.exportMealsByDateCSV(date)`. **Si el path resultante es no vacío (export exitoso), llama después a `clearMealsAndItems()`** para vaciar `comidas` e `items_comida`. |
-| `ExportDatabase`        | Llama a `LocalDataSource.exportDatabase(destinationPath)` (formato `.db` completo, legacy)                                                                                                  |
-| `ImportDatabase`        | Llama a `LocalDataSource.importDatabase(sourcePath)` (formato `.db` completo, legacy)                                                                                                       |
-| `ExportFoodsTsv`        | Llama a `LocalDataSource.exportFoodsTsv()`. Devuelve un `String` con el contenido TSV completo de `db_alimentos`.                                                                           |
-| `ImportFoodsTsv`        | Llama a `LocalDataSource.importFoodsTsvFromString(String)`. Devuelve el número de alimentos insertados con éxito (los duplicados por UNIQUE en `alimento` se ignoran).                      |
+- **Completo** = tiene `kcal`, `proteinas`, `grasas` y `carbohidratos`. Si no, está **pendiente**: aparece en Alimentos → Pendientes (con insignia), ordenado por prioridad (usado en recetas → comprado recientemente → resto).
+- **Un alimento pendiente no se registra en Calorías con ceros**: al elegirlo se ofrece completarlo (formulario + lectura de etiqueta).
+- **Borrar** un alimento sin compras lo borra, y sus porciones y presentaciones caen en cascada. Con compras se **archiva**. Recetas, listas y comidas que lo usaban quedan desvinculadas (`SET NULL`) pero conservan su texto.
+- **Duplicados**: no puede haber dos alimentos con el mismo nombre y marca (sin tildes ni mayúsculas). Editar nunca borra y reinserta: se conservan el id, los vínculos y el uso.
+- **Códigos de barras**: se normalizan antes de guardar o buscar (solo dígitos; UPC-A de 12 → EAN-13 con un 0 delante). Se valida el dígito de control, pero se permite guardar un código que no cuadre (códigos internos de tienda).
+- **Búsqueda**: FTS5 por prefijo de palabra, sin tildes, con singular y sinónimos regionales (`papas` → patata). Si lo escrito son 8–14 dígitos, se busca por código.
+- **Purga del historial**: al abrir la app (y antes de exportarlo) se borran las compras de más de 3 meses, **salvo la última de cada presentación**.
 
 ---
 
-## Capa de Datos
+## Flujos principales
 
-### `LocalDataSource` — `lib/data/datasources/local_data_source.dart`
+### Código de barras según el contexto
 
-**Clase abstracta** `LocalDataSource` + **implementación** `LocalDataSourceImpl`.
+| Dónde | Código conocido | Código desconocido |
+|---|---|---|
+| Modo carrito / lista (**tienda**) | Ficha de precio | Aviso **"Producto no registrado"** y alta mínima: nombre, marca, presentación, contenido y precio. Crea un alimento **pendiente**, su presentación y la compra en una transacción (`RegisterFoodInStore`). **Nunca pide la tabla nutricional.** También permite "Es otra presentación de uno que ya tengo". |
+| Agregar ingesta, Alimentos, vincular ingrediente (**casa**) | Abre o usa el alimento; si está pendiente, ofrece completarlo | Alta completa con tabla nutricional (y lectura de etiqueta) u "otra presentación de…" (`FoodFlows.foodForBarcode`) |
 
-#### Inicialización de la base de datos
+Siempre se puede escribir el código a mano.
 
-En el primer lanzamiento:
+### Carrito (`AddToCart`, `UpdateCartItem`, `RemoveFromCart`)
 
-1. Comprueba si existe el archivo `db_ctrl_calorias.db` en `getApplicationDocumentsDirectory()`.
-2. Si no existe, copia el archivo desde `assets/db/db_ctrl_calorias.db` usando `rootBundle.load`.
-3. Abre la BD con `sqflite.openDatabase` versión 1.
-4. Llama a `_createTables` tanto en `onCreate` como en `onOpen` (usa `CREATE TABLE IF NOT EXISTS`).
+- El artículo de la lista se elige así: si está en el carrito, ese; si no, un pendiente vinculado al alimento; si no, un pendiente sin vincular cuyo texto coincida (`findItemForFood`).
+- Repetir un producto suma unidades a la misma compra.
+- Desmarcar quita `compra_id` y conserva la compra. "Quitar del carrito" borra la compra.
+- Total del carrito = Σ unidades × precio de las compras enlazadas.
+- Un pendiente sin vincular ("Fruta") se mete en el carrito eligiendo o creando su alimento: todo lo que se compra entra en el repertorio.
+- Al terminar se avisa de los productos nuevos que quedaron sin tabla nutricional.
 
-#### Singleton de base de datos
+### Recetas conectadas (`nutrition_calculator.dart`, `recipe_food.dart`)
 
-`LocalDataSourceImpl` usa un campo estático `static Database? _database`. La instancia se comparte entre todas las llamadas. Si se cierra con `close()`, el campo se pone a `null` para permitir re-inicialización.
-
-#### Operaciones críticas de `updateMealItem`
-
-Al editar la cantidad de un `MealItem`, **no** se consulta el alimento original. Se usa el ratio:
-
-```dart
-final ratio = newCantidad / oldCantidad;
-nuevosGrasas   = grasasActuales   * ratio;
-nuevosCarbos   = carbosActuales   * ratio;
-nuevasProteinas = proteinasActuales * ratio;
-nuevasKcal     = kcalActuales     * ratio;
-```
-
-#### Importación de base de datos completa (`.db` legacy)
-
-`importDatabase(String sourcePath)` usa `ConflictAlgorithm.ignore` sobre la restricción `UNIQUE` de la columna `alimento`. Los duplicados se saltan silenciosamente. Devuelve el número de registros insertados con éxito.
-
-#### Exportación de base de datos completa (`.db` legacy)
-
-`exportDatabase(String destinationPath)` crea un nuevo archivo `.db` en `destinationPath` con la misma estructura y copia todos los alimentos actuales.
-
-#### Exportación / importación TSV de `db_alimentos`
-
-Métodos modernos para intercambiar **solo la tabla `db_alimentos`** en formato TSV:
-
-- `Future<String> exportFoodsTsv()` — devuelve el contenido completo del TSV. Header (línea 1):
-
-  ```
-  id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas
-  ```
-
-  Cada fila contiene los 6 campos separados por tabulador. En el campo `alimento`, los caracteres `\t`, `\n` y `\r` se reemplazan por espacios para no romper el formato.
-
-- `Future<int> importFoodsTsvFromString(String tsvContent)` — parsea el TSV. Validaciones:
-  - Si el contenido está vacío o el header no coincide exactamente, lanza `FormatException`.
-  - Líneas vacías se saltan; líneas con número de columnas distinto de 6 se ignoran (con log).
-  - **El campo `id` del TSV se ignora** al insertar (autoincremento de SQLite). El `UNIQUE` en `alimento` previene duplicados vía `ConflictAlgorithm.ignore`.
-  - Devuelve el número de filas insertadas con éxito.
-
-#### Verificación y limpieza de comidas
-
-- `Future<bool> hasMealItems()` — `SELECT COUNT(*) FROM items_comida` ; devuelve `true` si hay al menos un item.
-- `Future<void> clearMealsAndItems()` — borra todas las filas de `items_comida` y `comidas` dentro de una **transacción atómica**. El orden importa: primero items, luego comidas (aunque `ON DELETE CASCADE` lo cubriría).
-
-### `FoodModel` — `lib/data/models/food_model.dart`
-
-Extiende `Food`. Añade serialización desde/hacia `Map<String, dynamic>` (filas de SQLite):
-
-- Columna `id` → `food.id`
-- Columna `alimento` → `food.name`
-- Columna `kCal` → `food.kcalPer100`
-- Columna `grasas` → `food.grasasPer100`
-- Columna `carbohidratos` → `food.carbsPer100`
-- Columna `proteinas` → `food.proteinsPer100`
-
-> **CRÍTICO**: Los nombres de columnas en la DB son `kCal`, `grasas`, `carbohidratos`, `proteinas`, `alimento`. Cualquier nueva query debe usar exactamente estos nombres.
-
-### Implementaciones de repositorios
-
-#### `MealRepositoryImpl`
-
-- Convierte `Map<String, dynamic>` de SQLite a entidades `Meal` y `MealItem`.
-- `exportMealsByDateCSV`: usa el paquete `csv` (`ListToCsvConverter`) con separador tabulador (`\t`). Escribe el archivo en `getApplicationDocumentsDirectory()`.
-
-#### `SettingsRepositoryImpl`
-
-Persiste cada campo de `UserSettings` como una clave independiente en `SharedPreferences`:
-
-| Clave SharedPreferences | Campo                             |
-| ----------------------- | --------------------------------- |
-| `weightKg`              | `weightKg`                        |
-| `kcalTarget`            | `kcalTarget`                      |
-| `proteinsPerKg`         | `proteinsPerKg`                   |
-| `fatsPerKg`             | `fatsPerKg`                       |
-| `tolerancePercent`      | `tolerancePercent`                |
-| `bodyFatPercent`        | `bodyFatPercent` (puede ser nulo) |
-| `heightCm`              | `heightCm`                        |
-| `age`                   | `age`                             |
-| `sex`                   | `sex`                             |
-| `activityFactor`        | `activityFactor`                  |
-
-Si una clave no existe, se devuelven los valores de `UserSettings.initial()`.
+- **Gramos de un ingrediente**: si la unidad es `g`/`ml`, la cantidad; si es una porción, `cantidad × gramos de la porción` ("dientes" ↔ "diente").
+- **Cálculos**: `total = Σ gramos/100 × valor por 100`. `peso = peso_final_g ?? Σ gramos`. **Por porción** = total / porciones.
+- **Completa** cuando todos los ingredientes no opcionales están vinculados, con cantidad convertible a gramos y con su tabla completa. Si no, se muestra el mínimo ("≥ X kcal") y una lista con el motivo de cada ingrediente:
+  - sin vincular → **Vincular**
+  - sin cantidad → **Cantidad**
+  - porción sin peso → **Añadir peso**
+  - alimento pendiente → **Completar**, con lectura de etiqueta
+- "Sal/pimienta/agua al gusto" no bloquean el cálculo.
+- **Vincular automáticamente** (`SuggestIngredientLinks`): propone para cada línea el alimento que mejor encaja y la cantidad leída ("200 g de arroz" → Arroz, 200 g). Se revisa antes de guardar.
+- **Registrar porción** añade la receta al día. **Añadir a mis alimentos** crea o actualiza un alimento `preparado` con la nutrición calculada y la porción de la receta (`SaveRecipeAsFood`).
+- **Editar la receta** conserva los vínculos de las líneas cuyo texto no cambia.
+- **Modo cocina**: ingredientes y pasos en grande. Al empezar recuerda los datos que faltan, porque el envase está en la mano para leer la etiqueta.
 
 ---
 
-## Capa de Presentación
+## Exportar, importar y compartir
 
-### Providers de Riverpod
+Todo se guarda y se abre con el selector del sistema (SAF en Android, sin permisos de almacenamiento). "Importar" detecta el tipo de archivo por su contenido.
 
-#### `home_provider.dart`
+| Formato | Contenido | Al importar |
+|---|---|---|
+| **Repertorio** `.json` (`RepertoireCodec`) | Alimentos con porciones y presentaciones; recetas opcionales (con los ingredientes vinculados por `uuid`). **Sin datos personales**: ni comidas, ni compras, ni precios, ni uso, ni ajustes. | **Fusiona** (`ImportRepertoire`) |
+| **Respaldo completo** `.json` (`FullBackupService`) | Todas las tablas tal cual + ajustes (SharedPreferences) | **Reemplaza** todo, en una transacción, después de guardar una copia automática del estado actual (`respaldo_automatico_*.json` en documentos) |
+| **TSV** (`FoodsTsvCodec`) | `uuid nombre marca tipo unidad codigos kcal grasas grasas_saturadas carbohidratos azucares fibra proteinas sal` (TAB; celdas vacías = desconocido) | Fusiona. **También acepta la cabecera antigua** `id alimento kCal grasas carbohidratos proteinas` |
+| **`.db` antiguo** (`LegacyData`) | `db_alimentos` de versiones anteriores | Fusiona los alimentos |
+| Recetas `.txt`/JSON/CSV (`RecipeTextCodec`) | Recetas sueltas | Omite las que ya existen por nombre |
+| CSV diario / historial de precios | Exportación (TAB, extensión `.csv`) | — |
 
-Providers de infraestructura definidos aquí (y reutilizados desde `search_provider.dart`):
+Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, "exportado", "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "nutricion": {..., "origen"}, "porciones": [...], "presentaciones": [...]}], "recetas": [...]}`. Los campos desconocidos se ignoran y las versiones mayores más nuevas se rechazan con un mensaje claro.
 
-```dart
-// Instancia única de la fuente de datos (singleton)
-final localDataSourceProvider = Provider<LocalDataSource>((ref) {
-  return LocalDataSourceImpl();
-});
+**Fusión** (`ImportRepertoire`, todo en una transacción y con vista previa):
 
-final mealRepositoryProvider       = Provider<MealRepository>(...);
-final checkNewDayOnStartupProvider = Provider<CheckNewDayOnStartup>(...);
-final exportDayToCsvProvider       = Provider<ExportDayToCsv>(...);
-final exportFoodsTsvProvider       = Provider<ExportFoodsTsv>(...);
-final importFoodsTsvProvider       = Provider<ImportFoodsTsv>(...);
+1. **Emparejado**: cada alimento importado busca su pareja local por **uuid**, luego por **código de barras** y luego por **nombre y marca** (sin tildes ni mayúsculas).
+2. **Sin pareja**: se crea conservando su uuid.
+3. **Con pareja**:
+   - Se rellenan los huecos de la tabla nutricional.
+   - Si ambos tienen valores distintos, se aplica la política: *Conservar los míos* (por defecto) o *Usar los importados*.
+   - Se añaden las porciones y presentaciones que falten. Un código que ya es de otro alimento se ignora y se informa.
+4. **Recetas**: se emparejan por uuid o nombre; las que ya existen se omiten.
+5. **Resultado**: importar dos veces el mismo archivo no duplica nada.
 
-// Provider principal de estado de la pantalla home
-final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>(...);
-```
+**Primer arranque** (`OnboardingView`, solo con el repertorio vacío):
 
-**`HomeState`**:
-
-```dart
-class HomeState {
-  final DateTime selectedDate;           // Fecha mostrada (hoy por defecto)
-  final List<Meal> meals;                // Comidas del día
-  final Map<int, List<MealItem>> mealItems; // mealId → lista de items
-  final double totalKcal;
-  final double totalProteins;
-  final double totalFats;
-  final double totalCarbs;
-  final bool isLoading;
-}
-```
-
-**`HomeNotifier`**:
-
-- Carga datos al construirse (`loadDailyData()`).
-- `loadDailyData()`: obtiene comidas del día, itera items de cada comida, acumula totales.
-- `deleteMeal(id)`, `deleteMealItem(id)`, `updateMealItemQuantity(id, newCantidad)`: ejecutan la operación y llaman `loadDailyData()`.
-- `refresh()`: alias de `loadDailyData()`.
-
-#### `search_provider.dart`
-
-```dart
-final foodRepositoryProvider   = Provider<FoodRepository>(...);
-final searchFoodsProvider      = Provider<SearchFoods>(...);
-final exportDatabaseProvider   = Provider<ExportDatabase>(...);
-final importDatabaseProvider   = Provider<ImportDatabase>(...);
-final searchResultsProvider    = StateNotifierProvider<SearchNotifier, List<Food>>(...);
-```
-
-**`SearchNotifier`**: Implementa debounce de **200 ms** con `dart:async Timer`. Si la query está vacía, el estado se limpia inmediatamente (sin esperar el debounce).
-
-#### `settings_provider.dart`
-
-```dart
-final settingsRepositoryProvider = Provider<SettingsRepository>(...);
-final settingsProvider = StateNotifierProvider<SettingsNotifier, UserSettings>(...);
-```
-
-**`SettingsNotifier`** expone getters calculados derivados del estado:
-
-```dart
-double get proteinsRequired => state.weightKg * state.proteinsPerKg;
-double get fatsRequired     => state.weightKg * state.fatsPerKg;
-double get carbsRequired {
-  final proteinKcal = proteinsRequired * 4;
-  final fatKcal     = fatsRequired * 9;
-  return (state.kcalTarget - (proteinKcal + fatKcal)) / 4;
-}
-```
-
-> **IMPORTANTE**: Los carbohidratos se calculan **como residuo** del total calórico. El usuario solo fija proteínas y grasas (g/kg); los carbos se derivan. Esta es la lógica central del plan nutricional.
-
-#### `theme_provider.dart`
-
-```dart
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>(...);
-```
-
-Persiste el tema en `SharedPreferences` con la clave `isDarkMode` (bool). Método `toggleTheme()`.
-
-### Vistas
-
-#### `HomeView` — `lib/presentation/views/home_view.dart`
-
-Tipo: `ConsumerStatefulWidget`
-
-**Estructura de la pantalla** (de arriba a abajo):
-
-1. `AppBar` con título "Calorie Counter". `actions` (de izquierda a derecha):
-   - `PopupMenuButton` con icono `Icons.import_export`, dos opciones:
-     - **Exportar Alimentos (TSV)** → genera el TSV (`exportFoodsTsvProvider`), lo codifica a UTF-8 y lo guarda con `FileSaver.instance.saveAs` (SAF en Android 13+). Nombre: `db_alimentos_export_<yyyy-MM-dd_HH-mm-ss>.tsv`.
-     - **Importar Alimentos (TSV)** → `FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['tsv'], withData: true)`, decodifica UTF-8 y llama a `importFoodsTsvProvider`.
-   - `IconButton` `Icons.settings` → navega a `SettingsView`.
-2. Sección **"Metas (Objetivo)"**: grid 4 columnas (Kcal, Grasas, Carbs, Prot) en color `AppStyles.neutral`.
-3. Sección **"Consumido"**: mismo grid con color calculado por semáforo.
-4. Sección **"Restante"**: mismo grid con color calculado por semáforo de restante.
-5. Botón **"Agregar Ingesta"** (navega a `SearchView`).
-6. `Card` con `ExpansionTile` **"Resumen del Día"** (expandido por defecto).
-   - Lista cada `Meal` como `ListTile` con: nombre, count items, totales de kcal/G/C/P.
-   - Tap en `ListTile` → `MealItemsDialog`.
-   - Icono delete → dialog de confirmación → `HomeNotifier.deleteMeal`.
-   - Botones al pie: "Exportar Día" y "Eliminar Día" (rojo).
-
-**Lógica de semáforo** — `_computeColorForConsumed(target, consumed, tolerance)`:
-
-| Condición                                          | Color          |
-| -------------------------------------------------- | -------------- |
-| `consumed < target` (por debajo, con epsilon 0.01) | `semaphRed`    |
-| `consumed ≈ target` (±0.01)                        | `semaphGreen`  |
-| `target < consumed ≤ target * (1 + tolerance/100)` | `semaphOrange` |
-| `consumed > target * (1 + tolerance/100)`          | `semaphRed`    |
-
-**Lógica de semáforo** — `_computeColorForRemaining(remaining)`:
-
-| Condición                                   | Color          |
-| ------------------------------------------- | -------------- |
-| `remaining ≤ -10` o `remaining ≥ 10`        | `semaphRed`    |
-| `-9 ≤ remaining ≤ -3` o `3 ≤ remaining ≤ 9` | `semaphOrange` |
-| `-2 ≤ remaining ≤ 2`                        | `semaphBlue`   |
-
-**Cálculo de targets en la vista** (fórmulas exactas):
-
-```dart
-final double targetKcal  = settings.kcalTarget.toDouble();
-final double targetProt  = settings.weightKg * settings.proteinsPerKg;
-final double targetFats  = settings.weightKg * settings.fatsPerKg;
-final double targetCarbs = (targetKcal - (targetProt * 4 + targetFats * 9)) / 4;
-```
-
-**Detección de nuevo día** (en `initState` via `addPostFrameCallback`):
-
-1. Llama `CheckNewDayOnStartup`. **Solo devuelve no-null si hay items en `items_comida` Y la última fecha es anterior a hoy** (cualquier comida sin items o cualquier fecha = hoy → no muestra dialog).
-2. Si devuelve una fecha, muestra `AlertDialog` con tres opciones: Cancelar, Descartar, Exportar.
-   - **Descartar**: llama a `MealRepository.clearMealsAndItems()` (vacía completamente ambas tablas) y luego `refresh()`.
-   - **Exportar**: llama a `ExportDayToCsv(lastDate)`. Si el path es no vacío (export exitoso), `clearMealsAndItems()` se ejecuta dentro del use case, luego `refresh()` y se muestra `SnackBar`.
-
-#### `SearchView` — `lib/presentation/views/search_view.dart`
-
-Tipo: `ConsumerStatefulWidget`
-
-**Funcionalidades**:
-
-- Campo de texto con búsqueda en tiempo real (via `SearchNotifier`).
-- Lista de resultados de `searchResultsProvider`.
-- Tap en alimento → `AddFoodPopup`.
-- Icono editar en alimento → `FoodFormView` (modo edición).
-- Icono eliminar en alimento → confirmación → `FoodRepository.deleteFood`.
-- `FloatingActionButton` (+) → `FoodFormView` (modo creación).
-- Menú en `AppBar`: "Exportar DB" y "Importar DB".
-  - Exportar: usa `FilePicker.saveFile` (con `bytes:`) para guardar el archivo exportado.
-  - Importar: usa `file_picker` para seleccionar `.db`, luego `ImportDatabase`.
-
-#### `SettingsView` — `lib/presentation/views/settings_view.dart`
-
-Tipo: `ConsumerStatefulWidget`
-
-**Campos del formulario** (todos con validación):
-
-| Campo               | Tipo                      | Validación                           |
-| ------------------- | ------------------------- | ------------------------------------ |
-| Peso (kg)           | decimal, requerido        | > 0                                  |
-| Altura (cm)         | decimal, requerido        | > 0                                  |
-| Edad (años)         | entero, requerido         | > 0                                  |
-| % Grasa Corporal    | decimal, **opcional**     | 1–60 si se ingresa                   |
-| Sexo                | `SegmentedButton`         | "male" / "female"                    |
-| Factor de Actividad | `DropdownButtonFormField` | uno de: 1.2, 1.375, 1.55, 1.725, 1.9 |
-| Kcal Objetivo       | entero, requerido         | > 0                                  |
-| Proteínas (g/kg)    | decimal, requerido        | > 0                                  |
-| Grasas (g/kg)       | decimal, requerido        | > 0                                  |
-| Tolerancia (%)      | entero, requerido         | 0–100                                |
-
-> **Nota**: El selector de Sexo se **deshabilita** automáticamente cuando se ingresa un % de grasa corporal válido (porque Katch-McArdle no depende del sexo).
-
-**Cálculo TDEE** (botón "Calcular TDEE"):
-
-- Si `bodyFatPercent` es válido (> 0 y ≤ 60): **Katch-McArdle**
-  ```
-  lbm = weight * (1 - bodyFat/100)
-  TMB = 370 + (21.6 * lbm)
-  ```
-- Si no: **Mifflin-St Jeor**
-  ```
-  c   = sex == 'male' ? 5 : -161
-  TMB = (10 * weight) + (6.25 * height) - (5 * age) + c
-  ```
-- En ambos casos: `TDEE = TMB * activityFactor` → se redondea y se escribe en `_kcalController`.
-
-**Toggle de tema** en `AppBar` (switch con icono de sol/luna).
-
-**Card "Requerimientos Calculados"**: actualizada en tiempo real mientras el usuario edita campos (via `onChanged: (_) => setState({})`). Muestra proteínas, grasas y carbohidratos absolutos en gramos.
-
-#### `FoodFormView` — `lib/presentation/views/food_form_view.dart`
-
-Tipo: `ConsumerStatefulWidget`
-
-Modo creación: recibe `food: null`. Modo edición: recibe `food: Food`.
-
-Campos: nombre (texto), kcal/100g, grasas/100g, carbohidratos/100g, proteínas/100g.
-
-Al guardar: `FoodRepository.insertFood` (modo creación) o `FoodRepository.updateFood` (modo edición).
-
-### Widgets
-
-#### `NutrientCard` — `lib/presentation/widgets/nutrient_card.dart`
-
-Widget sin estado. Recibe: `label`, `value` (String), `unit`, `valueColor`.
-
-Renderiza una `Card` con el label arriba, el valor numérico grande en `valueColor`, y la unidad debajo.
-
-#### `AddFoodPopup` — `lib/presentation/widgets/add_food_popup.dart`
-
-`AlertDialog` para agregar un alimento a una comida.
-
-**Lógica interna**:
-
-1. Carga la lista de comidas del día actual (`MealRepository.getMealsByDate`).
-2. Muestra dropdown de comidas existentes + opción "Nueva comida" (auto-nombrada `Comida_N+1` donde N es el número de comidas existentes).
-3. Campo de texto para cantidad en gramos.
-4. Al confirmar:
-   - Si seleccionó "Nueva comida": llama `CreateMealIfNotExists` para crearla.
-   - Llama `AddFoodToMeal` con el `mealId`, el alimento y la cantidad.
-   - Llama `HomeNotifier.refresh()`.
-
-#### `MealItemsDialog` — `lib/presentation/widgets/meal_items_dialog.dart`
-
-`AlertDialog` con lista de `MealItem` de una comida.
-
-- Muestra: nombre del alimento, cantidad (g), kcal, G/C/P.
-- Botón editar → dialog para cambiar cantidad → `HomeNotifier.updateMealItemQuantity`.
-- Botón eliminar → confirmación → `HomeNotifier.deleteMealItem`.
+- **Importar mis datos de la versión anterior**: aparece si existe `db_ctrl_calorias.db` y migra todo con `MigrateLegacyData`, según el Apéndice A del plan:
+  - Cada producto pasa a ser un alimento envasado, con la tabla de su alimento vinculado.
+  - Las compras pasan a céntimos.
+  - Se migran las listas con el carrito, las recetas y las comidas.
+  - El archivo antiguo **no se modifica**.
+- **Catálogo base**: 678 alimentos genéricos en `assets/semilla/alimentos_base.json`, con uuid determinista para que el mismo catálogo coincida entre usuarios.
+- **Restaurar o importar** un archivo.
+- **Empezar vacío.**
 
 ---
 
-## Estilos y constantes
+## OCR de etiquetas
 
-### `AppStyles` — `lib/core/styles.dart`
+Desde el formulario de alimento, *Leer la etiqueta con la cámara* sigue estos pasos:
 
-```dart
-// Colores
-static const Color primary      = Color(0xFF6200EE);
-static const Color semaphRed    = Color(0xFFD32F2F);
-static const Color semaphGreen  = Color(0xFF388E3C);
-static const Color semaphOrange = Color(0xFFF57C00);
-static const Color semaphBlue   = Color(0xFF1976D2);
-static const Color neutral      = Color(0xFF757575);
+1. Foto con `image_picker` (cámara o galería).
+2. Reconocimiento de texto con **ML Kit** en el dispositivo (`MlKitLabelRecognizer`, modelo latino incluido: sin internet).
+3. Interpretación con `NutritionLabelParser`, que es Dart puro y está probado con textos reales:
+   - Agrupa en filas las líneas que están a la misma altura, porque el OCR devuelve las columnas por separado.
+   - Reconoce las etiquetas UE en español, portugués, francés, inglés, italiano y alemán.
+   - Toma la columna "por 100 g/ml" e ignora los % de ingesta de referencia.
+   - Energía: usa las kcal; si solo hay kJ, divide entre 4,184.
+   - Corrige errores típicos del OCR (`O`→`0`, `l`→`1`, comas sueltas).
+   - "<0,5 g" y "trazas" cuentan como 0. Con sodio, `sal = sodio × 2,5`.
+   - Si solo hay valores por ración y lee su peso, los convierte a 100 g. También lee el contenido neto.
+   - Marca como dudosos los valores sin unidad o incoherentes (saturadas > grasas, azúcares > hidratos, kcal que no cuadran con los macros).
+4. Hoja de revisión (`LabelReviewSheet`) con la foto, los valores y avisos. Los valores pasan al formulario y **nunca se guardan sin que el usuario confirme**. El origen queda como `etiqueta_ocr`.
 
-// Paddings
-static const double paddingSmall  = 8.0;
-static const double paddingMedium = 16.0;
-static const double paddingLarge  = 24.0;
-
-static const double borderRadius  = 8.0;
-```
-
-Ambos temas (light y dark) usan `useMaterial3: true` con `seedColor: primary`.
-
-- **Light**: AppBar fondo `primary`, foreground `Colors.white`.
-- **Dark**: AppBar fondo `Colors.grey[900]`, foreground `Colors.white`. Cards en `Colors.grey[850]`.
-
-### `AppConstants` — `lib/core/constants.dart`
-
-```dart
-static const String appName = 'Calorie Counter';
-static const String dbName  = 'db_ctrl_calorias.db';
-```
+El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 
 ---
 
-## Flujo de navegación
-
-```
-MyApp (MaterialApp)
-  └── MainShell  ← raíz: NavigationBar + IndexedStack (cada pestaña conserva su estado)
-        ├── [0] HomeView      (Calorías)
-        ├── [1] RecipesView   (Recetas)  → RecipeDetailView / RecipeFormView / RecipeImportView
-        ├── [2] ShoppingListsView (Compras) → ShoppingListDetailView
-        └── [3] ProductsView  (Productos) → ProductDetailView / ProductFormView / BarcodeScannerView
-
-HomeView (pestaña Calorías)
-        ├── [push] SettingsView
-        │           └── [pop] → HomeView.refresh()
-        ├── [push] SearchView
-        │           ├── [push] FoodFormView (crear)
-        │           │           └── [pop] → SearchView
-        │           ├── [push] FoodFormView (editar)
-        │           │           └── [pop] → SearchView
-        │           └── [push] BarcodeScannerView (registrar ingesta escaneando el envase)
-        └── [showDialog] AlertDialog (confirmar eliminación, nuevo día, etc.)
-```
-
-> Las subpantallas de los módulos se abren con `Navigator.push` sobre la barra inferior. Los selectores reutilizables (`FoodPickerView`, `ProductPickerView`, `BarcodeScannerView.scan`) devuelven su resultado con `Navigator.pop(context, valor)`.
-
-> La navegación usa `Navigator.push` y `MaterialPageRoute` en todos los casos. No hay `go_router` ni ningún paquete de navegación declarativa. Las rutas con nombre no están definidas.
-
-> Después de cada `Navigator.push(...).then((_) => ...)`, se llama a `HomeNotifier.refresh()` o `SearchNotifier.search(query)` para actualizar la UI.
-
----
-
-## Esquema de la base de datos SQLite
-
-Nombre del archivo: `db_ctrl_calorias.db`  
-Ubicación en runtime: `getApplicationDocumentsDirectory()/db_ctrl_calorias.db`  
-Versión de esquema: 1
-
-### Tabla `db_alimentos`
-
-```sql
-CREATE TABLE IF NOT EXISTS db_alimentos (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  alimento      TEXT NOT NULL UNIQUE,   -- nombre del alimento (clave de unicidad)
-  kCal          REAL NOT NULL,          -- kcal por 100g
-  grasas        REAL NOT NULL,          -- grasas en g por 100g
-  carbohidratos REAL NOT NULL,          -- carbohidratos en g por 100g
-  proteinas     REAL NOT NULL,          -- proteínas en g por 100g
-  uso_count     INTEGER NOT NULL DEFAULT 0, -- nº de veces agregado a una comida
-  ultimo_uso    TEXT                    -- timestamp ISO8601 del último uso (nullable)
-);
-```
-
-> Las columnas `uso_count` y `ultimo_uso` alimentan la lista **"Usados con frecuencia"** que `SearchView` muestra bajo el buscador cuando está vacío (orden `uso_count DESC, ultimo_uso DESC`). El contador se incrementa en `AddFoodPopup` al agregar un alimento a una comida, por lo que **persiste** aunque `ExportDayToCsv` vacíe `comidas`/`items_comida`. Como la BD precargada de assets no tiene estas columnas, `_createTables` ejecuta una migración idempotente (`PRAGMA table_info` + `ALTER TABLE ADD COLUMN`). `FoodModel` no las serializa, por lo que el formato TSV y export/import `.db` no cambian.
-
-### Tabla `comidas`
-
-```sql
-CREATE TABLE IF NOT EXISTS comidas (
-  id     INTEGER PRIMARY KEY AUTOINCREMENT,
-  nombre TEXT NOT NULL,                -- "Comida_1", "Comida_2", etc.
-  fecha  TEXT NOT NULL                 -- ISO8601 fecha solo: "YYYY-MM-DD"
-);
-```
-
-### Tabla `items_comida`
-
-```sql
-CREATE TABLE IF NOT EXISTS items_comida (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  comida_id     INTEGER NOT NULL REFERENCES comidas(id) ON DELETE CASCADE,
-  cantidad      REAL NOT NULL,         -- gramos consumidos
-  alimento      TEXT NOT NULL,         -- nombre del alimento (copia desnormalizada)
-  grasas        REAL NOT NULL,         -- grasas ya escaladas a 'cantidad'
-  carbohidratos REAL NOT NULL,         -- carbos ya escalados a 'cantidad'
-  proteinas     REAL NOT NULL,         -- proteínas ya escaladas a 'cantidad'
-  kCal          REAL NOT NULL          -- kcal ya escaladas a 'cantidad'
-);
-```
-
-> **IMPORTANTE**: sqflite **no** activa `PRAGMA foreign_keys` (SQLite las trae desactivadas por defecto) y la app no lo hace en `onConfigure`, así que los `REFERENCES ... ON DELETE CASCADE` son solo documentales. Por eso `deleteMeal` borra los `items_comida` de la comida en la misma transacción, `_createTables` elimina en cada apertura los items huérfanos que dejaban versiones anteriores (`comida_id` sin comida) y `hasMealItems` solo cuenta items de comidas existentes (JOIN). Los módulos nuevos también borran sus hijos explícitamente en transacción.
-
-### Tablas de recetas, productos y listas de compra
-
-Definidas en `lib/data/datasources/module_tables.dart` (`createModuleTables`, llamado desde `_createTables`; todo `IF NOT EXISTS`). Los `alimento_id` apuntan a `db_alimentos.id` sin FK: si el alimento se borra, el vínculo se trata como "sin vincular".
-
-```sql
-CREATE TABLE recetas (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nombre TEXT NOT NULL, categoria TEXT, porciones INTEGER, tiempo_min INTEGER,
-  elaboracion TEXT NOT NULL DEFAULT '',   -- un paso por línea
-  notas TEXT, favorita INTEGER NOT NULL DEFAULT 0,
-  alimento_id INTEGER,                    -- vínculo opcional a db_alimentos
-  peso_porcion_g REAL,                    -- gramos de una porción (para "Registrar porción")
-  creada TEXT NOT NULL, actualizada TEXT NOT NULL
-);
-CREATE TABLE ingredientes_receta (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  receta_id INTEGER NOT NULL, orden INTEGER NOT NULL,
-  texto TEXT NOT NULL                     -- línea tal cual: "200 g de arroz"
-);
-CREATE TABLE productos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  codigo_barras TEXT UNIQUE,              -- NULL si no tiene (varios NULL permitidos)
-  nombre TEXT NOT NULL, marca TEXT, presentacion TEXT,
-  alimento_id INTEGER,                    -- vínculo opcional a db_alimentos
-  creado TEXT NOT NULL
-);
-CREATE TABLE compras (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  producto_id INTEGER NOT NULL,
-  fecha TEXT NOT NULL,                    -- "YYYY-MM-DD"
-  precio REAL NOT NULL,                   -- precio unitario, 2 decimales
-  establecimiento TEXT NOT NULL
-);
-CREATE TABLE listas_compra (
-  id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL, creada TEXT NOT NULL
-);
-CREATE TABLE items_lista_compra (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  lista_id INTEGER NOT NULL, texto TEXT NOT NULL, cantidad TEXT,
-  producto_id INTEGER,                    -- vínculo opcional: precio de referencia
-  comprado INTEGER NOT NULL DEFAULT 0, orden INTEGER NOT NULL,
-  unidades INTEGER NOT NULL DEFAULT 1,    -- modo carrito: unidades en el carrito
-  precio_pagado REAL,                     -- precio unitario pagado en esta compra
-  compra_id INTEGER                       -- fila de compras registrada desde el artículo
-);
--- unidades/precio_pagado/compra_id se añaden con ensureColumn (PRAGMA + ALTER) a tablas antiguas.
--- Índices: ingredientes_receta(receta_id, orden), compras(producto_id, fecha), items_lista_compra(lista_id)
-```
-
----
-
-## Persistencia de configuración (SharedPreferences)
-
-El paquete `shared_preferences` se usa exclusivamente para dos propósitos:
-
-1. **Tema** (clave `isDarkMode`, tipo `bool`).
-2. **Configuración del usuario** (10 claves, ver tabla en sección [SettingsRepositoryImpl](#settingsrepositoryimpl)).
-
-No se usa para ningún otro tipo de estado.
-
----
-
-## Lógica de negocio crítica
-
-### Escalado de macronutrientes
-
-Al agregar un alimento (`AddFoodToMeal`):
-
-```dart
-final factor = cantidad / 100.0;
-final grasas        = food.grasasPer100  * factor;
-final carbos        = food.carbsPer100   * factor;
-final proteinas     = food.proteinsPer100 * factor;
-final kcal          = food.kcalPer100    * factor;
-```
-
-Al editar la cantidad de un `MealItem` (`LocalDataSourceImpl.updateMealItem`):
-
-```dart
-final ratio         = newCantidad / oldCantidad;
-// Todos los macros se multiplican por ratio
-```
-
-### Cálculo de carbohidratos objetivo
-
-Los carbohidratos **no** tienen una meta directa en g/kg. Se calculan como residuo:
-
-```dart
-proteinsReq = weightKg * proteinsPerKg;
-fatsReq     = weightKg * fatsPerKg;
-carbsReq    = (kcalTarget - (proteinsReq * 4 + fatsReq * 9)) / 4;
-```
-
-> Coeficientes calóricos: proteínas = 4 kcal/g, grasas = 9 kcal/g, carbohidratos = 4 kcal/g.
-
-### Nomenclatura de comidas
-
-Las nuevas comidas se nombran automáticamente `Comida_N` donde `N` es el número de comidas que ya existen para ese día + 1. El `AddFoodPopup` calcula este valor consultando `getMealsByDate` antes de mostrar el popup.
-
-### Exportación CSV diaria
-
-El CSV diario usa separador **tabulador** (`\t`), generado con `csv.ListToCsvConverter(fieldDelimiter: '\t')`. Cada fila corresponde a un `MealItem`. Header: `nombre_comida\tcantidad\talimento\tgrasas\tcarbos\tproteinas\tkcal`. Se añade una fila final con totales (`Total`). El archivo se guarda con `FilePicker.platform.saveFile` (SAF) y nombre `comidas_<yyyy-MM-dd>.csv`.
-
-> **IMPORTANTE**: Aunque la extensión del archivo es `.csv` (compatibilidad histórica), el delimitador real es **TAB**, no coma. No cambiar a coma sin actualizar también los tests y el comportamiento esperado por el usuario.
-
-### Limpieza tras exportar (`ExportDayToCsv`)
-
-Tras una exportación CSV diaria exitosa (path devuelto no vacío), `ExportDayToCsv` invoca `clearMealsAndItems()`. **Esto afecta a los DOS callsites** de `exportDayToCsvProvider` en la UI:
-
-1. Botón **"Exportar"** del dialog "Nuevo Día Detectado" → exporta + vacía + `refresh()` (idempotente porque la home muestra hoy y hoy estará vacío).
-2. Botón **"Exportar Día"** del resumen del día → exporta + vacía + `refresh()` (la home queda visiblemente vacía tras la operación).
-
-Si el usuario cancela el diálogo SAF, el path devuelto es vacío y NO se vacía nada.
-
-### Formato TSV de alimentos
-
-Header (línea 1, exacto):
-
-```
-id<TAB>alimento<TAB>kCal<TAB>grasas<TAB>carbohidratos<TAB>proteinas
-```
-
-Cada fila contiene los 6 campos separados por TAB. Reglas:
-
-- En exportación: caracteres `\t`, `\n` y `\r` del nombre se reemplazan por espacio.
-- En importación: el campo `id` se ignora (autoincrement). `UNIQUE` en `alimento` filtra duplicados con `ConflictAlgorithm.ignore`.
-- Encoding UTF-8 sin BOM.
-- Nombre de archivo de exportación: `db_alimentos_export_<yyyy-MM-dd_HH-mm-ss>.tsv` (los `:` de la hora se reemplazan por `-` para compatibilidad con Windows).
-
----
-
-## Módulos: Recetas, Listas de compra y Productos
-
-Los tres módulos son independientes del contador (pestañas propias) pero comparten la BD y se conectan entre sí y con las calorías:
-
-| Conexión | Dónde |
-| --- | --- |
-| Receta → lista de compra | `RecipeDetailView` → "Añadir lo que me falta a la lista" (`AddIngredientsToShoppingList` separa nombre y cantidad y omite los ya pendientes) |
-| Lista ↔ productos | Artículos vinculados a un producto muestran su último precio (estimación de lo que falta); al marcarlos se ofrece "Añadir precio"; el **Modo carrito** escanea lo que metes en el carrito, suma el total, marca la lista y registra cada precio en el historial |
-| Receta ↔ calorías | `recetas.alimento_id` + `peso_porcion_g`: el detalle muestra kcal/macros por 100 g y por porción y "Registrar porción" abre `AddFoodPopup` con esa cantidad |
-| Producto ↔ calorías | `productos.alimento_id`: en `SearchView` el botón de escáner busca el producto y abre `AddFoodPopup` con su alimento (ofrece registrar/vincular si falta) |
-
-### Recetas
-
-- **Búsqueda por ingredientes** (`SearchRecipesByIngredients`, Dart puro): el usuario escribe "huevo, patata y cebolla". `ingredient_matcher.dart` normaliza (sin tildes, minúsculas), singulariza de forma consistente (tomates→tomate, limones→limon, nueces→nuez), descarta cantidades/unidades/palabras vacías y unifica sinónimos regionales (papa=patata, palta=aguacate, choclo=elote=maíz...). Un ingrediente coincide si los tokens de uno contienen a los del otro ("pollo" ↔ "pechuga de pollo").
-- **Ranking**: primero las recetas completas ("¡Puedes hacerla!"), luego mayor % cubierto, más coincidencias y nombre. Las líneas con "(opcional)" no cuentan como faltantes. Opción para asumir **básicos** (sal, pimienta, agua, aceite) y para mostrar solo las completas. Una receta solo aparece si al menos un ingrediente lo indicó el usuario (los básicos no bastan).
-- **Datos**: los ingredientes se guardan como líneas libres (`ingredientes_receta.texto`); el nombre para comparar se calcula al vuelo, así que mejorar el parser no requiere migrar datos.
-- **Importación** (`RecipeTextCodec.parse`, por extensión o contenido) con vista previa (`RecipeImportView`) y omisión de duplicados por nombre (`ImportRecipes`):
-  - **Texto / plantilla `.txt` o texto pegado** (formato principal, pensado para usuarios no técnicos). Encabezados sin importar mayúsculas ni tildes y con sinónimos: `RECETA/NOMBRE/TÍTULO`, `CATEGORÍA/TIPO`, `PORCIONES/RACIONES/PERSONAS`, `TIEMPO` ("1 h 30 min" = 90), `INGREDIENTES`, `PREPARACIÓN/ELABORACIÓN/PASOS/INSTRUCCIONES`, `NOTAS`. Viñetas y numeración se eliminan sin romper "1.5 kg"; `#` = comentario; recetas separadas por `---` o un nuevo `RECETA:`. Sin encabezados (p. ej. copiado de WhatsApp) la 1ª línea es el nombre y las líneas con viñeta o cantidad se toman como ingredientes.
-  - **JSON**: lista, `{"recetas": [...]}` u objeto; claves flexibles; ingredientes/pasos como lista o texto.
-  - **CSV**: cabecera obligatoria, delimitador `;`, `,` o TAB autodetectado; ingredientes separados por salto de línea, `|`, `;` o coma (sin partir "1,5").
-- **Exportación**: "Exportar todas" guarda un `.txt` en el mismo formato (copia de seguridad reimportable); "Copiar como texto" lleva una receta al portapapeles; "Ver plantilla" permite copiarla o guardarla.
-
-Ejemplo de plantilla:
-
-```
-RECETA: Tortilla de patatas
-CATEGORÍA: Plato principal
-PORCIONES: 4
-TIEMPO: 40 min
-
-INGREDIENTES:
-- 4 huevos
-- 500 g de patatas
-- 1 cebolla (opcional)
-- Sal
-
-PREPARACIÓN:
-1. Pelar y cortar las patatas.
-2. Freírlas y cuajar con el huevo batido.
----
-```
-
-### Productos y precios
-
-- **Escáner** (`BarcodeScannerView`, paquete `mobile_scanner` con ML Kit empaquetado → funciona sin internet): formatos de comercio EAN-13/8, UPC-A/E, Code128/39, ITF-14; linterna; entrada manual del código; mensaje claro si se niega el permiso de cámara.
-- Producto conocido → detalle + diálogo de compra precargado con el último precio y establecimiento. Desconocido → `ProductFormView` con el código (incluye primera compra opcional). También se pueden añadir productos **sin código** (fruta a granel, mercado...).
-- **Detalle**: último precio, mínimo/promedio/máximo de los últimos 3 meses (`GetPriceStats`), último precio en cada establecimiento con el más barato destacado, historial (mantener pulsado para borrar).
-- **Retención de 3 meses** (`PurgeOldPurchases`): al abrir la app y antes de exportar se borran las compras anteriores a `threeMonthsAgo(hoy)` **salvo la última de cada producto**, que se conserva siempre.
-- **Export CSV** (`ExportPriceHistoryCsv`): `historial_precios_YYYY-MM-DD.csv`, separado por **TAB** como el resto de exports, una fila por compra de los últimos 3 meses ordenada por producto y fecha. Cabecera: `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio_eur`. El precio va como número sin símbolo (`0.90`) para poder operar con él en la hoja de cálculo; la moneda la indica la cabecera.
-- Precios: se aceptan coma o punto decimal (`RegisterPurchase.parsePrecio`); se muestran en euros con `AppUtils.formatPrecio` ("1.234,50 €", espacio no separable) y los campos de precio llevan el sufijo `€`. Para precargar un campo editable se usa `AppUtils.formatPrecioEditable` ("1234,50").
-
-### Listas de compra
-
-- Añadir rápido escribiendo ("2 L de leche" → artículo "Leche", cantidad "2 L") o desde el catálogo de productos.
-- Pendientes arriba, comprados tachados abajo. Tocar = marcar; mantener pulsado = editar (texto, cantidad, producto vinculado); deslizar a la izquierda = borrar.
-- Menú: copiar como texto (para WhatsApp), desmarcar todo, quitar comprados, renombrar, eliminar.
-- Barra inferior: **En el carrito** (unidades × precio pagado de lo comprado) y **Falta por comprar (estimado)** con el último precio conocido de los pendientes.
-- Marcar a mano → SnackBar «Añadir precio»: con producto vinculado pide precio, unidades y tienda y lo registra en el historial (`AddProductToCart`); sin producto, el precio solo cuenta para el total. Desmarcar (o «Desmarcar todo») saca el artículo del carrito pero **conserva** la compra del historial.
-
-### Modo carrito (`CartModeView`)
-
-Botón/FAB «Modo carrito» en una lista: cámara siempre abierta para ir escaneando lo que se mete en el carrito.
-
-1. Al entrar pregunta **«¿En qué tienda estás?»** (autocompletado + accesos rápidos a las últimas tiendas); se usa para registrar todas las compras y se puede cambiar desde la AppBar.
-2. Cada código escaneado (`BarcodeScannerPanel` incrustado, escaneo continuo; el mismo código se acepta de nuevo tras ~2,5 s = una unidad más):
-   - **Producto con precio guardado** → tarjeta con el último precio precargado y unidades: **un toque** en «Añadir al carrito» (se puede corregir el precio de la etiqueta ahí mismo; no abre el teclado).
-   - **Producto sin precio** → el campo queda vacío y es obligatorio: «No hay precio guardado: escribe el de la etiqueta y quedará registrado».
-   - **No está en la lista** → aviso naranja y botón «Añadir aunque no está en la lista» (pregunta antes de sumarlo).
-   - **Código desconocido** → tarjeta «Producto nuevo» (nombre, marca, precio, unidades): crea el producto, registra la compra y lo mete en el carrito.
-3. `findItemForProduct` (`lib/domain/services/cart_matching.dart`) decide qué artículo marcar: el que ya está en el carrito (suma unidades) → pendiente vinculado al producto → pendiente sin vincular cuyo texto coincide ("Leche" ↔ "Leche entera", misma normalización que las recetas).
-4. `AddProductToCart` registra la compra en `compras` (precio unitario, tienda, hoy) y guarda en el artículo `unidades`, `precio_pagado` y `compra_id`. Escanear otra vez el mismo producto suma unidades sin duplicar la compra (si cambió el precio, la corrige). `UpdateCartItem` corrige precio/unidades (y la compra); `RemoveFromCart` («Quitar del carrito») borra la compra y devuelve el artículo a pendiente.
-5. Total en vivo, lista de lo que llevas («2× Leche 1,05 €/ud. = 2,10 €», tocar para editar o quitar) y sección «Te falta»: tocar un pendiente lo mete sin escanear (fruta a granel, productos sin código).
-6. «Terminar compra»: resumen (total, artículos, tienda) y opción de quitar los comprados de la lista o mantenerla.
+## Calorías: objetivos, TDEE y día
+
+- **Objetivos**:
+  - `proteinas = peso × g/kg`
+  - `grasas = peso × g/kg`
+  - **carbohidratos = residuo calórico**: `(kcalObjetivo − (proteinas·4 + grasas·9)) / 4`
+- **TDEE** (`SettingsView`):
+  - Con % de grasa corporal válido: **Katch-McArdle**, `TMB = 370 + 21,6 × masa magra` (el sexo no interviene y su selector se deshabilita).
+  - Si no: **Mifflin-St Jeor**, `10·peso + 6,25·altura − 5·edad + (5 | −161)`.
+  - `TDEE = TMB × factor de actividad`.
+- **Agregar** (`AddFoodToMeal`): `factor = cantidad / 100` sobre la tabla del alimento. **Editar la cantidad** (`updateMealItem`) aplica `ratio = nueva / anterior` sobre lo ya guardado, sin volver a consultar el alimento.
+- **Comidas**: se nombran `Comida_N`. La cantidad sugerida es el máximo que cabe en todas las metas restantes. Las porciones caseras aparecen como atajos.
+- **Exportar el día** (`ExportDayToCsv`): TAB, cabecera `nombre_comida\tcantidad\talimento\tgrasas\tcarbos\tproteinas\tkcal`, fila final `Total`. **Tras exportar con éxito vacía `comidas` e `items_comida`.**
+- **Nuevo día** (`CheckNewDayOnStartup`): al abrir la app, si hay items **y** la última fecha es anterior a hoy, se ofrece exportar o descartar el día anterior.
 
 ---
 
 ## Configuración Android
 
-### `AndroidManifest.xml`
-
-Permisos declarados:
-
-```xml
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="29"/>
-```
-
-Lector de códigos de barras (la cámara es opcional: sin ella se escribe el código a mano):
-
-```xml
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-feature android:name="android.hardware.camera" android:required="false" />
-```
-
-`mobile_scanner` pide el permiso de cámara en tiempo de ejecución al abrir el escáner y exige `minSdk 23` (Flutter 3.44 usa 24). Con AGP 8.x y `android.builtInKotlin=false` el plugin aplica KGP por sí mismo.
-
-Flag de almacenamiento legacy (para compatibilidad):
-
-```xml
-android:requestLegacyExternalStorage="true"
-```
-
-La actividad principal soporta `processText` para integración con selección de texto del sistema.
-
-### Permisos en runtime
-
-El paquete `permission_handler` gestiona los permisos de almacenamiento en tiempo de ejecución, necesarios para exportar/importar la base de datos en Android < 13.
+- **Toolchain anclada**: AGP 8.13.1 con `android.builtInKotlin=false` y `android.newDsl=false`. Flutter 3.44 no soporta todavía el DSL nuevo de AGP 9, y bajo AGP 9 `file_picker` deja de aplicar KGP. Revisar al actualizar Flutter.
+- **`google_mlkit_text_recognition` anclado a `^0.16.0`**: las versiones 0.17+ y 1.x se compilan para AGP 9 con Kotlin integrado y romperían el build. La 0.16 aplica `kotlin-android` por sí misma, igual que `file_picker` y `mobile_scanner`.
+- **SQLite**: la incluye el paquete `sqlite3` mediante *build hooks*. Durante el build descarga binarios precompilados, así que el build necesita internet.
+- **Permisos**: `CAMERA` (escáner de códigos con `mobile_scanner` y fotos con `image_picker`), con `uses-feature camera required=false`: sin cámara se escribe el código a mano. Los permisos de almacenamiento heredados solo aplican a Android ≤ 12. Importar y exportar usa SAF.
+- **iOS**: `Info.plist` incluye `NSCameraUsageDescription` y `NSPhotoLibraryUsageDescription`. No se ha probado en iOS.
+- `file_saver` se eliminó (aplicaba KGP y bloqueaba la toolchain); no reintroducirlo.
 
 ---
 
 ## Dependencias
 
-### Runtime
-
-| Paquete              | Versión   | Uso                                   |
-| -------------------- | --------- | ------------------------------------- |
-| `flutter_riverpod`   | `^2.6.1`  | State management global               |
-| `sqflite`            | `^2.4.1`  | Base de datos SQLite local            |
-| `path_provider`      | `^2.1.5`  | Directorios del dispositivo           |
-| `path`               | `^1.9.0`  | Manipulación de rutas de archivo      |
-| `csv`                | `^6.0.0`  | Generación de CSV (exportación)       |
-| `intl`               | `^0.19.0` | Formato de fechas en español          |
-| `equatable`          | `^2.0.7`  | Comparación de entidades de dominio   |
-| `shared_preferences` | `^2.3.5`  | Persistencia de settings y tema       |
-| `permission_handler` | `^11.3.1` | Permisos de almacenamiento en Android |
-| `file_picker`        | `^11.0.2` | Selección y guardado de archivos      |
-| `mobile_scanner`     | `^7.5.0`  | Lector de códigos de barras (cámara, ML Kit empaquetado) |
-| `cupertino_icons`    | `^1.0.8`  | Iconos iOS (incluidos por defecto)    |
-
-### Dev
-
-| Paquete                     | Versión  | Uso                                                                                                     |
-| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| `flutter_lints`             | `^5.0.0` | Reglas de análisis estático                                                                             |
-| `sqflite_common_ffi`        | `^2.3.6` | SQLite en tests de escritorio                                                                           |
-| `plugin_platform_interface` | `^2.1.8` | Necesario para mockear `FilePicker.platform` en `csv_export_test.dart` vía `MockPlatformInterfaceMixin` |
+| Paquete | Uso |
+|---|---|
+| `flutter_riverpod` 2.6 | Estado e inyección de dependencias |
+| `drift`, `drift_flutter`, `sqlite3` | Base de datos (Drift sobre SQLite incluida, FTS5) |
+| `uuid` | Identidad global de alimentos, presentaciones y recetas |
+| `mobile_scanner` | Escáner de códigos de barras (ML Kit incluido) |
+| `google_mlkit_text_recognition` (0.16), `image_picker` | OCR de etiquetas |
+| `file_picker` | Guardar/abrir archivos con SAF |
+| `path_provider`, `path` | Directorios (base de datos antigua, temporales, copia automática) |
+| `shared_preferences` | Ajustes del usuario y tema |
+| `csv`, `intl`, `equatable` | CSV diario, formato es-ES, igualdad de entidades |
+| dev: `drift_dev`, `build_runner` | Generación de código de Drift |
+| dev: `flutter_lints`, `plugin_platform_interface` | Análisis; mock de `file_picker` |
 
 ---
 
-## Cómo ejecutar el proyecto
+## Pruebas
 
-```bash
-# Instalar dependencias
-flutter pub get
-
-# Ejecutar en dispositivo/emulador Android
-flutter run
-
-# Compilar APK release
-flutter build apk --release
-
-# Compilar APK debug
-flutter build apk --debug
-```
-
-> El archivo de base de datos de assets (`assets/db/db_ctrl_calorias.db`) debe estar presente y declarado en `pubspec.yaml` para que el build funcione.
+- `test/unit/db_repositories_test.dart`: repositorios Drift en memoria: claves foráneas y cascadas, FTS (tildes, prefijos, sinónimos, código), duplicados, archivado, pendientes, porciones, compras y purga, alta en tienda (transaccional), carrito, recetas, comidas y CSV.
+- `test/unit/domain_services_test.dart`: GTIN, céntimos, cantidades de ingredientes, `NutritionFacts` y cálculo nutricional de recetas.
+- `test/unit/backup_test.dart`:
+  - repertorio de ida y vuelta, importar dos veces, huecos y conflictos, emparejado por código y versiones
+  - catálogo base
+  - TSV (incluido el formato antiguo)
+  - respaldo completo
+  - lectura del `.db` de la v1.2 (`test/fixtures/`) y migración completa de una instalación antigua
+- `test/unit/nutrition_label_parser_test.dart`: 14 etiquetas: una y dos columnas, ruido de OCR, solo kJ, multilingüe, ración, sodio, trazas, incoherencias, agrupación por geometría y peso neto.
+- `test/widget/`:
+  - `modules_smoke_test.dart`: recorre la app real sobre una base de datos en memoria: alimentos, agregar ingesta, recetas con vinculación automática, compras y modo carrito con cámara simulada.
+  - `onboarding_test.dart`: primer arranque.
+  - `label_review_test.dart`: revisión de la lectura de etiquetas.
+- Integración continua (`.github/workflows/ci.yml`): `flutter analyze` y `flutter test` en cada push y pull request.
 
 ---
 
-## Convenciones y reglas que NO deben romperse
+## Reglas que no deben romperse
 
-Estas son las reglas de diseño que si se violan romperán la aplicación o su coherencia:
-
-1. **Macros en `MealItem` son valores absolutos** (no por 100g). Si se agrega un campo nuevo a `items_comida` debe seguir la misma convención.
-
-2. **La columna `alimento` en `db_alimentos` es UNIQUE**. La importación usa `ConflictAlgorithm.ignore` para no duplicar. No cambiar esto a `replace` sin analizar el impacto en los `MealItem` existentes (que guardan el nombre desnormalizado).
-
-3. **`items_comida` NO almacena `food_id`** (FK al alimento original). El alimento se guarda desnormalizado como texto. Esta es una decisión de diseño deliberada para evitar problemas si el alimento se edita o elimina después.
-
-4. **Las fechas en la tabla `comidas`** se almacenan como `String` en formato `YYYY-MM-DD` (solo la parte de fecha de `DateTime.toIso8601String().split('T')[0]`). Nunca almacenar timestamps completos.
-
-5. **`localDataSourceProvider` es el único punto de creación de `LocalDataSourceImpl`**. Es un `Provider` (no `StateNotifierProvider`), lo que garantiza que Riverpod reutilice la misma instancia. No crear instancias adicionales de `LocalDataSourceImpl` directamente.
-
-6. **El estado del tema** se gestiona exclusivamente a través de `themeProvider`. No llamar `Theme.of(context)` para cambiar el tema global; solo para leerlo.
-
-7. **`HomeNotifier.refresh()`** debe llamarse después de cualquier operación de escritura en la DB que afecte las comidas del día (agregar item, eliminar item, eliminar comida). Esto es lo que hace que la pantalla principal se actualice.
-
-8. **`SearchNotifier.search(query)` con query vacía limpia inmediatamente** el estado (sin debounce). No cambiar este comportamiento sin actualizar la UI de `SearchView` correspondientemente.
-
-9. **Los campos de `UserSettings`** se serializan uno a uno en `SharedPreferences`. Si se añaden nuevos campos a `UserSettings`, deben añadirse las claves correspondientes en `SettingsRepositoryImpl` tanto en `getSettings()` (con valor por defecto) como en `saveSettings()`.
-
-10. **Los temas usan `AppStyles.lightTheme` y `AppStyles.darkTheme`** definidos en `lib/core/styles.dart`. Toda modificación visual de la app debe pasar por allí o usar el `Theme.of(context)` para respetar el sistema de temas.
-
-11. **La navegación es imperativa** (`Navigator.push`/`pop`). No introducir navegación declarativa (go_router, auto_route, etc.) sin migrar todo el sistema de navegación.
-
-12. **El idioma de la interfaz es español**. Todos los textos visibles al usuario, nombres de campos en la DB, claves de SharedPreferences y comentarios relevantes están en español. No mezclar idiomas en la UI.
-
-13. **`ExportDayToCsv` tiene un efecto secundario crítico**: tras una exportación exitosa, vacía `comidas` e `items_comida`. Si se necesitase un export "limpio" sin vaciar, debe crearse un use case separado, no modificar este. Cualquier callsite de `exportDayToCsvProvider` debe llamar a `homeProvider.notifier.refresh()` después de un éxito.
-
-14. **`CheckNewDayOnStartup` requiere AMBAS condiciones**: (a) `hasMealItems()` debe ser `true` y (b) la última fecha en `comidas` debe ser anterior a hoy. Una comida vacía o un día actual con datos no dispara el dialog. No relajar esta condición sin replantear el flujo.
-
-15. **El TSV de `db_alimentos` usa header fijo**: `id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas`. La importación lo valida exactamente. Cambiar nombres de columnas o añadir/quitar campos rompe los archivos exportados previamente. Si se debe migrar el formato, mantener compatibilidad detectando el header.
-
-16. **SAF en Android 13+**: la app evita `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` en versiones modernas usando `FilePicker.saveFile(bytes:)` y `FilePicker.pickFiles(withData: true)`. No reintroducir manejo manual de paths absolutos ni añadir permisos al manifest sin justificación clara.
-
-17. **Raíz = `MainShell`** (barra inferior). `HomeView` es la primera pestaña y sigue llamando a `HomeNotifier.refresh()` tras sus escrituras; desde recetas/productos se registra comida con `AddFoodPopup.showForToday`, que ya refresca `homeProvider`.
-
-18. **Foreign keys desactivadas**: al borrar comidas, recetas, productos o listas, borrar explícitamente los hijos en la misma transacción (ver `deleteMeal` y los data sources). No depender de `ON DELETE CASCADE`.
-
-19. **Historial de compras = 3 meses + la última compra de cada producto**. `PurgeOldPurchases` se ejecuta al cargar `ProductsNotifier` y antes de exportar. No borrar nunca la última compra de un producto: es su "último precio".
-
-20. **Ingredientes de recetas como texto libre**: el nombre comparable se deriva con `ingredient_matcher.dart`; no guardar columnas derivadas. Cambios en la normalización deben aplicarse por igual a recetas y búsqueda (son simétricos) y cubrirse en `test/unit/ingredient_matcher_test.dart`.
+1. **El repertorio es el núcleo**: lo que se compra, se cocina o se come apunta a `alimentos`. No crear catálogos paralelos.
+2. **Desconocido ≠ 0**: los nutrientes desconocidos son `NULL`. Un pendiente no se registra en el contador.
+3. **Nada de `REPLACE`** sobre `alimentos`: editar con `update` conserva id, uuid, vínculos y uso.
+4. **Claves foráneas activas**: no borrar padres a mano esperando huérfanos. Un alimento con compras se archiva.
+5. **Dinero en céntimos** (`precio_cent`). Para mostrarlo, `AppUtils.formatPrecioCent` ("1,05 €"); para leer lo que escribe el usuario, `parsePrecioCent` (acepta coma o punto).
+6. **El carrito no duplica datos**: unidades y precio se leen de la compra enlazada (`compra_id`).
+7. **Historial = 3 meses + la última compra de cada presentación.** No borrar nunca esa última compra.
+8. **`items_comida` es histórico**: valores ya escalados y nombre copiado. Editar la cantidad escala por proporción.
+9. **`ExportDayToCsv` vacía el día tras un export con éxito** (deliberado). Para exportar sin vaciar, crear otro caso de uso.
+10. **`CheckNewDayOnStartup`** exige items **y** última fecha anterior a hoy.
+11. **Esquema**: tocar `tables.dart` implica subir `schemaVersion`, escribir la migración en `MigrationStrategy`, regenerar con `build_runner` y cubrirlo con tests.
+12. **Formatos de intercambio estables**: el repertorio y el respaldo están versionados. Ampliarlos sin romper los archivos ya compartidos.
+13. **Normalización simétrica**: `ingredient_matcher.dart` se aplica igual a recetas, búsqueda y sugerencias. No guardar columnas derivadas.
+14. **Todo en local**: no consultar servicios online (ni para códigos de barras ni para OCR).
+15. **Idioma español** en la interfaz, en las columnas de la base de datos, en las claves de SharedPreferences y en los comentarios.
+16. **`UserSettings`**: cada campo nuevo necesita su clave en `SettingsRepositoryImpl.getSettings()` (con valor por defecto) y en `saveSettings()`.
+17. **Tema** solo con `themeProvider`. Estilos centralizados en `AppStyles`.
 
 \*\*
 NOTA PERSONAL:

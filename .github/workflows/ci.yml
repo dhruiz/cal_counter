@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.9
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Código generado de Drift al día
+        run: |
+          dart run build_runner build
+          git diff --exit-code -- lib/data/db/app_database.g.dart
+      - run: flutter analyze
+      - run: flutter test
