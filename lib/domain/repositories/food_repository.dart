@@ -52,6 +52,13 @@ abstract class FoodRepository {
   /// Alimento y presentación de un código de barras (se normaliza).
   Future<BarcodeMatch?> findByBarcode(String codigo);
 
+  /// Alimento por su identificador global (repertorios compartidos).
+  Future<Food?> findByUuid(String uuid);
+
+  /// Alimento con exactamente ese nombre y marca, sin distinguir tildes ni
+  /// mayúsculas (incluye archivados).
+  Future<Food?> findByNameAndBrand(String nombre, String marca);
+
   /// Alimentos con nombre parecido (sin tildes ni mayúsculas) para avisar de
   /// posibles duplicados antes de crear uno nuevo.
   Future<List<Food>> findSimilar(String nombre, {String marca = ''});
@@ -66,6 +73,9 @@ abstract class FoodRepository {
 
   Future<void> incrementUsage(int id);
   Future<void> resetUsage(int id);
+
+  /// Fija el contador de uso (migración desde versiones anteriores).
+  Future<void> setUsage(int id, int count, DateTime? ultimoUso);
   Stream<List<Food>> watchMostUsed({int limit = 20});
 
   /// Pendientes de completar, por prioridad: usados en recetas, comprados
@@ -82,6 +92,7 @@ abstract class FoodRepository {
   // Presentaciones ----------------------------------------------------------
   Stream<List<FoodPackage>> watchPackages(int alimentoId);
   Future<List<FoodPackage>> getPackages(int alimentoId);
+  Future<Map<int, List<FoodPackage>>> getPackagesFor(Iterable<int> ids);
   Future<FoodPackage?> getPackage(int id);
 
   /// Inserta o actualiza. Lanza [DuplicateBarcodeException] si el código ya

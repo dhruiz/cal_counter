@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/styles.dart';
-import 'presentation/views/main_shell.dart';
+import 'presentation/views/onboarding_view.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -24,7 +24,7 @@ class MyApp extends ConsumerWidget {
       theme: AppStyles.lightTheme,
       darkTheme: AppStyles.darkTheme,
       themeMode: themeMode,
-      home: const MainShell(),
+      home: const StartupGate(),
     );
   }
 }

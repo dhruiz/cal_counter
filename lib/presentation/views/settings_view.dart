@@ -5,6 +5,7 @@ import '../../core/styles.dart';
 import '../../domain/entities/user_settings.dart';
 import '../providers/settings_provider.dart';
 import '../providers/theme_provider.dart';
+import 'data_view.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -184,6 +185,20 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           key: _formKey,
           child: ListView(
             children: [
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.import_export),
+                  title: const Text('Datos y respaldos'),
+                  subtitle: const Text(
+                    'Compartir repertorio, respaldo completo, importar',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DataView()),
+                  ),
+                ),
+              ),
               _buildSectionTitle('Datos Personales'),
               _buildTextField(
                 controller: _weightController,
@@ -363,10 +378,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Objetivo de peso',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('Objetivo de peso', style: Theme.of(context).textTheme.bodyMedium),
         const SizedBox(height: 8),
         SegmentedButton<String>(
           segments: const [

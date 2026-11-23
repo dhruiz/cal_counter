@@ -1,0 +1,8821 @@
+{
+ "formato": "cal_counter/repertorio",
+ "version": 1,
+ "exportado": "2026-11-23T00:00:00Z",
+ "alimentos": [
+  {
+   "uuid": "155df56a-cc28-532a-9be6-16c44d8cf2c6",
+   "nombre": "Arroz Blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 345,
+    "proteinas": 8.1,
+    "grasas": 0.7,
+    "carbohidratos": 77.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8e20c1fa-c41b-5374-815e-a3ef954ddafa",
+   "nombre": "Arroz Blanco Cocido (sancochado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 106,
+    "proteinas": 2.2,
+    "grasas": 0.1,
+    "carbohidratos": 24.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "32c3be7c-6341-5847-ae26-c470c3c7b2a7",
+   "nombre": "Arroz Blanco, variedad Araure",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 353,
+    "proteinas": 8.6,
+    "grasas": 0.6,
+    "carbohidratos": 79.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b8b22018-7e9f-5d3a-acf5-a08ca0f9c524",
+   "nombre": "Arroz Blanco, variedad Cimarrón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 355,
+    "proteinas": 6.1,
+    "grasas": 0.9,
+    "carbohidratos": 81.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4d9bd0ab-c98c-571c-b21a-c70a17d6d56f",
+   "nombre": "Arroz Blanco, variedad Oryzica",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 353,
+    "proteinas": 9.2,
+    "grasas": 0.6,
+    "carbohidratos": 78.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fc7589f5-70cf-532a-a7f4-87b3ad201c29",
+   "nombre": "Harina de Arroz",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 366,
+    "proteinas": 7.6,
+    "grasas": 0.7,
+    "carbohidratos": 82.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ea2a16d5-1d04-555a-adad-114537502254",
+   "nombre": "Harina enriquecida de Arroz",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 370,
+    "proteinas": 8.5,
+    "grasas": 0.7,
+    "carbohidratos": 83,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "50720fb1-8fd1-5fbc-ba24-0474c59ec1e0",
+   "nombre": "Arroz Integral",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 354,
+    "proteinas": 8.5,
+    "grasas": 1.5,
+    "carbohidratos": 80.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "428e2bc8-5414-58b4-8b4d-861bf8be36db",
+   "nombre": "Arroz Integral cocido (sancochado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 96,
+    "proteinas": 2.4,
+    "grasas": 0.3,
+    "carbohidratos": 22.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2f45c9ba-ee51-5cc2-b0fb-138acfcdb61c",
+   "nombre": "Arroz Integral, variedad Araure",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 351,
+    "proteinas": 8.9,
+    "grasas": 2.9,
+    "carbohidratos": 75.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3ad4c423-7a96-5be3-af6b-c2799666428c",
+   "nombre": "Arroz Integral, Variedad Cimarrón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 352,
+    "proteinas": 6.8,
+    "grasas": 2.7,
+    "carbohidratos": 78.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7156f604-f3c2-5b47-9b78-96b0aa79c20f",
+   "nombre": "Arroz Integral, variedad Oryzica",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 350,
+    "proteinas": 9.6,
+    "grasas": 3.3,
+    "carbohidratos": 74,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c2e35df1-0fe8-548a-9ab4-bc81439bf401",
+   "nombre": "Harina de Avena",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 384,
+    "proteinas": 14.7,
+    "grasas": 8.6,
+    "carbohidratos": 66.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7f1678ce-ad10-5b38-8e75-b9b48026d49b",
+   "nombre": "Hojuelas de Avena",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 348,
+    "proteinas": 9.6,
+    "grasas": 7.3,
+    "carbohidratos": 71.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8634476a-dc66-5386-adb0-865fd992eb8e",
+   "nombre": "Hojuelas saborizadas de Avena",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 395,
+    "proteinas": 5.4,
+    "grasas": 5.8,
+    "carbohidratos": 80.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1f7a95e3-afba-54a1-aec1-a829c2fa770b",
+   "nombre": "Cebada Grano entero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 317,
+    "proteinas": 11.3,
+    "grasas": 1.8,
+    "carbohidratos": 74,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d6fdd96c-b997-57ba-ad8f-2e7abcc931d7",
+   "nombre": "Harina enriquecida de Cebada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 356,
+    "proteinas": 8.3,
+    "grasas": 2.2,
+    "carbohidratos": 80.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c2764c9b-e1c2-5415-b426-b52daece6dad",
+   "nombre": "Cebada Perlada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 323,
+    "proteinas": 9,
+    "grasas": 1,
+    "carbohidratos": 78,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2193d67d-79b9-5319-a3c1-e5b5769194b4",
+   "nombre": "Arepa de (1), enriquecida Maiz A.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 184,
+    "proteinas": 4.2,
+    "grasas": 0.7,
+    "carbohidratos": 44.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2c3313a2-c5a3-5a5e-9dc3-570693ea9a8e",
+   "nombre": "Maiz Grano Entero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 284,
+    "proteinas": 8.5,
+    "grasas": 4,
+    "carbohidratos": 72.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "47b7699c-d461-5db7-b6cb-cadcf2411e37",
+   "nombre": "Harina de grano completo (funche) M.A.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 286,
+    "proteinas": 7.3,
+    "grasas": 3.5,
+    "carbohidratos": 78.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d0470bf2-9613-507c-8815-b6b82189d7db",
+   "nombre": "Harina precocida de Maiz A.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 355,
+    "proteinas": 7.2,
+    "grasas": 1.2,
+    "carbohidratos": 82,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9fe8af33-c462-55a8-9a31-073b07b229b7",
+   "nombre": "Harina precocida enriquecida de M.A.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 355,
+    "proteinas": 7.2,
+    "grasas": 1.2,
+    "carbohidratos": 82,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "85c9bcdf-be23-5c56-b880-9f9c1fff4d27",
+   "nombre": "Hojuelas azucaradas enriquecidas de (cereal desayuno) Maiz A.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 363,
+    "proteinas": 3.7,
+    "grasas": 0.1,
+    "carbohidratos": 90,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "22d13770-9477-5326-927a-822cb941b961",
+   "nombre": "Hojuelas enriquecidas de (cereal Desayuno) Maíz A.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 350,
+    "proteinas": 6.7,
+    "grasas": 0.4,
+    "carbohidratos": 83.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e60f5b3e-14fa-5476-81c9-d500c76f3cbc",
+   "nombre": "Maíz A. Inflado azucarado enqriquecido (cereal desayuno)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 369,
+    "proteinas": 5.5,
+    "grasas": 0,
+    "carbohidratos": 90,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "db25a3b7-9d70-5586-ae71-300f326c6bf0",
+   "nombre": "Maíz A. tierno enlatado, estilo crema",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 77,
+    "proteinas": 1.5,
+    "grasas": 0.2,
+    "carbohidratos": 18.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1f4d39c9-2244-5a37-a7fc-6e1f2dc7715b",
+   "nombre": "Maíz A. enlatado, grano entero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 85,
+    "proteinas": 2.5,
+    "grasas": 0.3,
+    "carbohidratos": 19.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9b65f5b2-44e8-5996-8c9b-70b1442ecbc5",
+   "nombre": "Arepa de(1)enriquecida maiz blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 168,
+    "proteinas": 3.8,
+    "grasas": 0.6,
+    "carbohidratos": 40.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "73e316d3-d20d-52ec-a589-74263ee82a18",
+   "nombre": "Arepa de(1)grano pelado con cal M.B",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 196,
+    "proteinas": 5.7,
+    "grasas": 2.5,
+    "carbohidratos": 38.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ff64a70b-d158-5b37-bd7d-d49478b24e6a",
+   "nombre": "Maíz blanco grano entero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 286,
+    "proteinas": 9,
+    "grasas": 4.3,
+    "carbohidratos": 71.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1b2a94f4-a2d4-56ce-95ae-44bea034dc85",
+   "nombre": "Harina integral precocida de Maíz B.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 354,
+    "proteinas": 7.1,
+    "grasas": 3.8,
+    "carbohidratos": 78.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3c944cb0-2bd7-5467-811c-8fcdf6e60db8",
+   "nombre": "Harina precocida de maíz blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 354,
+    "proteinas": 7.2,
+    "grasas": 1.1,
+    "carbohidratos": 80.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1415fa90-7ebd-5cf1-879b-5aaf7fabce7b",
+   "nombre": "Hallaquita de (16) maíz blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 130,
+    "proteinas": 2.6,
+    "grasas": 0.3,
+    "carbohidratos": 29.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4d6693c9-771d-549c-bd39-7fbf9e1eedc8",
+   "nombre": "Maíz blanco pilado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 339,
+    "proteinas": 7.8,
+    "grasas": 1.5,
+    "carbohidratos": 78.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f530e3ac-0a84-5e8a-9fd3-f384da893f45",
+   "nombre": "Maíz cariaca, harina de maíz blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 360,
+    "proteinas": 9.5,
+    "grasas": 4.1,
+    "carbohidratos": 73.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "db70bc2c-31a2-5515-a90d-d48ee5c33b4b",
+   "nombre": "Maíz tostado, harina de maíz blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 364,
+    "proteinas": 9.9,
+    "grasas": 4.6,
+    "carbohidratos": 73.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f518f86b-ec11-53fd-b829-1e221bfa0c5a",
+   "nombre": "Maicena enriquecida (almidon de maíz)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 345,
+    "proteinas": 0.6,
+    "grasas": 0.2,
+    "carbohidratos": 85.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "79cf62e6-6438-5c57-a3e2-fa3e2cc1e3f2",
+   "nombre": "maíz tierno (jojoto)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 3.4,
+    "grasas": 1,
+    "carbohidratos": 20.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "14085487-f52b-59db-a0f1-cca3e561e713",
+   "nombre": "Galletas de soda",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 415,
+    "proteinas": 8.6,
+    "grasas": 10.2,
+    "carbohidratos": 72.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "adf61f9d-4570-5930-901e-e1a52aa3746b",
+   "nombre": "Dulce (tipo María) galletas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 420,
+    "proteinas": 7.7,
+    "grasas": 9.2,
+    "carbohidratos": 77.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "65ae51cd-ac18-53ec-bd7a-5ec9a4de505f",
+   "nombre": "Integrales dulces (Honey Bran)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 392,
+    "proteinas": 8,
+    "grasas": 13.5,
+    "carbohidratos": 73.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ad1cce85-1fee-5ea7-8722-f6ddaa3d03fc",
+   "nombre": "Integrales saladas (Kracker Bran)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 412,
+    "proteinas": 9.7,
+    "grasas": 12.6,
+    "carbohidratos": 71.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "74127d65-eea4-5bdf-a3ee-f91f4761534f",
+   "nombre": "Saltines galletas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 415,
+    "proteinas": 10.3,
+    "grasas": 9.4,
+    "carbohidratos": 72.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6cd6da9e-b7cb-5838-ab1c-94fe3f16e666",
+   "nombre": "Galletas simples surtidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 438,
+    "proteinas": 6,
+    "grasas": 12.7,
+    "carbohidratos": 75,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8f903d1c-d98b-55d6-963c-4e6ca1dd5e49",
+   "nombre": "Pan blanco tipo sandwich",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 263,
+    "proteinas": 9.4,
+    "grasas": 3,
+    "carbohidratos": 52.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fa92211b-c5c7-55a8-b17a-3de59053dab8",
+   "nombre": "Pan canilla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 295,
+    "proteinas": 11.4,
+    "grasas": 2.3,
+    "carbohidratos": 60.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2c327770-db4d-503b-af4e-8140f751e85e",
+   "nombre": "Pan de centeno",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 257,
+    "proteinas": 9.2,
+    "grasas": 0.7,
+    "carbohidratos": 54.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "50e358ed-3aad-5776-b8ee-67be6cdeb139",
+   "nombre": "Pan de glúten",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 299,
+    "proteinas": 17.3,
+    "grasas": 1.8,
+    "carbohidratos": 54,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d1ed7928-f898-556a-a861-7debc10e0eef",
+   "nombre": "Pan de trigo integral",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 241,
+    "proteinas": 9,
+    "grasas": 2.6,
+    "carbohidratos": 51.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3ae1e08d-0edf-5521-9db3-d708ea610178",
+   "nombre": "Pan de Horno (25)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 416,
+    "proteinas": 5.1,
+    "grasas": 16.7,
+    "carbohidratos": 67.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c62f2f5b-586f-5047-82d4-c3493b24353a",
+   "nombre": "Panela de san Joaquin (26) Pan",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 370,
+    "proteinas": 6.3,
+    "grasas": 5.3,
+    "carbohidratos": 74.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ac3053ce-44da-5164-bc06-02b592b0882a",
+   "nombre": "Pasta no enriquecidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 363,
+    "proteinas": 15.6,
+    "grasas": 1.6,
+    "carbohidratos": 71.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bc34a799-77d6-5f5d-89a2-0ecd3d17e793",
+   "nombre": "Pasta no enriquecidas cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 113,
+    "proteinas": 4.3,
+    "grasas": 0.6,
+    "carbohidratos": 22.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "71f71cd5-aed3-54b5-b06f-3b057e60e43c",
+   "nombre": "Pasta enriquecidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 353,
+    "proteinas": 15,
+    "grasas": 1.9,
+    "carbohidratos": 69.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f318d106-b74c-500e-8520-06a680b54d87",
+   "nombre": "Pasta enriquecidas cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 124,
+    "proteinas": 4.6,
+    "grasas": 0.7,
+    "carbohidratos": 24.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1e641d17-7a2f-5704-aace-bf76b3d98bad",
+   "nombre": "Pasta al huevo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 372,
+    "proteinas": 15.6,
+    "grasas": 2.3,
+    "carbohidratos": 72.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b09e89cb-68fa-56c6-9b15-e90158e3b020",
+   "nombre": "Pasta al huevo cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 126,
+    "proteinas": 6.2,
+    "grasas": 1,
+    "carbohidratos": 23.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8883d3d5-fa22-5450-8de6-2f26403bf038",
+   "nombre": "Pasta con espinacas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 365,
+    "proteinas": 14.8,
+    "grasas": 1.8,
+    "carbohidratos": 72.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f31c1012-5aa7-5217-a7d0-e58e3819e500",
+   "nombre": "Pasta con espinacas cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 108,
+    "proteinas": 5.3,
+    "grasas": 0.8,
+    "carbohidratos": 27.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d22d7366-3db2-5022-8248-d0f3f13b6267",
+   "nombre": "Pasta Sémola de trigo Durum",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 337,
+    "proteinas": 12.2,
+    "grasas": 1.7,
+    "carbohidratos": 71.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c66eabc2-ad46-5e65-8487-67dd1b19099b",
+   "nombre": "Pasta Sémola granular de trigo panadero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 337,
+    "proteinas": 11.5,
+    "grasas": 0.9,
+    "carbohidratos": 73.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "74f5f796-8885-5ccb-863e-6526c7e4d18f",
+   "nombre": "Afrecho de trigo Dark North Spring (DNS)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 170,
+    "proteinas": 16.3,
+    "grasas": 4.5,
+    "carbohidratos": 59.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4bdc2a25-7ae5-51f1-8dd5-edebd3d72bac",
+   "nombre": "Afrecho de trigo Hard Amber Durum (HAD)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 172,
+    "proteinas": 13.3,
+    "grasas": 5.2,
+    "carbohidratos": 65.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fa3f6734-7e06-515e-aac2-a7deca34502c",
+   "nombre": "Afrecho de trigo Soft Red Wheath (SRW)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 193,
+    "proteinas": 14.2,
+    "grasas": 4.4,
+    "carbohidratos": 66.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cd0e922f-a429-5eb5-8ee9-c6c75bae621d",
+   "nombre": "Arepa andina de trigo,  (2)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 303,
+    "proteinas": 10.9,
+    "grasas": 2.6,
+    "carbohidratos": 59.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8c916ab0-0fb5-5514-a716-d4735fab94b4",
+   "nombre": "Trigo entero variedad de,(2) (DNS)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 313,
+    "proteinas": 13.3,
+    "grasas": 2.2,
+    "carbohidratos": 72.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "38e97962-fd49-5067-ba52-133fdf3b4256",
+   "nombre": "Trigo entero, variedad (HAD)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 316,
+    "proteinas": 12.9,
+    "grasas": 2.8,
+    "carbohidratos": 71.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fa6de111-4925-5799-be64-167d3137fb58",
+   "nombre": "Trigo entero variedad de, (SRW)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 313,
+    "proteinas": 10.4,
+    "grasas": 2.1,
+    "carbohidratos": 74.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1b3ddb94-5613-5de6-bbfd-e41eae7afd55",
+   "nombre": "Germen de trigo tostado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 381,
+    "proteinas": 30.5,
+    "grasas": 11.7,
+    "carbohidratos": 50.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7de9ae9b-051c-518f-b421-ea8ba8c79fce",
+   "nombre": "Harina de trigo panadera de, variedad(DNS)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 347,
+    "proteinas": 13.5,
+    "grasas": 1.2,
+    "carbohidratos": 73.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9a28f156-88bf-55e5-aba1-c39fd03c9d44",
+   "nombre": "Harina de trigo panadera enriquecida de trigo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 347,
+    "proteinas": 13.5,
+    "grasas": 1.2,
+    "carbohidratos": 73.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "18b94411-aec5-5b77-b1e7-3f120fae569d",
+   "nombre": "Harina de trigo, variedad (HAD)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 339,
+    "proteinas": 14,
+    "grasas": 2.8,
+    "carbohidratos": 68.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e4761060-9bd3-5691-a6b8-f6cabf08eba9",
+   "nombre": "Harina de trigo galletera, variedad (SRW)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 349,
+    "proteinas": 9.3,
+    "grasas": 1.2,
+    "carbohidratos": 78.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d2b0ba03-71a3-5762-9676-70a4b592616e",
+   "nombre": "Salvado de trigo (cereal)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 347,
+    "proteinas": 14.5,
+    "grasas": 2.8,
+    "carbohidratos": 72.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2ab5a83b-2513-5dd6-ab3e-9ce1c8bfaec5",
+   "nombre": "Gallina, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 240,
+    "proteinas": 18.5,
+    "grasas": 18.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7c47ae9e-0c64-5f5a-9f18-339b00bf96e3",
+   "nombre": "Paloma, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 273,
+    "proteinas": 18.6,
+    "grasas": 22.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "48b437d3-177c-5c3c-9785-588955f71f10",
+   "nombre": "Pato, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 321,
+    "proteinas": 16,
+    "grasas": 28.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "21b00f8f-70df-50c6-b81c-2bf631444a2d",
+   "nombre": "Pavo, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 261,
+    "proteinas": 20,
+    "grasas": 20.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "27cc1863-43be-5fe8-8f61-d841739e7446",
+   "nombre": "Pavo, pechuga de, estándar (charcutería)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 76,
+    "proteinas": 15.2,
+    "grasas": 0.7,
+    "carbohidratos": 2.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "856d60c4-d086-564e-b1db-a1eb3f863ec3",
+   "nombre": "Pavo, pechuga de, superior (charcutería)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 103,
+    "proteinas": 22.6,
+    "grasas": 1.3,
+    "carbohidratos": 0.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a820eb26-ce9f-5289-bab1-1f263fd37756",
+   "nombre": "Pollo, alas de, con piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 217,
+    "proteinas": 18.3,
+    "grasas": 16,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "14d86196-bd8f-5065-a407-f3586d5f1af5",
+   "nombre": "Pollo, alas de, sin piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 120,
+    "proteinas": 22,
+    "grasas": 3.5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6b45cd02-7575-5c76-94ee-aaea7fd1a5ae",
+   "nombre": "Pollo, bologna de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 254,
+    "proteinas": 13.2,
+    "grasas": 18.3,
+    "carbohidratos": 9.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6c381b05-5d78-5603-b55a-86bab32e9356",
+   "nombre": "Pollo, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 183,
+    "proteinas": 20.2,
+    "grasas": 11.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e71de7da-f71d-57e4-8146-53c5cd18ded3",
+   "nombre": "Pollo, carne de, enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 168,
+    "proteinas": 9.6,
+    "grasas": 8.2,
+    "carbohidratos": 14,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "70e6579d-eee8-5710-9c45-33db1f8fbddf",
+   "nombre": "Pollo, guisado enlatado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 141,
+    "proteinas": 10.3,
+    "grasas": 6.3,
+    "carbohidratos": 10.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "460b5987-c352-58a6-90cc-7921d4f72d70",
+   "nombre": "Pollo, hígado de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 157,
+    "proteinas": 17.9,
+    "grasas": 7.3,
+    "carbohidratos": 5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9f657653-4a3e-5f5f-89dd-af26fbee4b3d",
+   "nombre": "Pollo, jamón de, estándar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 95,
+    "proteinas": 12.4,
+    "grasas": 3.8,
+    "carbohidratos": 2.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c9f7c465-88f0-595b-90b7-b4f82aa7ed33",
+   "nombre": "Pollo, jamón de, superior",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 118,
+    "proteinas": 16.2,
+    "grasas": 5.2,
+    "carbohidratos": 1.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "69e92932-9819-53da-8700-2d547689ed66",
+   "nombre": "Pollo, molleja de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 18.1,
+    "grasas": 1.2,
+    "carbohidratos": 2.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c8037fe6-ec1b-5f41-85aa-42f4d93ae88f",
+   "nombre": "Pollo, muslo de, con piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 182,
+    "proteinas": 18.2,
+    "grasas": 12.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "def47b64-dc0f-57fb-95dc-35f622673f95",
+   "nombre": "Pollo, muslo de, sin piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 115,
+    "proteinas": 20.1,
+    "grasas": 3.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "229ddc79-c14c-5bc0-b69b-dd9057742172",
+   "nombre": "Pollo, pasta de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 208,
+    "proteinas": 13.4,
+    "grasas": 14,
+    "carbohidratos": 7.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "95135454-614e-5511-bfce-b19edd3252f8",
+   "nombre": "Pollo, pechuga de, cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 143,
+    "proteinas": 28.6,
+    "grasas": 3.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2c937e57-7008-5f99-8f45-18ce89c3aee7",
+   "nombre": "Pollo, pechuga de, estándar (charcutería)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 71,
+    "proteinas": 14,
+    "grasas": 0.8,
+    "carbohidratos": 0.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9713d284-0795-5e13-9585-5e832dbdc147",
+   "nombre": "Pollo, pechuga de, superior (charcutería)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 92,
+    "proteinas": 19.9,
+    "grasas": 0.8,
+    "carbohidratos": 1.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3c86bce3-0b81-5f8a-9b47-e236485ed0ad",
+   "nombre": "Pollo, pechuga de, con piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 167,
+    "proteinas": 20.9,
+    "grasas": 9.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e5785701-936a-5f16-84e8-dc5ed248f1f9",
+   "nombre": "Pollo, pechuga de, sin piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 103,
+    "proteinas": 23.1,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2b0a3ff5-c651-5bf8-bfab-5ed3f8a66c84",
+   "nombre": "Pollo, pierna de, con piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 156,
+    "proteinas": 19.3,
+    "grasas": 8.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "eaa198ca-61e0-529b-a691-c021aebeba0d",
+   "nombre": "Pollo, pierna de, sin piel",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 113,
+    "proteinas": 20.6,
+    "grasas": 3.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f5999750-e13e-54c4-8db8-57599dfa5c7b",
+   "nombre": "Pollo, Salchicha de, enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 185,
+    "proteinas": 9.9,
+    "grasas": 13.3,
+    "carbohidratos": 6.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "620d7300-0480-5072-b1aa-583a36cf998e",
+   "nombre": "Carne de cerdo, jamonizada enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 129,
+    "proteinas": 11.1,
+    "grasas": 5.7,
+    "carbohidratos": 8.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bd292744-9b47-52bb-84a6-4d2209de5c7c",
+   "nombre": "Costilla de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 295,
+    "proteinas": 16.5,
+    "grasas": 25.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "31e397d4-df8f-56f3-94c2-c5e5182ba4c6",
+   "nombre": "Chuleta de Cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 250,
+    "proteinas": 18.3,
+    "grasas": 19.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4553586c-52e7-5b8a-aed8-6e8209c4ceab",
+   "nombre": "Chuleta de cerdo, magra (sin grasa visible)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 22.9,
+    "grasas": 2.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ec5ebd85-7a37-5b16-a16e-b2cd3d44edff",
+   "nombre": "Chuleta de cerdo, ahumada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 201,
+    "proteinas": 25.2,
+    "grasas": 11.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "59d28590-a05f-5783-b6cc-6cdb6a057d4b",
+   "nombre": "Lomo de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 192,
+    "proteinas": 19.5,
+    "grasas": 12.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "03c67d91-0db5-55b9-aa58-d026e16b77b0",
+   "nombre": "Lomo de cerdo, magro (sin grasa visible)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 121,
+    "proteinas": 24.4,
+    "grasas": 2.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f6ce36e0-ed62-5174-9de7-6d0cdb10f36c",
+   "nombre": "Paleta de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 219,
+    "proteinas": 18,
+    "grasas": 16.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e18fa537-3873-5037-8c92-79dc3f1f389a",
+   "nombre": "Paleta de cerdo, magra (sin grasa visible)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 102,
+    "proteinas": 21.1,
+    "grasas": 2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cc203797-24fb-5c85-bf56-fd5dd461fb4d",
+   "nombre": "Pernil de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 158,
+    "proteinas": 19.2,
+    "grasas": 9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ac214f0b-5464-564f-b222-efc48e2a94b3",
+   "nombre": "Pernil de cerdo, magro (sin grasa visible)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 120,
+    "proteinas": 21.4,
+    "grasas": 3.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0f788d12-ccfd-5d2d-abfb-9ae86885aa7c",
+   "nombre": "Chicharrón de cerdo (10)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 646,
+    "proteinas": 20.9,
+    "grasas": 62.5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "438d119a-6f62-5e84-acf0-0e984bb3be31",
+   "nombre": "Hígado de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 134,
+    "proteinas": 20,
+    "grasas": 4.7,
+    "carbohidratos": 3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "63f3040d-e8dd-5f7c-99b3-280954b6ad0b",
+   "nombre": "Jamón ahumado de cerdo, semi gordo, con hueso",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 360,
+    "proteinas": 17.7,
+    "grasas": 31.8,
+    "carbohidratos": 0.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d46f7897-6ace-582e-b32f-9511f8f24d2c",
+   "nombre": "Jamón cocido de cerdo, estándar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 13.2,
+    "grasas": 3.9,
+    "carbohidratos": 1.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a0b3f20c-055e-5a48-8d15-3528f8a98271",
+   "nombre": "Jamón cocido de cerdo, superior",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 106,
+    "proteinas": 16.6,
+    "grasas": 4.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "32b3623a-15a8-523f-9159-fb0e3c39855a",
+   "nombre": "Jamón endiablado, enlatado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 301,
+    "proteinas": 12.9,
+    "grasas": 26.7,
+    "carbohidratos": 2.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "37c22921-2b2b-5e97-85db-564c83cd39f9",
+   "nombre": "Jamón de espalda",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 116,
+    "proteinas": 13.1,
+    "grasas": 6.1,
+    "carbohidratos": 2.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "79eb3735-471e-57c8-9eb4-c2712acbda68",
+   "nombre": "Jamón serrano, sin hueso y sin grasa acompañante",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 175,
+    "proteinas": 35.4,
+    "grasas": 3.4,
+    "carbohidratos": 0.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1a3ccd17-7f70-59dd-9c27-b76eedfc3555",
+   "nombre": "Pasta endiablada enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 288,
+    "proteinas": 13.5,
+    "grasas": 24.3,
+    "carbohidratos": 3.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "98cb6303-37c6-5e78-a9a4-d2b62a375660",
+   "nombre": "Salchicha de cerdo enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 119,
+    "proteinas": 6.5,
+    "grasas": 7,
+    "carbohidratos": 7.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "86578625-54a0-54da-8a49-613aa64b7671",
+   "nombre": "Salchicha de cerdo y res, sin piel, enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 202,
+    "proteinas": 7.6,
+    "grasas": 16,
+    "carbohidratos": 7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "851b1e1f-2b0e-5fbc-87f6-a3a3403da60c",
+   "nombre": "Tocineta cruda",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 628,
+    "proteinas": 9.1,
+    "grasas": 65,
+    "carbohidratos": 1.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d29b9394-3e8e-5458-a720-ae38986b7d11",
+   "nombre": "Tocineta frita",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 599,
+    "proteinas": 25,
+    "grasas": 55,
+    "carbohidratos": 1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "068ed180-14ad-5faf-bbeb-bf5b2d21312e",
+   "nombre": "Conejo, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 151,
+    "proteinas": 20.3,
+    "grasas": 7.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5a276286-8dda-5f87-8f37-ba02deee4548",
+   "nombre": "Cordero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 247,
+    "proteinas": 18.2,
+    "grasas": 19.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "342aa22b-a7f1-5104-805d-b07cd96f60e2",
+   "nombre": "Carne de chiguire",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 80,
+    "proteinas": 18.4,
+    "grasas": 0.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "759c517e-ceab-5331-bcd8-2f5781c27360",
+   "nombre": "Chiguire seco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 153,
+    "proteinas": 33.9,
+    "grasas": 0.6,
+    "carbohidratos": 2.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "47558038-438a-5703-ad01-0dfa8fe8e32c",
+   "nombre": "Chivo, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 159,
+    "proteinas": 18.7,
+    "grasas": 9.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "72962308-2029-50d8-9d8a-98b1351d7557",
+   "nombre": "Iguana, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 106,
+    "proteinas": 24.4,
+    "grasas": 0.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5cd6b28a-d488-5fca-8ac9-15329b3f258c",
+   "nombre": "Ternera, carne de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 122,
+    "proteinas": 19.3,
+    "grasas": 5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dfb123a4-0502-563f-88d7-dbaa4050fead",
+   "nombre": "Venado, carne de (semi seca salada)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 134,
+    "proteinas": 31.4,
+    "grasas": 0.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bac3086f-a6a1-545f-91ce-bb743dd6e056",
+   "nombre": "Tipo bologna",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 207,
+    "proteinas": 15.6,
+    "grasas": 15.1,
+    "carbohidratos": 2.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6442a28b-f897-574f-8b56-dca6b338bdb1",
+   "nombre": "Tipo chorizo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 273,
+    "proteinas": 15.8,
+    "grasas": 22.8,
+    "carbohidratos": 1.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e810f253-8f76-5c6b-b773-ff9d59150d02",
+   "nombre": "Tipo chorizo carupanero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 370,
+    "proteinas": 16.6,
+    "grasas": 33.5,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "24cc0a1d-b341-5c2d-8b53-f6597858d41b",
+   "nombre": "Tipo chorizo cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 367,
+    "proteinas": 19.5,
+    "grasas": 30.6,
+    "carbohidratos": 3.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2f2e6ff2-1b16-5d75-838e-6961d46b43e2",
+   "nombre": "Tipo chorizo español",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 379,
+    "proteinas": 25.7,
+    "grasas": 21.9,
+    "carbohidratos": 1.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9732af93-ca11-54fa-b17f-84382f2ab048",
+   "nombre": "Tipo chorizo húngaro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 305,
+    "proteinas": 19.5,
+    "grasas": 23.7,
+    "carbohidratos": 3.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3fd69170-8845-5002-b944-1d51e4b902df",
+   "nombre": "Tipo frankfurter, cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 244,
+    "proteinas": 14,
+    "grasas": 20,
+    "carbohidratos": 2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "657ea503-9b43-5388-afd8-bdacb3e4f044",
+   "nombre": "Tipo morcilla alemana (23)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 292,
+    "proteinas": 18.6,
+    "grasas": 22.7,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1ca54326-c34d-55df-ba7d-bd30b8171442",
+   "nombre": "Tipo morcilla con arroz y cebolla (23)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 280,
+    "proteinas": 9.8,
+    "grasas": 22.2,
+    "carbohidratos": 10.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f17ffcf8-1226-51e1-8548-1a3b6f1fd733",
+   "nombre": "Tipo morcilla condimentada (23)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 197,
+    "proteinas": 15,
+    "grasas": 12.6,
+    "carbohidratos": 6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e410e7c4-8044-51ac-a3b9-982f6705a453",
+   "nombre": "Tipo mortadela económica",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 324,
+    "proteinas": 13,
+    "grasas": 27.2,
+    "carbohidratos": 6.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7de3281a-5214-5b29-9a7a-a9ee2b5a6236",
+   "nombre": "Tipo mortadela especial",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 237,
+    "proteinas": 15.6,
+    "grasas": 16.9,
+    "carbohidratos": 5.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "09b2c14a-265b-5d9d-a5b7-0f795c1920d0",
+   "nombre": "Tipo mortadela extra",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 312,
+    "proteinas": 12.8,
+    "grasas": 27.1,
+    "carbohidratos": 4.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d75c7b43-480e-5887-869a-312c09ec74b3",
+   "nombre": "Tipo pasta de hígado (liverwurst)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 268,
+    "proteinas": 16.8,
+    "grasas": 21.6,
+    "carbohidratos": 1.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a11a5896-7bf4-56e7-a547-8e1946c89ed5",
+   "nombre": "Tipo salchicha de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 448,
+    "proteinas": 10.8,
+    "grasas": 44.8,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cfc21204-37cf-5572-b745-6206df3b2a29",
+   "nombre": "Tipo salchicha (pero caliente)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 206,
+    "proteinas": 13.8,
+    "grasas": 15.5,
+    "carbohidratos": 2.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5079e3fd-4084-5672-8e88-bf6c765d362f",
+   "nombre": "Tipo salchicha (viena)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 211,
+    "proteinas": 15.8,
+    "grasas": 16.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b8c7b31d-0abc-5aee-9b4c-268f1b04bc06",
+   "nombre": "Tipo salchichón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 460,
+    "proteinas": 27.3,
+    "grasas": 38.2,
+    "carbohidratos": 1.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6462af6f-8a1e-55ba-99c2-6ee7f86f5b73",
+   "nombre": "Carne molida (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 201,
+    "proteinas": 18.2,
+    "grasas": 14.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "780c85d4-f97b-5852-8efa-a264f4c36146",
+   "nombre": "Chocozuela (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 100,
+    "proteinas": 22.3,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a460b7e5-7d42-5889-bbb5-9be2e8f2ccec",
+   "nombre": "Falda (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 20.6,
+    "grasas": 0.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5d76577f-8ad2-5db7-8761-2b55c0bebec1",
+   "nombre": "Ganso (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 21.3,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0e0b850b-c08f-5c94-b758-016086a649a3",
+   "nombre": "Lagarto (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 84,
+    "proteinas": 20.5,
+    "grasas": 0.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a3f254ac-d4b8-5193-a739-f4b7f8fe8ac6",
+   "nombre": "Lomito (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 18.7,
+    "grasas": 1.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bb391661-1a14-576d-9efb-d14e5be82de2",
+   "nombre": "Muchacho redondo (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 21.8,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cb8ce13d-5c3f-5622-b0be-202a9116c946",
+   "nombre": "Papelon (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 89,
+    "proteinas": 19.8,
+    "grasas": 1.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fb2484dc-08e4-5726-8f46-6898e107a7bb",
+   "nombre": "Pollo (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 89,
+    "proteinas": 21,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b61dc17c-12aa-56d8-9bb2-4f704824c21f",
+   "nombre": "Pulpa Negra (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 104,
+    "proteinas": 21.6,
+    "grasas": 1.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dfac7d72-b5f1-5b3c-bd09-d8e718ec1acf",
+   "nombre": "Punta trasera (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 21.7,
+    "grasas": 2.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2e484e7a-0a38-5c15-b1f8-887a34728a79",
+   "nombre": "Solomo (res)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 23.2,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2bafbdd1-dceb-5e1f-acbe-02d59960e64e",
+   "nombre": "Carne de almuerzo enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 220,
+    "proteinas": 11.5,
+    "grasas": 14.8,
+    "carbohidratos": 10.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ed007477-9e0e-56dc-b74b-c05f0de93721",
+   "nombre": "Carne de almuerzo, de res y cerdo enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 188,
+    "proteinas": 10.6,
+    "grasas": 10.5,
+    "carbohidratos": 12.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "952551a3-e0c4-53a9-99e7-7fbc32f966ba",
+   "nombre": "Carne de buey enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 158,
+    "proteinas": 11,
+    "grasas": 7.6,
+    "carbohidratos": 11.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c1cb0fcf-9577-5001-8750-2b0ac0affefe",
+   "nombre": "Carne mechada enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 162,
+    "proteinas": 13.2,
+    "grasas": 9.1,
+    "carbohidratos": 6.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f428b98c-914a-5644-9131-a944e614adff",
+   "nombre": "Carne mechada con soya enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 158,
+    "proteinas": 13.4,
+    "grasas": 9.5,
+    "carbohidratos": 4.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "717f3bba-c8ec-5df1-914f-f5a7ad6dcaff",
+   "nombre": "Carne mechada, tipo argentino enlatada (corned beef)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 137,
+    "proteinas": 14.6,
+    "grasas": 7.2,
+    "carbohidratos": 5.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ba38ff7b-94ce-511f-b080-e6fb4e494f4b",
+   "nombre": "Salchicha, (res) tipo frankfurter enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 230,
+    "proteinas": 9.3,
+    "grasas": 19.4,
+    "carbohidratos": 4.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8b69f276-ebce-5f68-aa79-74e72260773e",
+   "nombre": "Corazón de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 113,
+    "proteinas": 16.8,
+    "grasas": 4.9,
+    "carbohidratos": 0.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b39a7c8b-d5c2-541c-8fe7-8f924c5660ab",
+   "nombre": "Hígado de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 128,
+    "proteinas": 19.3,
+    "grasas": 3.8,
+    "carbohidratos": 4.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "05cd1fe4-ac15-57d0-ae30-9d210ade2b42",
+   "nombre": "Lengua de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 193,
+    "proteinas": 18.4,
+    "grasas": 12.3,
+    "carbohidratos": 2.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "05e323cc-e5ed-5802-89be-7b0a4f71be73",
+   "nombre": "Panza de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 104,
+    "proteinas": 15,
+    "grasas": 3.8,
+    "carbohidratos": 2.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8a8cac77-3bf1-596b-927e-c8943c71953c",
+   "nombre": "riñón de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 129,
+    "proteinas": 15,
+    "grasas": 7.3,
+    "carbohidratos": 0.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "870de492-e84b-5715-a298-4461d9c0de44",
+   "nombre": "Sesos de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 129,
+    "proteinas": 10.4,
+    "grasas": 9.6,
+    "carbohidratos": 0.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c60c0974-eb80-5452-bb08-9949edd59ed9",
+   "nombre": "Ubre de res (vísceras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 195,
+    "proteinas": 15.4,
+    "grasas": 11.7,
+    "carbohidratos": 7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "599729c0-6461-5251-b420-ddd540d765d6",
+   "nombre": "Anchova (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 134,
+    "proteinas": 21,
+    "grasas": 5.5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4049fade-c006-5850-b425-6d26d1ab0bf5",
+   "nombre": "Anchova frita (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 192,
+    "proteinas": 25,
+    "grasas": 10.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c7676d76-57c6-5897-a784-9571e59390cc",
+   "nombre": "Anchova sancochada (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 171,
+    "proteinas": 23.4,
+    "grasas": 8.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "54e64a85-4024-5aa7-9ba4-bd993fb7b83d",
+   "nombre": "Arenque aumado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 293,
+    "proteinas": 24.3,
+    "grasas": 21.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "75503727-abc4-55f4-87eb-2995cd517e2f",
+   "nombre": "Atún",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 26.1,
+    "grasas": 0.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6349ba3e-588b-59e9-a44e-bbafc56da8f3",
+   "nombre": "Atún natural enlatado, escurrido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 96,
+    "proteinas": 23.2,
+    "grasas": 0.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "82e70d58-4134-52a8-8bd3-891681ad8252",
+   "nombre": "Atún en aceite enlatado, escurrido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 167,
+    "proteinas": 29,
+    "grasas": 5.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "143c976a-9390-5655-98f7-0414c4c34d25",
+   "nombre": "Bacalao (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 73,
+    "proteinas": 17.5,
+    "grasas": 0.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "76a803f9-c0fa-54d4-ac68-e975c03707a1",
+   "nombre": "Bacalao seco salado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 341,
+    "proteinas": 78.9,
+    "grasas": 2.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "35c10881-80ef-5159-91cf-45c99865d63c",
+   "nombre": "Bonito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 134,
+    "proteinas": 24.4,
+    "grasas": 4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "efaeb2d1-758d-5703-86d5-78ec707e4174",
+   "nombre": "Bonito frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 224,
+    "proteinas": 31.8,
+    "grasas": 10.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9b90e07c-fd47-5775-ad91-e6fd3b10adb7",
+   "nombre": "Bonito sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 163,
+    "proteinas": 29,
+    "grasas": 5.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1139d1f6-020a-59cd-85f6-e559e3b421a2",
+   "nombre": "Buco o curito cocido (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 141,
+    "proteinas": 24.1,
+    "grasas": 4.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8a1c7b29-f27a-595d-93c2-68c60c57778c",
+   "nombre": "Caballa (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 159,
+    "proteinas": 21.3,
+    "grasas": 8.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "553af0d7-6405-5ea9-bca2-4d030b09629c",
+   "nombre": "Cachama (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 82,
+    "proteinas": 18.7,
+    "grasas": 0.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7beb8148-ef16-5919-92ec-7b65d335f4b1",
+   "nombre": "Cachicato (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 90,
+    "proteinas": 21.2,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c9fea1d1-7a1b-5d7d-860a-59c5c0bc1c13",
+   "nombre": "Carite (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 90,
+    "proteinas": 21.1,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "04a17b18-372f-5fc5-a4cf-6a6c20caf9b1",
+   "nombre": "Carpa (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 92,
+    "proteinas": 16,
+    "grasas": 3.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "16f4efbf-9712-5c31-8079-4b1ee8a5bc6e",
+   "nombre": "Cazón (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 103,
+    "proteinas": 25.4,
+    "grasas": 0.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cce62b92-dfbe-5621-90c2-70defa873040",
+   "nombre": "Coporo (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 126,
+    "proteinas": 25.1,
+    "grasas": 2.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9305c4bd-8d09-5fe2-95d4-a9734921a24b",
+   "nombre": "Corocoro (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 93,
+    "proteinas": 19.7,
+    "grasas": 1.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ca3a0179-f138-570c-b52f-2d6877f3c19a",
+   "nombre": "orocoro frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 163,
+    "proteinas": 25.1,
+    "grasas": 7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0e773664-04c8-53f9-a289-60f793f9b6bf",
+   "nombre": "Corocoro sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 110,
+    "proteinas": 23.1,
+    "grasas": 1.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "508ebcae-c51f-5ca7-945f-61b49e890d01",
+   "nombre": "Corvina (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 20.8,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a00e7b08-9e2f-5416-bd0c-dadd5c9825e6",
+   "nombre": "Chicharro (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 102,
+    "proteinas": 21.3,
+    "grasas": 1.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dc51af3b-d7ed-55e2-86d4-5e71e30e01dd",
+   "nombre": "Chicharro frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 249,
+    "proteinas": 33,
+    "grasas": 13,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d9d41338-b0bc-5bfc-a9df-29c0b631e0c6",
+   "nombre": "Chicharro sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 116,
+    "proteinas": 25.4,
+    "grasas": 1.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0e82a4f7-aec2-54ed-bd1e-a3916bd2e868",
+   "nombre": "Jurel (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 112,
+    "proteinas": 22,
+    "grasas": 2.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "01296a9f-8e84-53a9-9773-6228a3e7b9e3",
+   "nombre": "Jurel frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 205,
+    "proteinas": 33.1,
+    "grasas": 8.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4a487832-bb75-5322-88cb-9bff303412dd",
+   "nombre": "Jurel sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 133,
+    "proteinas": 28.7,
+    "grasas": 2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f490265d-f081-5d44-b178-3f63a0e7632a",
+   "nombre": "Lamparosa (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 97,
+    "proteinas": 20.2,
+    "grasas": 1.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "96fa759e-5efb-5912-af2c-4b76ca436b7a",
+   "nombre": "Lamparosa frita (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 218,
+    "proteinas": 29.6,
+    "grasas": 11.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5fbc2afc-c6db-57c6-b451-6c8edabf1cc6",
+   "nombre": "Lamparosa sancochada (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 104,
+    "proteinas": 22.7,
+    "grasas": 1.5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b0985b7d-5112-5c22-9046-1f3001b3035a",
+   "nombre": "Lebranche (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 142,
+    "proteinas": 19.3,
+    "grasas": 7.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0df701eb-292b-5ffe-be4e-637218cd779f",
+   "nombre": "Lebranche frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 188,
+    "proteinas": 25.5,
+    "grasas": 9.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dfcfbe7c-ae58-5a97-acfc-19356af7a3ee",
+   "nombre": "Lebranche sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 138,
+    "proteinas": 20.2,
+    "grasas": 6.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2d043edd-7745-5395-8d6d-2f4fb740ae08",
+   "nombre": "Lenguado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 85,
+    "proteinas": 20.3,
+    "grasas": 0.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "34b4dff8-0f5f-552d-a651-abde37003248",
+   "nombre": "Loro (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 81,
+    "proteinas": 18.9,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9d806ac3-5619-5855-9f6f-2797faa65255",
+   "nombre": "Merluza (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 20.5,
+    "grasas": 1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f81c0969-e28d-5e86-a124-89eb3349f27a",
+   "nombre": "Mero (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 89,
+    "proteinas": 19.4,
+    "grasas": 1.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "11a0e9c4-ee4d-508c-88d4-7d5735657c32",
+   "nombre": "Mojarra (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 85,
+    "proteinas": 18.6,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "570754ce-5b8c-5a86-acdb-63de5618f4d4",
+   "nombre": "Pámpano (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 92,
+    "proteinas": 19.6,
+    "grasas": 1.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a529bd41-3e49-5b3e-8b68-df8875f55cc5",
+   "nombre": "Pargo (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 77,
+    "proteinas": 18.2,
+    "grasas": 0.5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1689d6e3-e9f1-554d-ba97-37257cdc3ba8",
+   "nombre": "Perla de mar (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 17.7,
+    "grasas": 0.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "724408a3-70c9-56c5-a933-9c8f20921bba",
+   "nombre": "Picúa (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 20.9,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "42524a06-3cd4-5ec6-82c8-66d04709346c",
+   "nombre": "Rayado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 84,
+    "proteinas": 19.2,
+    "grasas": 0.8,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a07fefe5-a347-5df9-99c3-cfccc1697c39",
+   "nombre": "Rayado sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 106,
+    "proteinas": 24.8,
+    "grasas": 0.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8bfc9cba-400f-5357-a312-e8143b249fcf",
+   "nombre": "Róbalo (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 102,
+    "proteinas": 21.1,
+    "grasas": 1.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "32a92c4f-0c3e-5235-abaa-b47d8f5a0ff1",
+   "nombre": "Róbalo frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 156,
+    "proteinas": 28.7,
+    "grasas": 4.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "94ea1e0f-1628-5765-93d1-081896fd94a9",
+   "nombre": "Róbalo sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 107,
+    "proteinas": 23.2,
+    "grasas": 1.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "59403926-3465-5033-86b1-6c59a786c703",
+   "nombre": "Roncador (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 82,
+    "proteinas": 19.3,
+    "grasas": 0.5,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "adfdb1d7-d9a8-5e3b-8cb0-9ce1b1a00b4b",
+   "nombre": "Salmón enlatado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 145,
+    "proteinas": 19.7,
+    "grasas": 7.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fc26f70c-1cc3-502c-b4db-8b7d1f860a6f",
+   "nombre": "Sardinas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 145,
+    "proteinas": 20.6,
+    "grasas": 7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "53d5d860-3312-5ac2-a906-9e2d95ad52c4",
+   "nombre": "Sardinas enlatadas (parte sólida)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 183,
+    "proteinas": 24.9,
+    "grasas": 9.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "92dbc2cd-7e33-5ed8-8819-02cc44b990a1",
+   "nombre": "Sierra (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 119,
+    "proteinas": 23,
+    "grasas": 3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0cba7dd4-e2fe-59d3-9359-5fab31e60dbb",
+   "nombre": "Sierra frita (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 189,
+    "proteinas": 30,
+    "grasas": 7.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5b5f96c3-681f-5f61-9e2d-56a8220ec56e",
+   "nombre": "Sierra sancochada (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 131,
+    "proteinas": 25.3,
+    "grasas": 3.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "da2d709e-69af-57df-991f-e25356a7a3b5",
+   "nombre": "Tajalí (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 19.3,
+    "grasas": 2.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "58d0c54f-8830-5638-8e5f-bc84313edd68",
+   "nombre": "Tajalí frito (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 212,
+    "proteinas": 29,
+    "grasas": 10.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "24594479-5302-58fd-bf27-e22c8ba74487",
+   "nombre": "Tajalí sancochado (pescado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 11,
+    "proteinas": 22.9,
+    "grasas": 2.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ced42656-5e77-5ae1-85b1-49dbe45b5ae3",
+   "nombre": "Trucha arcoiris",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 103,
+    "proteinas": 19.5,
+    "grasas": 2.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5311dc1d-1272-59e6-8407-17bb838042aa",
+   "nombre": "Trucha de mar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 17.9,
+    "grasas": 0.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "878df086-a74b-5d27-af1f-ad7f903ab77a",
+   "nombre": "Almejas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 73,
+    "proteinas": 12.6,
+    "grasas": 1.6,
+    "carbohidratos": 2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "083f5157-da43-5853-b1e6-6b80592ef8cd",
+   "nombre": "Calamares",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 80,
+    "proteinas": 16.8,
+    "grasas": 1.4,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c83a84b7-c7cf-584c-a1b8-5bfe7528dc8b",
+   "nombre": "Camarones",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 19.7,
+    "grasas": 1.3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fc10f4e4-399f-5c65-b2e6-fbb93c570442",
+   "nombre": "Cangrejos enlatados",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 97,
+    "proteinas": 17.4,
+    "grasas": 2.5,
+    "carbohidratos": 1.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f90a1a08-2122-5b50-9827-ecf4d8f9e982",
+   "nombre": "Chipi-Chipi cocidos",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 81,
+    "proteinas": 17.4,
+    "grasas": 0.8,
+    "carbohidratos": 1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "02744381-c71b-55b4-ac28-139b221fc992",
+   "nombre": "Guacuco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 121,
+    "proteinas": 18.3,
+    "grasas": 4.6,
+    "carbohidratos": 1.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a1159c62-7fbc-5282-8b79-e02d58852aa5",
+   "nombre": "Langosta",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 84,
+    "proteinas": 16.2,
+    "grasas": 1.9,
+    "carbohidratos": 0.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7676acdf-833a-55b4-9b13-eee464458448",
+   "nombre": "Langostinos",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 89,
+    "proteinas": 20.3,
+    "grasas": 0.9,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dba51331-e409-5512-b714-84c0b5c78dd4",
+   "nombre": "Mejillones enlatados",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 104,
+    "proteinas": 17.2,
+    "grasas": 3.3,
+    "carbohidratos": 1.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7415442f-5a82-5611-a577-449c721455b2",
+   "nombre": "Ostras",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 42,
+    "proteinas": 5.8,
+    "grasas": 0.5,
+    "carbohidratos": 3.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e17b7ca7-bcb1-5e25-b1e6-8b37e18b5c8e",
+   "nombre": "Pepitonas enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 88,
+    "proteinas": 16.8,
+    "grasas": 1.2,
+    "carbohidratos": 2.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3b40a080-c4b5-5daf-a4a7-eb65790199ef",
+   "nombre": "Pulpo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 64,
+    "proteinas": 14.2,
+    "grasas": 0.6,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "56f406c1-6120-5589-a095-990affbe32c0",
+   "nombre": "Huevo de Codorníz, Gallina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 179,
+    "proteinas": 11.6,
+    "grasas": 13.1,
+    "carbohidratos": 3.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ffdd0f7b-d377-5c37-bbc9-d1ee12edfd5b",
+   "nombre": "Huevo entero Gallina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 156,
+    "proteinas": 12.4,
+    "grasas": 11.1,
+    "carbohidratos": 1.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b94ba5c4-358e-5fe9-b8f2-df8547cf18bf",
+   "nombre": "Clara de huevo Gallina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 46,
+    "proteinas": 10.8,
+    "grasas": 0.2,
+    "carbohidratos": 0.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "de7c787c-f11d-5d7c-91dd-de98e938e281",
+   "nombre": "Yema de huevo Gallina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 354,
+    "proteinas": 16.1,
+    "grasas": 31.6,
+    "carbohidratos": 1.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "467049c5-8ccd-5071-9b2b-933e54e06a27",
+   "nombre": "Huevo de gallina en polvo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 576,
+    "proteinas": 46.8,
+    "grasas": 42,
+    "carbohidratos": 2.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f5be6919-0293-5b72-8904-c3a051e393c6",
+   "nombre": "Huevo de Iguana",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 166,
+    "proteinas": 16.2,
+    "grasas": 10.4,
+    "carbohidratos": 2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "67f7c79d-ac7a-5c2a-933a-e192caa9d871",
+   "nombre": "Huevo de Lisa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 367,
+    "proteinas": 39.9,
+    "grasas": 19,
+    "carbohidratos": 9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "86e2ca1a-0a6e-5a27-9807-c6621b419ca7",
+   "nombre": "Huevo de Tortuga",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 12.6,
+    "grasas": 6.3,
+    "carbohidratos": 0.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3cefee63-8631-5772-9220-a4847b66ee49",
+   "nombre": "Leche de burra",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 44,
+    "proteinas": 1.7,
+    "grasas": 1.2,
+    "carbohidratos": 6.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6556980b-df75-5c82-a76b-5e0c1f81474d",
+   "nombre": "Leche de cabra",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 75,
+    "proteinas": 4,
+    "grasas": 4.8,
+    "carbohidratos": 4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dcc6eeda-e4a2-5005-9744-d1ac9258b93d",
+   "nombre": "Leche Humana",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 78,
+    "proteinas": 1.1,
+    "grasas": 4,
+    "carbohidratos": 9.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9ad0f7b7-4f09-5c22-9c9d-b6774a2b4501",
+   "nombre": "Leche de soya",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 36,
+    "proteinas": 3.4,
+    "grasas": 1.5,
+    "carbohidratos": 2.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b223e910-b3cd-5bf9-acb2-9739b2929dd5",
+   "nombre": "Leche de vaca liquida completa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 3.5,
+    "grasas": 3.4,
+    "carbohidratos": 4.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "861e0b63-e0f3-55a8-b1e6-156c956114d3",
+   "nombre": "Leche de vaca líquida descremada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 43,
+    "proteinas": 3.6,
+    "grasas": 0.9,
+    "carbohidratos": 5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3dc5e93e-f53f-5759-b83e-a2226156a5bd",
+   "nombre": "Leche de vaca en polvo completa, enriquecida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 492,
+    "proteinas": 25.8,
+    "grasas": 26.7,
+    "carbohidratos": 38,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a86e07bf-32f4-56c0-b822-2319c0c236f9",
+   "nombre": "Leche de vaca en polvo descremada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 356,
+    "proteinas": 35,
+    "grasas": 1,
+    "carbohidratos": 51.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "260ee857-890b-5b3f-afb1-e327bbc82f12",
+   "nombre": "Leche de vaca condensada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 324,
+    "proteinas": 8,
+    "grasas": 8.7,
+    "carbohidratos": 53.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ab918bc3-037a-51ea-bd90-b02085d7b0fe",
+   "nombre": "Leche de vaca evaporada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 138,
+    "proteinas": 6.8,
+    "grasas": 7.9,
+    "carbohidratos": 9.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3526986b-5837-5460-96d9-28efb3c2c40f",
+   "nombre": "Crema de leche de vaca pasteurizada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 382,
+    "proteinas": 2,
+    "grasas": 40.3,
+    "carbohidratos": 2.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8262325a-6bff-5211-90d3-0d65679bc8bc",
+   "nombre": "Cuajada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 257,
+    "proteinas": 15.5,
+    "grasas": 18.9,
+    "carbohidratos": 6.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f3cf1949-5534-5819-a794-a3629751d2d2",
+   "nombre": "Mantequilla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 731,
+    "proteinas": 0.6,
+    "grasas": 81,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "38fb12de-db7f-5590-adcb-25caf8bc57e9",
+   "nombre": "Nata",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 326,
+    "proteinas": 2.5,
+    "grasas": 32,
+    "carbohidratos": 7.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ef6bab09-4c19-5f73-906a-094cb5a1a5dc",
+   "nombre": "Suero criollo pasteurizado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 3.1,
+    "grasas": 3.3,
+    "carbohidratos": 5.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "03d6721b-ed0c-50f6-8737-1ea64503ae4d",
+   "nombre": "Queso amarillo fundido, tipo americano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 376,
+    "proteinas": 22.4,
+    "grasas": 31.2,
+    "carbohidratos": 1.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a9f3e7bf-ca6f-5809-bfae-5a852b9cfbf8",
+   "nombre": "Queso amarillo fundidio para untar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 277,
+    "proteinas": 12.7,
+    "grasas": 21.9,
+    "carbohidratos": 7.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b8e95e35-41c4-5861-83b3-63640c8bd6ba",
+   "nombre": "Queso amarillo holandés",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 398,
+    "proteinas": 26,
+    "grasas": 32.1,
+    "carbohidratos": 1.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9df1d905-6f26-5e8c-b385-70624bda4410",
+   "nombre": "Queso azúl danés",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 337,
+    "proteinas": 22.8,
+    "grasas": 26.5,
+    "carbohidratos": 1.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a61455c9-8083-5948-8cb8-789dd4253c9f",
+   "nombre": "Queso blanco duro de leche complet.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 389,
+    "proteinas": 24.9,
+    "grasas": 31.5,
+    "carbohidratos": 1.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d17003f9-acd8-5881-87ac-973441ae6735",
+   "nombre": "Queso blanco duro de leche descrem.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 224,
+    "proteinas": 38.2,
+    "grasas": 5.7,
+    "carbohidratos": 4.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cb5e81c6-9e5c-54e6-a038-b20f15c990ed",
+   "nombre": "Queso blanc duro de leche semidescre.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 337,
+    "proteinas": 34,
+    "grasas": 21,
+    "carbohidratos": 3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e42f263e-b454-59af-b71f-9060f154dff4",
+   "nombre": "Queso fundidio para untar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 304,
+    "proteinas": 12.3,
+    "grasas": 26.5,
+    "carbohidratos": 4.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6cc83ef0-586d-5dce-81e7-d8cda886c5cb",
+   "nombre": "Queso blanco suave",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 313,
+    "proteinas": 18.3,
+    "grasas": 26.3,
+    "carbohidratos": 0.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "85aa9279-6a9b-59e5-956c-cde1aeb3449b",
+   "nombre": "Queso Cheddar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 398,
+    "proteinas": 25,
+    "grasas": 32.2,
+    "carbohidratos": 2.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3a5467d5-060d-5e5f-b63a-2e5f63c906ab",
+   "nombre": "Queso de año",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 402,
+    "proteinas": 24.3,
+    "grasas": 32.8,
+    "carbohidratos": 2.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9d0296af-c606-5dc4-82e5-7b08ca1576c1",
+   "nombre": "Queso de cabra",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 172,
+    "proteinas": 16,
+    "grasas": 10.3,
+    "carbohidratos": 3.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3a4bfb9f-580a-5407-9177-1085cdcde3e2",
+   "nombre": "Queso de crema (cream chesse)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 377,
+    "proteinas": 9,
+    "grasas": 37,
+    "carbohidratos": 2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0a04048c-a1ee-5916-b9f8-d4800336dc11",
+   "nombre": "Queso de mano (29)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 316,
+    "proteinas": 19.3,
+    "grasas": 24.8,
+    "carbohidratos": 4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cac513f4-ea57-5ff1-9ddb-ef690989b728",
+   "nombre": "Queso gouda",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 355,
+    "proteinas": 24.9,
+    "grasas": 27.4,
+    "carbohidratos": 2.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "614ed7e5-3d37-50df-ab07-61d09655939f",
+   "nombre": "Queso guayanés",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 284,
+    "proteinas": 18.8,
+    "grasas": 23,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1a2a3db0-1388-5528-b742-4e2498e1e31a",
+   "nombre": "Queso gruyere",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 404,
+    "proteinas": 28.8,
+    "grasas": 31.8,
+    "carbohidratos": 0.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ea2a09d5-4ed0-51d1-9c9e-0b84e01a062a",
+   "nombre": "Queso mozzarela",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 230,
+    "proteinas": 19.9,
+    "grasas": 16.1,
+    "carbohidratos": 1.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1218781a-7203-559c-8fac-ffe40ce4046d",
+   "nombre": "Queso muenster",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 363,
+    "proteinas": 24.2,
+    "grasas": 28.5,
+    "carbohidratos": 2.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "921263f5-bf2a-56e4-83c9-3d7d392d4337",
+   "nombre": "Queso parmesano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 391,
+    "proteinas": 40.8,
+    "grasas": 24.7,
+    "carbohidratos": 1.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "23752b6c-d6ca-5487-8bff-7c836b784f64",
+   "nombre": "Requeson",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 161,
+    "proteinas": 13.4,
+    "grasas": 10.8,
+    "carbohidratos": 2.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3c6254cd-bf90-5108-91b3-8a918f10f123",
+   "nombre": "Queso roquefort",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 423,
+    "proteinas": 22.2,
+    "grasas": 36.6,
+    "carbohidratos": 1.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "56a7d9cb-4be1-5ab0-a763-e11950570fc0",
+   "nombre": "Pasta para untar con sabor a queso",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 323,
+    "proteinas": 7.2,
+    "grasas": 28.6,
+    "carbohidratos": 9.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "99020955-dcb8-5203-8813-3962f09ef8e5",
+   "nombre": "Yoghurt de leche completa y frutas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 114,
+    "proteinas": 3.6,
+    "grasas": 3.2,
+    "carbohidratos": 17.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "39d29c28-3902-5bb4-b6ac-63536fde21b3",
+   "nombre": "Dulce de leche completa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 92,
+    "proteinas": 4.2,
+    "grasas": 3.6,
+    "carbohidratos": 10.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0282d552-ee9a-5cd8-b838-46950e6d3259",
+   "nombre": "Yoghurt líquido de leche semidescrem c/frutas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 4.9,
+    "grasas": 1.5,
+    "carbohidratos": 7.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fb755f1e-178f-5791-a50e-d7bf54c752a8",
+   "nombre": "Yoghurt líqu. De leche descrem. C/frutas y edulcorante",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 55,
+    "proteinas": 4.3,
+    "grasas": 0.7,
+    "carbohidratos": 7.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "68b20ec6-436f-5e77-a823-4ea88d9a6a6a",
+   "nombre": "Yoghurt natural de leche completa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 4.3,
+    "grasas": 3.8,
+    "carbohidratos": 5.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a98ba31c-2120-5961-84ba-f8fb5bf33d08",
+   "nombre": "Yoghurt natural de leche descremad.",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 51,
+    "proteinas": 4.6,
+    "grasas": 0.6,
+    "carbohidratos": 6.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "03e83f41-b031-50ce-94c2-7ba536de326d",
+   "nombre": "Arvejas secas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 271,
+    "proteinas": 23.2,
+    "grasas": 1.4,
+    "carbohidratos": 60.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "319c0456-b5b0-572b-8bf8-aaf6787b5679",
+   "nombre": "Arvejas secas cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 86,
+    "proteinas": 7.4,
+    "grasas": 0.3,
+    "carbohidratos": 19,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "62201dd8-9a6b-5fd4-8156-b3426105c924",
+   "nombre": "Arvejas tiernas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 7.8,
+    "grasas": 0.5,
+    "carbohidratos": 21.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c46acece-26b5-5e72-a529-c77a0bd95e6f",
+   "nombre": "Arvejas Tiernas enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 67,
+    "proteinas": 4.7,
+    "grasas": 0.3,
+    "carbohidratos": 15.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6dc25cea-3831-5764-9c8f-c5365496dcb9",
+   "nombre": "Caraotas blancas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 233,
+    "proteinas": 23.9,
+    "grasas": 1.5,
+    "carbohidratos": 59.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d6dfdb0e-a098-5bb0-be15-00b2670bc822",
+   "nombre": "Caraotas blancas cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 84,
+    "proteinas": 8,
+    "grasas": 0.5,
+    "carbohidratos": 19.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dd3e3aac-d075-5c19-872e-434b17381b36",
+   "nombre": "Caraotas blancas enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 73,
+    "proteinas": 6.3,
+    "grasas": 0.5,
+    "carbohidratos": 17.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "62908ec9-3224-588c-ae71-d3b0b6a5ccda",
+   "nombre": "Caraotas negras",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 248,
+    "proteinas": 23,
+    "grasas": 1.6,
+    "carbohidratos": 59.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b23c73ea-cb6c-5f0c-9750-0be270ec1dd5",
+   "nombre": "Caraotas negras cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 82,
+    "proteinas": 8.5,
+    "grasas": 0.3,
+    "carbohidratos": 21,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7182acf9-01ea-517b-8c1a-3f73633c4511",
+   "nombre": "caraotas negras enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 66,
+    "proteinas": 5.4,
+    "grasas": 1.5,
+    "carbohidratos": 15,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d9e8bbeb-9a01-5ae4-93f5-10165fc3ae0a",
+   "nombre": "Caraotas rojas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 251,
+    "proteinas": 20.9,
+    "grasas": 2,
+    "carbohidratos": 60.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ad575983-f9b0-5572-a28d-c2b5f9555d4f",
+   "nombre": "Caraotas rojas cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 8.6,
+    "grasas": 0.5,
+    "carbohidratos": 21.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "45e12ab5-5750-53e6-9918-9a309841d0ba",
+   "nombre": "Caraotas rojas enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 88,
+    "proteinas": 6.8,
+    "grasas": 0.7,
+    "carbohidratos": 21.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1bed6a97-d2c4-59b8-96f8-4d77e03a8bbd",
+   "nombre": "Cuarentano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 322,
+    "proteinas": 24.1,
+    "grasas": 1.3,
+    "carbohidratos": 57.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7dd60aa4-fa51-5e4c-87c8-9e0309fdd2ad",
+   "nombre": "Frijol",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 257,
+    "proteinas": 26.7,
+    "grasas": 0.9,
+    "carbohidratos": 57.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8757ba41-b8ac-56ec-a282-4e74cad6914a",
+   "nombre": "Frijol cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 92,
+    "proteinas": 8.2,
+    "grasas": 0.4,
+    "carbohidratos": 21.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4115f63f-92fa-50c6-93de-2225dae04617",
+   "nombre": "Gallinazo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 311,
+    "proteinas": 22.1,
+    "grasas": 1,
+    "carbohidratos": 61.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "63dddac9-ea76-5ea3-b34a-3c1767f1c0cc",
+   "nombre": "Garbanzos",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 310,
+    "proteinas": 20,
+    "grasas": 4.6,
+    "carbohidratos": 60,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8313b5e8-d6bd-548c-be0c-7eaba71ad06b",
+   "nombre": "Garbanzos cocidos",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 113,
+    "proteinas": 9.5,
+    "grasas": 1.8,
+    "carbohidratos": 22.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2d178926-4814-5275-853b-e0160811c3ce",
+   "nombre": "Guaracaro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 324,
+    "proteinas": 21.2,
+    "grasas": 1.5,
+    "carbohidratos": 60.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2ce134b5-c78b-585b-84d4-d37eb214e620",
+   "nombre": "Habas blancas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 267,
+    "proteinas": 25.5,
+    "grasas": 1.3,
+    "carbohidratos": 57,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "674998a3-3f1d-55e9-be50-5b5c3e6d1420",
+   "nombre": "Habas rojas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 273,
+    "proteinas": 25.5,
+    "grasas": 1.6,
+    "carbohidratos": 57.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "692cdae2-d77d-5b12-9bd6-f0779ff35eb6",
+   "nombre": "Habas verdes",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 9.3,
+    "grasas": 0.5,
+    "carbohidratos": 24.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "952f956a-d6af-57b1-9906-6231502fa70c",
+   "nombre": "Lentejas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 252,
+    "proteinas": 23.9,
+    "grasas": 0.9,
+    "carbohidratos": 59.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3a0f612b-8689-51eb-9932-612582f082a9",
+   "nombre": "Lentejas cocidas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 65,
+    "proteinas": 6.8,
+    "grasas": 0.3,
+    "carbohidratos": 13.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fb44895b-b60b-5ed4-963c-d0c1fffdee7f",
+   "nombre": "Quinchoncho seco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 250,
+    "proteinas": 20.9,
+    "grasas": 1,
+    "carbohidratos": 63.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "103b0469-9752-5485-b48d-1ba6a6fd36b0",
+   "nombre": "Quinchoncho seco cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 8.2,
+    "grasas": 0.5,
+    "carbohidratos": 24,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1ef4299e-34b1-5d9f-bb21-738d33d95740",
+   "nombre": "Quinchoncho tierno",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 121,
+    "proteinas": 8.4,
+    "grasas": 1,
+    "carbohidratos": 23.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8f51a4ef-4a6a-57cc-b9fb-16303c3bba11",
+   "nombre": "Soya, grano entero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 412,
+    "proteinas": 33.4,
+    "grasas": 16.1,
+    "carbohidratos": 38.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e27fca1b-54ed-5f57-8db2-26796d9b0dcd",
+   "nombre": "Soya, harina de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 442,
+    "proteinas": 35.4,
+    "grasas": 20.1,
+    "carbohidratos": 32.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "94413d4b-30e1-55db-a3e5-2adefdd78e8d",
+   "nombre": "Soya, harina desgrasada de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 335,
+    "proteinas": 52,
+    "grasas": 0.8,
+    "carbohidratos": 32.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b9331151-44d2-53f5-b9af-fd0b6c678377",
+   "nombre": "Apio",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 1,
+    "grasas": 0.1,
+    "carbohidratos": 24.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "814df1f1-744a-5a10-8008-b843b72e5bca",
+   "nombre": "Apio cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 88,
+    "proteinas": 0.6,
+    "grasas": 0.5,
+    "carbohidratos": 21.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "99d3a7b1-a63d-5e45-ab97-a14fe8eea19e",
+   "nombre": "Batata",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 108,
+    "proteinas": 1.5,
+    "grasas": 0.4,
+    "carbohidratos": 28.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4df16269-8945-5457-9569-c374a86df05b",
+   "nombre": "Batata cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 83,
+    "proteinas": 1.9,
+    "grasas": 0.1,
+    "carbohidratos": 20.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "087099b5-4f67-5efe-805c-27bd4cf53a5a",
+   "nombre": "Mapuey blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 90,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 21.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a431b153-18e1-53ba-9a27-d955fb6c4c8e",
+   "nombre": "Mapuey morado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 112,
+    "proteinas": 1.2,
+    "grasas": 0.6,
+    "carbohidratos": 27.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e25a9cc7-cc73-5a16-b195-388c3b7ba6f4",
+   "nombre": "Ñame",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 2.1,
+    "grasas": 0.2,
+    "carbohidratos": 23.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "be5b1b9b-8630-5459-934d-5b2cb40eccbc",
+   "nombre": "Ñame cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 88,
+    "proteinas": 1.7,
+    "grasas": 0.1,
+    "carbohidratos": 21.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "96cb9567-0864-59da-8b58-1c328a626242",
+   "nombre": "Ocumo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 103,
+    "proteinas": 1.7,
+    "grasas": 0.8,
+    "carbohidratos": 24.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dc2a6582-5d26-5ab5-a02c-c0b12559d502",
+   "nombre": "Ocumo cocido",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 101,
+    "proteinas": 1,
+    "grasas": 0.2,
+    "carbohidratos": 26.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ba3616b3-a1f3-57d1-9c1b-e2dc0ebf3929",
+   "nombre": "Ocumo chino",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 156,
+    "proteinas": 1.2,
+    "grasas": 0.2,
+    "carbohidratos": 40.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "accde1d8-f9cf-5b32-8bc9-4f5e54946352",
+   "nombre": "Papa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 81,
+    "proteinas": 2,
+    "grasas": 0.1,
+    "carbohidratos": 19.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fe4d5229-134e-5c1c-8b08-aba155e24a4e",
+   "nombre": "Papa cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 68,
+    "proteinas": 2,
+    "grasas": 0.1,
+    "carbohidratos": 16.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "24ceb312-39cc-5d54-9e51-060db4a5552d",
+   "nombre": "Papa morada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 80,
+    "proteinas": 2.1,
+    "grasas": 0.3,
+    "carbohidratos": 18.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d99f020e-b77b-55c3-be4e-92be1b140e82",
+   "nombre": "Yuca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 143,
+    "proteinas": 1.1,
+    "grasas": 0.2,
+    "carbohidratos": 36.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "77a3f789-ea7b-575f-b425-35fc92d3ca92",
+   "nombre": "Yuca cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 129,
+    "proteinas": 0.8,
+    "grasas": 0.2,
+    "carbohidratos": 33.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0d2d7bfb-fa1b-5f15-9629-4df849c0b04c",
+   "nombre": "Acelga",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 19,
+    "proteinas": 2,
+    "grasas": 0.2,
+    "carbohidratos": 5.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "84d3626c-1b32-5277-8186-cc39e3a4d801",
+   "nombre": "Aguacate",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 152,
+    "proteinas": 1.3,
+    "grasas": 14,
+    "carbohidratos": 8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "87dddbe9-415c-5f04-9e06-e2301a374702",
+   "nombre": "Ají chile picante",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 41,
+    "proteinas": 1.2,
+    "grasas": 0.2,
+    "carbohidratos": 9.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "947241b9-dc3a-52e1-b24f-43fd89e3a8b0",
+   "nombre": "Ají dulce sin clasificar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 46,
+    "proteinas": 1.9,
+    "grasas": 0.6,
+    "carbohidratos": 10.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a332193b-d59b-5e71-b28c-f17ba1dc2085",
+   "nombre": "Ají rojo picante",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 2.2,
+    "grasas": 1.6,
+    "carbohidratos": 14.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6c04f326-3331-576f-a044-ba03a9d68098",
+   "nombre": "Ajo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 129,
+    "proteinas": 5.1,
+    "grasas": 0.2,
+    "carbohidratos": 27.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "84318326-4e1f-57e4-bbee-6b544b44887c",
+   "nombre": "Ajoporro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 36,
+    "proteinas": 1.5,
+    "grasas": 0.1,
+    "carbohidratos": 11.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3761ad03-ca4e-5974-9486-d1aaccd9eeb9",
+   "nombre": "Alcachofa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 2.8,
+    "grasas": 0.2,
+    "carbohidratos": 9.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "12163757-8c44-58bf-b041-0468fbd9d321",
+   "nombre": "Apio españa (celery)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 16,
+    "proteinas": 0.9,
+    "grasas": 0.1,
+    "carbohidratos": 4.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "06ba3324-3d7d-579b-8933-00ce959e3a54",
+   "nombre": "Auyama",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 43,
+    "proteinas": 1.5,
+    "grasas": 0.4,
+    "carbohidratos": 9.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ce78d987-d0e3-5dfe-92e8-8fa133244ee5",
+   "nombre": "Auyama cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 27,
+    "proteinas": 0.8,
+    "grasas": 0.2,
+    "carbohidratos": 6.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "776f0397-9a07-55ab-8e11-7c27fc6a3504",
+   "nombre": "Berenjena",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 18,
+    "proteinas": 1,
+    "grasas": 0.3,
+    "carbohidratos": 5.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6e193614-d973-5b02-b500-364104eb66ef",
+   "nombre": "Berro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 18,
+    "proteinas": 2.2,
+    "grasas": 0.4,
+    "carbohidratos": 4.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "55456571-9a4a-596f-8f34-f013b4d233ba",
+   "nombre": "Brócoli",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 27,
+    "proteinas": 3.8,
+    "grasas": 0.4,
+    "carbohidratos": 6.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2cb2e837-b5ec-577d-8d25-7c649597059d",
+   "nombre": "Calabacín",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 11,
+    "proteinas": 1.2,
+    "grasas": 0.2,
+    "carbohidratos": 1.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bfdafebf-59b5-5b15-9fa4-6e5f9c670d68",
+   "nombre": "Cebolla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 43,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 11.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "52a18995-b80a-5e3a-8bfa-c21dfc718960",
+   "nombre": "Coliflor",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 19,
+    "proteinas": 2.5,
+    "grasas": 0.2,
+    "carbohidratos": 5.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "63f0120d-ce4b-5a5e-9d69-f66d684ec640",
+   "nombre": "Colinabo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 2,
+    "grasas": 0.1,
+    "carbohidratos": 6.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d4020743-5fab-5749-a7e2-e82db4bb3824",
+   "nombre": "Chayota",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 0.7,
+    "grasas": 0.2,
+    "carbohidratos": 6.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e3b0f7c7-37b0-5be1-96ff-6a554f102971",
+   "nombre": "Escarola",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 14,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 4.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "55d04c50-3d09-5689-b898-fb11499085d1",
+   "nombre": "Espárrago",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 23,
+    "proteinas": 2.2,
+    "grasas": 0.2,
+    "carbohidratos": 4.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b7dee9cb-3e9f-576c-841e-493090758f80",
+   "nombre": "Espárrago enlatado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 2.4,
+    "grasas": 0.4,
+    "carbohidratos": 4.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7c0c34a4-c8fc-5ebe-9c9d-68ac546bc105",
+   "nombre": "Espinaca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 17,
+    "proteinas": 2.3,
+    "grasas": 0.3,
+    "carbohidratos": 3.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7d6654c4-1ee7-5054-b01e-ea76c4dfe885",
+   "nombre": "Hongos",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 26,
+    "proteinas": 2.7,
+    "grasas": 0.2,
+    "carbohidratos": 5.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "84343446-cd22-5c12-8343-27fd6cdd90a2",
+   "nombre": "Hongos enlatados",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 2.3,
+    "grasas": 0.5,
+    "carbohidratos": 4.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "77629de6-3db4-5274-8a45-991b32d83be8",
+   "nombre": "Lairen",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 45,
+    "proteinas": 0.5,
+    "grasas": 0.8,
+    "carbohidratos": 9.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a2610add-2c06-5f3e-9cbc-bae8cfcc8c80",
+   "nombre": "Lechuga",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 10,
+    "proteinas": 1.2,
+    "grasas": 0.2,
+    "carbohidratos": 3.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e72d2822-db13-55bd-9ada-144ad2d69771",
+   "nombre": "Nabo blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 1.1,
+    "grasas": 0.1,
+    "carbohidratos": 5.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c3af5e1b-918b-51af-8dc5-29ff265202ff",
+   "nombre": "Palmito",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 41,
+    "proteinas": 1.6,
+    "grasas": 0.2,
+    "carbohidratos": 13.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "99c2257b-3f3a-5871-8424-06b91cb823c8",
+   "nombre": "Pepino",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 13,
+    "proteinas": 0.7,
+    "grasas": 0.1,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5a7d09cd-6341-53e8-93d8-cbd47716789e",
+   "nombre": "Perejil",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 37,
+    "proteinas": 4,
+    "grasas": 0.8,
+    "carbohidratos": 9.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ab58c866-3605-511a-ba0b-d47cb039e763",
+   "nombre": "Pimenton Rojo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 20,
+    "proteinas": 0.8,
+    "grasas": 0.2,
+    "carbohidratos": 6.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8bf4b840-51fc-57dd-81ed-44202e8b7e25",
+   "nombre": "Pimentón verde",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 19,
+    "proteinas": 0.9,
+    "grasas": 0.1,
+    "carbohidratos": 5.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c56a3ad5-d42b-5770-9199-4593f3ad921f",
+   "nombre": "Quimbombó",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 34,
+    "proteinas": 2.4,
+    "grasas": 0.3,
+    "carbohidratos": 6.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "00c4f97e-7b41-5053-8b28-a46ede055a0d",
+   "nombre": "Rábano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 15,
+    "proteinas": 1,
+    "grasas": 0.1,
+    "carbohidratos": 4.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2bbe8b20-e772-5103-8cf7-d0ed71fec458",
+   "nombre": "Remolacha",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 35,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 10.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "051dd003-ca24-565a-899a-f2ea1a12dce6",
+   "nombre": "Remolacha enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 28,
+    "proteinas": 1,
+    "grasas": 0.1,
+    "carbohidratos": 8.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b22a2675-98e7-5c32-a2bd-503154478e73",
+   "nombre": "Repollito de bruselas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 40,
+    "proteinas": 4.7,
+    "grasas": 0.4,
+    "carbohidratos": 9.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d7d86909-c5d2-5ad0-b7b3-732121573e29",
+   "nombre": "Repollo blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 6.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "18d25cf0-0cd4-5fbb-b478-2a26153cc5b9",
+   "nombre": "Repollo morado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 16,
+    "proteinas": 1.8,
+    "grasas": 0.3,
+    "carbohidratos": 5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "58e810b0-c387-5d51-9edb-888027965d86",
+   "nombre": "Ruibarbo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 17,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 4.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c436c386-8a20-5259-852b-3aa23bf61240",
+   "nombre": "Tomate enlatado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 10,
+    "proteinas": 1.1,
+    "grasas": 0.2,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d92c7a46-6f3c-57e4-afc6-182af58b59be",
+   "nombre": "Tomate manzano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 15,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5473d870-d7b0-5e8c-b77a-1486820d78ef",
+   "nombre": "Tomate perita",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 17,
+    "proteinas": 1.2,
+    "grasas": 0.5,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3ab40f59-6482-561b-8062-f07c76ecb5db",
+   "nombre": "Vainita",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 2.4,
+    "grasas": 0.2,
+    "carbohidratos": 9.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7c26ac63-12b1-5798-93d8-4593f383e35c",
+   "nombre": "Vainitas enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 13,
+    "proteinas": 1.3,
+    "grasas": 0.1,
+    "carbohidratos": 4.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "28f71a25-044d-5c4f-9ef8-1e208a50153d",
+   "nombre": "Vegetales mixtos enlatados",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 34,
+    "proteinas": 2.6,
+    "grasas": 0.3,
+    "carbohidratos": 8.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8597ad00-bf6e-5ef0-a2d9-c667f1d6d9fa",
+   "nombre": "Zanahoria",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 1,
+    "grasas": 0.2,
+    "carbohidratos": 8.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "898e1f0d-d259-5a40-b67a-d9e7cba4e742",
+   "nombre": "Zanahoria enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 26,
+    "proteinas": 0.8,
+    "grasas": 0.3,
+    "carbohidratos": 6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bba15fe4-4d2e-5ff9-83db-d442f114fb4f",
+   "nombre": "Aceituna verde",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 137,
+    "proteinas": 1.5,
+    "grasas": 13.5,
+    "carbohidratos": 5.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "57d94333-f09c-568c-891f-12b01bbbecdc",
+   "nombre": "Albaricoque",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 50,
+    "proteinas": 1,
+    "grasas": 0.1,
+    "carbohidratos": 13.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5b753623-e10c-585f-ac28-b5f61b49e6d5",
+   "nombre": "Albaricoque, compota para niños",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 64,
+    "proteinas": 1,
+    "grasas": 0.4,
+    "carbohidratos": 15.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b01e2434-69fd-59ee-8d02-d533786a7b27",
+   "nombre": "Albaricoque enlatado, con sirup",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 84,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 21.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e502ce26-ce44-5877-acc3-5e07e82e0965",
+   "nombre": "Albaricoque seco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 284,
+    "proteinas": 5.2,
+    "grasas": 0.4,
+    "carbohidratos": 67.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8fc1d481-e0d9-5dc0-acf0-633687fd140e",
+   "nombre": "Anón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 100,
+    "proteinas": 1.6,
+    "grasas": 0.2,
+    "carbohidratos": 24.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d12275d3-61f8-50d8-a665-2907fc1f3d3a",
+   "nombre": "Caimito",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 72,
+    "proteinas": 0.8,
+    "grasas": 1.6,
+    "carbohidratos": 14.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "826ace79-9eab-5d13-b2c2-24a74612831b",
+   "nombre": "Cambur cuyaco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 92,
+    "proteinas": 1.9,
+    "grasas": 0.7,
+    "carbohidratos": 19.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6b74000f-6bec-5f8d-9c25-ac8ad8e7a4c9",
+   "nombre": "Cambur guineo morado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 85,
+    "proteinas": 1.2,
+    "grasas": 0.6,
+    "carbohidratos": 19.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "66e1eb4a-930b-5683-916d-ab7a85367a48",
+   "nombre": "Cambur guineo verde",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 78,
+    "proteinas": 1.7,
+    "grasas": 0.6,
+    "carbohidratos": 17,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "98abf003-dee0-5e96-b581-f00ecdf7f301",
+   "nombre": "Cambur, harina de,",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 358,
+    "proteinas": 3.7,
+    "grasas": 0.5,
+    "carbohidratos": 85.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ad7bb6e0-5f3c-5628-b1a7-ddd959db20ef",
+   "nombre": "Cambur manzano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 95,
+    "proteinas": 1,
+    "grasas": 1.3,
+    "carbohidratos": 23.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f41e5a9e-f11a-56c9-bf75-500ff977f656",
+   "nombre": "Cambur pasado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 231,
+    "proteinas": 3.3,
+    "grasas": 2.8,
+    "carbohidratos": 49.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "71080184-a7d7-5e07-bf52-f66b29d75088",
+   "nombre": "Cambur pineo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 70,
+    "proteinas": 1.5,
+    "grasas": 1,
+    "carbohidratos": 17.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c350ac3b-7c1a-574d-bbc7-a1910fdcaf48",
+   "nombre": "Cambur titiaro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 132,
+    "proteinas": 1.4,
+    "grasas": 1.9,
+    "carbohidratos": 27.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ee4faa3d-d4e3-5832-8a7b-ed9beff805fa",
+   "nombre": "Cambur topocho",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 124,
+    "proteinas": 1.3,
+    "grasas": 1,
+    "carbohidratos": 27.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "87420aac-2c2f-53b5-8c50-8df6e4f88faf",
+   "nombre": "Ciruela de huesito",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 80,
+    "proteinas": 0.9,
+    "grasas": 0.8,
+    "carbohidratos": 17.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "32886efe-5dd0-59fd-bae2-38c9c165b455",
+   "nombre": "Ciruela morada (importada)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 57,
+    "proteinas": 0.7,
+    "grasas": 0.2,
+    "carbohidratos": 14.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a2027135-333e-5f63-baa9-227325b1eb0f",
+   "nombre": "Ciruela pasa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 272,
+    "proteinas": 2.3,
+    "grasas": 0.6,
+    "carbohidratos": 72.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1b455c40-f7fe-5375-8d10-9ee27307e763",
+   "nombre": "Coco maduro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 295,
+    "proteinas": 3.5,
+    "grasas": 27.2,
+    "carbohidratos": 15.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "37f0e08a-9a2b-5294-9b58-0b6d2af9fc77",
+   "nombre": "Coco tierno",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 117,
+    "proteinas": 1.9,
+    "grasas": 11.9,
+    "carbohidratos": 4.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cfbfc54c-74eb-5311-b99f-8ddf413aa7ba",
+   "nombre": "Curuba",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 29,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 6.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "53300e1f-1746-54cf-ab77-b3040a965a9d",
+   "nombre": "Chirimorriñon (chirimoya)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 1.1,
+    "grasas": 0.2,
+    "carbohidratos": 23.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e2944b73-583a-53a5-b6d8-ac88cbf1836f",
+   "nombre": "Chirimoya (corazón)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 91,
+    "proteinas": 1.1,
+    "grasas": 1.2,
+    "carbohidratos": 20.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "67d8928e-5557-54a2-8ec2-ec0cecef732d",
+   "nombre": "Dátil seco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 281,
+    "proteinas": 2.2,
+    "grasas": 0.6,
+    "carbohidratos": 75.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c08a2057-54b6-57ae-ac35-1768baedb2b2",
+   "nombre": "Durazno criollo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 49,
+    "proteinas": 0.4,
+    "grasas": 0.1,
+    "carbohidratos": 13.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c0af2238-45a4-5c21-a34e-e3fb77a3cb37",
+   "nombre": "Fresa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 39,
+    "proteinas": 0.8,
+    "grasas": 0.5,
+    "carbohidratos": 9.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ce238596-6d5c-58bf-a192-5f8d57ec063e",
+   "nombre": "Fruta de pan",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 90,
+    "proteinas": 1.3,
+    "grasas": 0.5,
+    "carbohidratos": 21.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "19fdafbb-a25a-5e20-91a4-d847b31ab444",
+   "nombre": "Granada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 69,
+    "proteinas": 0.7,
+    "grasas": 0.5,
+    "carbohidratos": 17.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "757eeabb-1a80-5f99-ac58-0f8cb36e1f9d",
+   "nombre": "Grappe fruit",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 0.8,
+    "grasas": 0,
+    "carbohidratos": 8.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3e874cf4-6cd7-5366-ad66-48fb9dc4574d",
+   "nombre": "Guama",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 67,
+    "proteinas": 1,
+    "grasas": 0.1,
+    "carbohidratos": 16.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "36226b69-d536-5b71-bed3-53d74c684b32",
+   "nombre": "Guanábana",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 1,
+    "grasas": 0.4,
+    "carbohidratos": 14.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "23bedd36-ffab-5e76-9ed5-2709d79ec5fa",
+   "nombre": "Guayaba colorada o rosada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 29,
+    "proteinas": 1,
+    "grasas": 0.4,
+    "carbohidratos": 8.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "57df0a27-11c5-56b8-a213-08a89a76c226",
+   "nombre": "Guayaba parcha o blanca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 49,
+    "proteinas": 1,
+    "grasas": 0.5,
+    "carbohidratos": 15.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d4a81a2d-bd35-5dc4-836e-e68ebc260a59",
+   "nombre": "Higo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 85,
+    "proteinas": 1.4,
+    "grasas": 0.4,
+    "carbohidratos": 21.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "329001d9-af28-52f8-bfd5-2da56304c539",
+   "nombre": "Higo seco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 252,
+    "proteinas": 4,
+    "grasas": 1.2,
+    "carbohidratos": 69.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f22c3060-8c19-54e7-871b-6f11169ee621",
+   "nombre": "Icaco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 51,
+    "proteinas": 0.4,
+    "grasas": 0.1,
+    "carbohidratos": 13.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9d4d3338-cb6b-5a2b-91fd-09af6658abe3",
+   "nombre": "Jobo amarillo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 77,
+    "proteinas": 0.8,
+    "grasas": 2.1,
+    "carbohidratos": 14.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "081612cc-9e80-5df7-a695-79741e35eee5",
+   "nombre": "Kiwi",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 60,
+    "proteinas": 1,
+    "grasas": 0.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6d052819-7ea4-5aa6-88bb-11164fb8abf9",
+   "nombre": "Lechoza",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 8.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "391d6e4b-38ce-512a-9b91-e97e1c35064c",
+   "nombre": "Lima dulce",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 34,
+    "proteinas": 0.7,
+    "grasas": 0.6,
+    "carbohidratos": 7.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "71cf690e-a4b5-5882-b4a0-d2e44be2de97",
+   "nombre": "Limón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 44,
+    "proteinas": 0.9,
+    "grasas": 0.6,
+    "carbohidratos": 9.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d37a57af-ea28-540b-bdc8-ffad04b0f65e",
+   "nombre": "Mamey",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 41,
+    "proteinas": 0.3,
+    "grasas": 0.6,
+    "carbohidratos": 9.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8761cbaa-3233-59db-9bf7-9ba28d6cd32f",
+   "nombre": "Mamón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 83,
+    "proteinas": 1.2,
+    "grasas": 1.3,
+    "carbohidratos": 16.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "58365bd6-c226-5ed6-8194-d7484eb76cb1",
+   "nombre": "Mandarina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 50,
+    "proteinas": 0.8,
+    "grasas": 0.3,
+    "carbohidratos": 11.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "87195d19-51f8-5daf-8f31-f07c541f3264",
+   "nombre": "Manga",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 55,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 14.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0d225bc5-4ee5-56b8-a87a-41b67fba3117",
+   "nombre": "Mango bocado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 62,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 16.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bf32aee3-320f-5c00-b446-a3eb7d35e869",
+   "nombre": "Mango de hilacha",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 72,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "carbohidratos": 18.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "25e29bb1-1948-597c-b5db-b8c3bd3799dc",
+   "nombre": "Manzana, compota para niños",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 65,
+    "proteinas": 0.5,
+    "grasas": 0.2,
+    "carbohidratos": 16,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e8415c5f-c408-5ae2-b27c-350d06d25f95",
+   "nombre": "Manzana criolla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 42,
+    "proteinas": 0.4,
+    "grasas": 0.2,
+    "carbohidratos": 11.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0ce99da6-e69b-507d-9427-4c26662433cf",
+   "nombre": "Manzana importada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 55,
+    "proteinas": 0.3,
+    "grasas": 0.3,
+    "carbohidratos": 14.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "076fc4d4-1ccc-514e-af7e-a9fe73bc16c3",
+   "nombre": "Manzana seca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 270,
+    "proteinas": 1.4,
+    "grasas": 1,
+    "carbohidratos": 73.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0350eb6d-9f35-5b8f-9b36-fbcbb1d035b0",
+   "nombre": "Melocotón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 65,
+    "proteinas": 0.5,
+    "grasas": 0.1,
+    "carbohidratos": 18.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6b4628de-2ad9-545a-be4f-7f707c6331fa",
+   "nombre": "Melocotón, compota para niños",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 65,
+    "proteinas": 0.8,
+    "grasas": 0.3,
+    "carbohidratos": 15.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f35e82a6-c9ca-582b-a124-8245dbac9ac2",
+   "nombre": "Melocotón, enlatado con sirup",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 71,
+    "proteinas": 0.4,
+    "grasas": 0.1,
+    "carbohidratos": 18.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7c059574-bb33-5326-9212-0ef23bbeeb2d",
+   "nombre": "Melocotón seco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 253,
+    "proteinas": 3,
+    "grasas": 0.6,
+    "carbohidratos": 70.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6430d03c-ce88-5458-b74d-cfc975e6bc83",
+   "nombre": "Melón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 21,
+    "proteinas": 0.6,
+    "grasas": 0.2,
+    "carbohidratos": 4.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "18617741-1337-5765-80ad-fe6b4736cd97",
+   "nombre": "Membrillo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 51,
+    "proteinas": 0.3,
+    "grasas": 0.5,
+    "carbohidratos": 17.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ac66b634-4ba4-5581-a667-dca703782365",
+   "nombre": "Merey",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 46,
+    "proteinas": 0.8,
+    "grasas": 0.3,
+    "carbohidratos": 11.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "69095856-b058-5c6c-b020-116a41dc5ae2",
+   "nombre": "Mora-Zarzamora",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 66,
+    "proteinas": 1.2,
+    "grasas": 0.6,
+    "carbohidratos": 17.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9b083832-b51f-53e2-924a-a06a7968bbb3",
+   "nombre": "Naranja cajera",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 58,
+    "proteinas": 0.7,
+    "grasas": 0.1,
+    "carbohidratos": 13.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ab964039-d11c-513b-83bb-200761ffceed",
+   "nombre": "Naranja china",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 44,
+    "proteinas": 1.4,
+    "grasas": 0.7,
+    "carbohidratos": 8.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3ea5d7eb-2926-53d8-b30a-a37173af484c",
+   "nombre": "Naranja valencia",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 35,
+    "proteinas": 0.7,
+    "grasas": 0,
+    "carbohidratos": 8.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "466fd3fc-22ba-53e0-bab1-5dca71a05f21",
+   "nombre": "Nispero",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 79,
+    "proteinas": 0.4,
+    "grasas": 1,
+    "carbohidratos": 17.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3f4ebfbe-b0f1-55f8-96fa-e3109fd47fc4",
+   "nombre": "Nispero del japón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 47,
+    "proteinas": 0.5,
+    "grasas": 0.8,
+    "carbohidratos": 10.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b6ca9d0a-9699-5ed0-aaee-fa5153d1d2f7",
+   "nombre": "Parcha granadina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 33,
+    "proteinas": 0.8,
+    "grasas": 0.6,
+    "carbohidratos": 6.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4747c742-caee-5299-8f3b-f35173ba1946",
+   "nombre": "Parcha morada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 51,
+    "proteinas": 1.3,
+    "grasas": 0.6,
+    "carbohidratos": 10.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e2b59303-e4eb-52d9-be05-21a87a5c96ae",
+   "nombre": "Parchita",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 78,
+    "proteinas": 1.8,
+    "grasas": 3.4,
+    "carbohidratos": 13.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "23e85135-cdec-5204-ba62-8dea2ee17172",
+   "nombre": "Patilla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 21,
+    "proteinas": 0.5,
+    "grasas": 0,
+    "carbohidratos": 5.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2194f3b0-47a4-5e33-815a-e2d2c9c276d2",
+   "nombre": "Pera",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 0.7,
+    "grasas": 0.4,
+    "carbohidratos": 17.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b0e87169-1f07-53b3-a70b-e06801858af8",
+   "nombre": "Pera, compota para niños",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 53,
+    "proteinas": 0.7,
+    "grasas": 0.2,
+    "carbohidratos": 13.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "db208315-0fc3-5c30-965c-82fcda111d76",
+   "nombre": "Pera enlatada, con sirup",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 0.2,
+    "grasas": 0.1,
+    "carbohidratos": 18.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4da60b39-ebf1-52cb-ad9f-23f4256399b9",
+   "nombre": "Piña",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 55,
+    "proteinas": 0.4,
+    "grasas": 0.2,
+    "carbohidratos": 14.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "670e38b2-dfa0-5b9e-9178-2cfaa17f51a7",
+   "nombre": "Pitahaya",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 62,
+    "proteinas": 1.4,
+    "grasas": 0.4,
+    "carbohidratos": 14.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "59906537-6e25-5625-87ef-1143b4594bbf",
+   "nombre": "Plátano maduro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 137,
+    "proteinas": 1.2,
+    "grasas": 0.4,
+    "carbohidratos": 34,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dc55657d-2212-5d19-81ce-f6c0f1ed4bc6",
+   "nombre": "Plátano maduro horneado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 168,
+    "proteinas": 1.5,
+    "grasas": 0.2,
+    "carbohidratos": 42.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4207ce9b-2cdd-527a-b742-3613ca73ddda",
+   "nombre": "Plátano maduro sancochado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 133,
+    "proteinas": 1.2,
+    "grasas": 0.3,
+    "carbohidratos": 33.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c06940cc-7063-5529-b182-6d7c18801192",
+   "nombre": "Plátano pintón",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 147,
+    "proteinas": 1.2,
+    "grasas": 0.2,
+    "carbohidratos": 37.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ad452020-6a61-597b-86e9-5f85eb2d8058",
+   "nombre": "Plátano verde",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 148,
+    "proteinas": 1.4,
+    "grasas": 0.3,
+    "carbohidratos": 37.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e702e8a0-97e3-511a-8526-92b3a1f1294d",
+   "nombre": "Plátano verde asado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 201,
+    "proteinas": 1.5,
+    "grasas": 0.5,
+    "carbohidratos": 47.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "08c3c2e8-ea20-5da0-bc22-ee4e8f6b0441",
+   "nombre": "Plátano verde, harina de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 332,
+    "proteinas": 2.7,
+    "grasas": 1.6,
+    "carbohidratos": 82.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0c0f17cc-c06b-59a1-8b6a-bd434aea9a36",
+   "nombre": "Plátano verde sancochado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 138,
+    "proteinas": 1.4,
+    "grasas": 0.2,
+    "carbohidratos": 36.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7b2fee4d-8407-56d6-bcfa-768e98201507",
+   "nombre": "Plátano verde, sopa de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 0.4,
+    "grasas": 3.3,
+    "carbohidratos": 11.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e644108a-409e-595f-8f54-62fb6ae09449",
+   "nombre": "Pomarrosa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 67,
+    "proteinas": 0.6,
+    "grasas": 0.2,
+    "carbohidratos": 17,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "735c46f8-2787-5798-9100-8f1b36c3c3dd",
+   "nombre": "Riñon",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 87,
+    "proteinas": 2.1,
+    "grasas": 0.9,
+    "carbohidratos": 19.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "50e3c810-6cd9-53c8-8c0b-f4d990a55c0f",
+   "nombre": "Semeruco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 40,
+    "proteinas": 0.4,
+    "grasas": 0.4,
+    "carbohidratos": 9.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "06a0b9ca-2e9f-5653-9643-1fb2d57e2845",
+   "nombre": "Tamarindo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 296,
+    "proteinas": 2.4,
+    "grasas": 0.3,
+    "carbohidratos": 73.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c9e6609d-99ab-5cee-b743-a121b5b096f0",
+   "nombre": "Tomate francés (de árbol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 44,
+    "proteinas": 1.8,
+    "grasas": 0.4,
+    "carbohidratos": 11.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a4c5e156-590d-5745-82db-950e5773f4e5",
+   "nombre": "Toronja",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 38,
+    "proteinas": 0.6,
+    "grasas": 0.2,
+    "carbohidratos": 9.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c3dc17ef-352b-57ea-9c8f-f9289e2707db",
+   "nombre": "Tuna s/semilla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 75,
+    "proteinas": 0.5,
+    "grasas": 0.1,
+    "carbohidratos": 18.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "453f4bdf-fd52-53cb-b87b-bf29458d40d3",
+   "nombre": "Urupagua",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 200,
+    "proteinas": 2.7,
+    "grasas": 3.6,
+    "carbohidratos": 40.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1e66daea-f46b-53b7-a25a-4485f505f8bc",
+   "nombre": "Uva",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 68,
+    "proteinas": 0.7,
+    "grasas": 0.3,
+    "carbohidratos": 17.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "db11196c-2063-5844-b480-8ebfd29ae72c",
+   "nombre": "Uva de playa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 81,
+    "proteinas": 1.4,
+    "grasas": 0.3,
+    "carbohidratos": 20.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d768e88f-d7a6-54ba-94f9-1be48e1d5c8b",
+   "nombre": "Uva pasa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 277,
+    "proteinas": 2.3,
+    "grasas": 0.5,
+    "carbohidratos": 71.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "546cc176-01ca-525c-b641-262ceacc5eb2",
+   "nombre": "Zapote (mamey colorado)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 1.2,
+    "grasas": 1,
+    "carbohidratos": 25.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "74743ead-3588-56e6-a7ae-a071f5b09d33",
+   "nombre": "Arepa c/c/mechada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 160,
+    "proteinas": 15.5,
+    "grasas": 2.7,
+    "carbohidratos": 20.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6fe2849b-ceb8-55a3-9345-b5317d6be3e3",
+   "nombre": "Arepa c/ensal/galli/aguacat",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 158,
+    "proteinas": 9.1,
+    "grasas": 4.7,
+    "carbohidratos": 22.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "530419c6-6d9c-585e-bc60-2c011fe8e2e1",
+   "nombre": "Arepa c/jamón y queso amarillo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 176,
+    "proteinas": 8.6,
+    "grasas": 7.4,
+    "carbohidratos": 20.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a5005e5c-b09c-5ec4-b6ad-cdbec0e76a52",
+   "nombre": "Arepa c/pollo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 160,
+    "proteinas": 10.9,
+    "grasas": 3.8,
+    "carbohidratos": 22.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8dfaf9b2-b3d5-5035-80fd-4b6aa5ad83b2",
+   "nombre": "Arepa c/queso guyanés",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 198,
+    "proteinas": 8.8,
+    "grasas": 8.4,
+    "carbohidratos": 24.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f2c97227-124d-51d0-b056-f1f59bd9156c",
+   "nombre": "Bocadillo de guayaba (3)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 322,
+    "proteinas": 0.4,
+    "grasas": 0,
+    "carbohidratos": 80.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "63af72d3-2819-51f0-8b77-000a1266951d",
+   "nombre": "Cachapa de budare (4)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 137,
+    "proteinas": 4,
+    "grasas": 1.3,
+    "carbohidratos": 34.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "45a3e1a9-2218-5e49-920d-e5f9998baebc",
+   "nombre": "Cafunga (5)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 156,
+    "proteinas": 3.7,
+    "grasas": 3.3,
+    "carbohidratos": 27.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b35fe650-6cd4-5bc9-a558-93f6777bab86",
+   "nombre": "Carne mechada frita (6)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 247,
+    "proteinas": 21.3,
+    "grasas": 16.5,
+    "carbohidratos": 3.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b7b3585f-e1b4-5bec-b1da-0fc73ddc29c6",
+   "nombre": "Casabe (7)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 333,
+    "proteinas": 1.3,
+    "grasas": 0.6,
+    "carbohidratos": 84.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9730dc0d-98d0-522c-b58f-ea878d1a6ae0",
+   "nombre": "Catalina (8)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 343,
+    "proteinas": 8.1,
+    "grasas": 0.8,
+    "carbohidratos": 76.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bff66c3c-6835-5ffb-89fc-3c0dbe68d80b",
+   "nombre": "Cotufa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 50,
+    "proteinas": 12,
+    "grasas": 5.6,
+    "carbohidratos": 72.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bbac2e84-6572-5bd6-bd04-5fd8bdfdd295",
+   "nombre": "Churro (11)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 373,
+    "proteinas": 11.1,
+    "grasas": 3.2,
+    "carbohidratos": 75.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "96930f0a-239c-5178-b5e0-00eb70133991",
+   "nombre": "Empanada de caraota (12)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 253,
+    "proteinas": 4.1,
+    "grasas": 13.4,
+    "carbohidratos": 29.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f734d81a-013b-5895-8f5b-af591d8e1767",
+   "nombre": "Empanada de carne (12)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 282,
+    "proteinas": 5.8,
+    "grasas": 14.7,
+    "carbohidratos": 31.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5c2e8ce7-695d-5f28-89b2-514ea6933987",
+   "nombre": "Empanada de cazón (12)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 262,
+    "proteinas": 8.6,
+    "grasas": 16,
+    "carbohidratos": 21,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "951bc059-871a-5ddb-bb34-adcb769e11b6",
+   "nombre": "Empanada de queso (12)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 292,
+    "proteinas": 6.1,
+    "grasas": 15.7,
+    "carbohidratos": 31.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4f2dc768-8db9-5cd5-bfbf-d5ae9fca80c5",
+   "nombre": "Flan preparado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 113,
+    "proteinas": 2.9,
+    "grasas": 3.4,
+    "carbohidratos": 17.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5eb99e55-1705-588a-9917-af59f9029944",
+   "nombre": "Gelatina preparada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 67,
+    "proteinas": 1.6,
+    "grasas": 0,
+    "carbohidratos": 15.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "38dc95f1-08d9-555e-908b-c888a639166e",
+   "nombre": "Golfeado (14)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 326,
+    "proteinas": 5.2,
+    "grasas": 5.5,
+    "carbohidratos": 64.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "737f7594-bc25-5f93-aa5e-34f8740ac98b",
+   "nombre": "Hallaca criolla (15)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 183,
+    "proteinas": 6.5,
+    "grasas": 10.8,
+    "carbohidratos": 15,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9254e1da-4ad3-5da6-8be6-004188d8d14e",
+   "nombre": "Hamburguesa c/queso",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 247,
+    "proteinas": 12.3,
+    "grasas": 11.8,
+    "carbohidratos": 24.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a021dbdb-86c5-519b-b210-520c49f93bfc",
+   "nombre": "Hamburguesa doble carne/queso",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 285,
+    "proteinas": 16.3,
+    "grasas": 16.1,
+    "carbohidratos": 20.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9e05dc68-40d1-5e20-8f7c-317e2888f5f6",
+   "nombre": "Hamburguesa c/queso y mayonesa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 250,
+    "proteinas": 14,
+    "grasas": 14.1,
+    "carbohidratos": 18.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5a6bfbaf-780c-58d4-b0d8-cbef43d78c01",
+   "nombre": "Hervido de gallina (17)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 2.4,
+    "grasas": 4.2,
+    "carbohidratos": 7.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1c0f1a46-080e-5cdd-aa2e-fca68eb42626",
+   "nombre": "Hervido de pesacdo (17)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 49,
+    "proteinas": 8.6,
+    "grasas": 3,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "775adf9c-de2b-5a92-a59a-adb14e086e13",
+   "nombre": "Hervido de res (17)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 60,
+    "proteinas": 2.8,
+    "grasas": 3.1,
+    "carbohidratos": 6.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fcdacd9f-9e2b-5b2a-88ea-f1c8e68daf2f",
+   "nombre": "Jalea de mango",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 185,
+    "proteinas": 0.5,
+    "grasas": 1,
+    "carbohidratos": 43.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b5ba0624-5e64-5f9e-a835-2cf71f376a5b",
+   "nombre": "Majarete (20)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 128,
+    "proteinas": 1.3,
+    "grasas": 2.9,
+    "carbohidratos": 24.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b154a3cd-05a1-56ea-9a34-378800ca2b18",
+   "nombre": "Mermelada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 287,
+    "proteinas": 0.5,
+    "grasas": 0.3,
+    "carbohidratos": 71.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9ba7c2d7-861d-5300-99e7-0b01ee6c38fb",
+   "nombre": "Mondongo (sopa)(22)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 95,
+    "proteinas": 6.9,
+    "grasas": 4.9,
+    "carbohidratos": 6.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "bdf8d1ec-844c-5230-ad67-bd67215c7a7a",
+   "nombre": "Pabellón (24)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 136,
+    "proteinas": 10.4,
+    "grasas": 4.9,
+    "carbohidratos": 16.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0806532b-81f6-5a96-92b7-0e8312bf8350",
+   "nombre": "Papas fritas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 318,
+    "proteinas": 4.5,
+    "grasas": 11.3,
+    "carbohidratos": 53.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0eed3f4b-1950-5361-9b87-32eaf12d167b",
+   "nombre": "Pelota (28)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 0.5,
+    "grasas": 2.1,
+    "carbohidratos": 22.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f5a85d9b-2de4-5d56-b2dd-1dbf65e06788",
+   "nombre": "Plátano maduro frito (tajadas)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 224,
+    "proteinas": 1.4,
+    "grasas": 9.2,
+    "carbohidratos": 39.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f8beacfe-d1a6-5865-9b7f-443d007193e0",
+   "nombre": "Plátano maduro, dulce de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 211,
+    "proteinas": 1.5,
+    "grasas": 0.9,
+    "carbohidratos": 49.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4d4adce9-09b9-5988-b530-5e32da5d0d22",
+   "nombre": "Plátano vere, tostones de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 252,
+    "proteinas": 1.9,
+    "grasas": 10.1,
+    "carbohidratos": 51.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c10d7fa3-539b-5609-9aae-7370434c42f4",
+   "nombre": "Pudin preparado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 130,
+    "proteinas": 3.4,
+    "grasas": 3.1,
+    "carbohidratos": 22.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a6ea579f-3746-57c9-a969-2581905a2eda",
+   "nombre": "Tapioca seca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 350,
+    "proteinas": 0.6,
+    "grasas": 0.2,
+    "carbohidratos": 86.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a98b92b3-aa34-5eac-97b1-d2acd204ca55",
+   "nombre": "Aceite",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 900,
+    "proteinas": 0,
+    "grasas": 100,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0cb2df0d-a040-5ff6-b464-40f66845fefb",
+   "nombre": "Azúcar blanca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 398,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 99.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "444e827f-c190-59a8-b67f-da563bce7fc9",
+   "nombre": "Azúcar morena",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 383,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 95.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5fe38311-9fb6-57f5-9640-6f011e584f73",
+   "nombre": "Cacao, grano integro s/cáscara",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 563,
+    "proteinas": 12.4,
+    "grasas": 43.7,
+    "carbohidratos": 34.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "94827ff6-5297-56d0-8344-2198bf2170a3",
+   "nombre": "Café Tostado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 398,
+    "proteinas": 14.2,
+    "grasas": 14,
+    "carbohidratos": 61.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1d7a62b8-327b-5b3c-87fc-b1ddcb84587d",
+   "nombre": "Cereal c/chocolate, tipo musli",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 351,
+    "proteinas": 6.7,
+    "grasas": 4.4,
+    "carbohidratos": 77.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ae48c679-1342-59be-a342-65733721d406",
+   "nombre": "Cereal con fruta, tipo nusli",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 331,
+    "proteinas": 6.7,
+    "grasas": 2.2,
+    "carbohidratos": 80,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "33a14dd1-deae-57a5-b1bd-94345016835e",
+   "nombre": "Cereal infantil c/leche",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 410,
+    "proteinas": 16,
+    "grasas": 8,
+    "carbohidratos": 69,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9dfea85f-cce2-525a-83ca-7e0c6d0ffd06",
+   "nombre": "Cereal infantil sin leche (16%proteina)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 356,
+    "proteinas": 16,
+    "grasas": 0.8,
+    "carbohidratos": 72.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8bdd9d00-d087-51fe-a12a-cef3becf80fe",
+   "nombre": "Cereal infantil sin leche (menos de 16% proteina)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 365,
+    "proteinas": 9.6,
+    "grasas": 2.6,
+    "carbohidratos": 78.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "395f8267-96e6-5649-82b4-2dcb0071d946",
+   "nombre": "Chocolate simple dulce",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 467,
+    "proteinas": 3.8,
+    "grasas": 16.8,
+    "carbohidratos": 76.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "37d946b8-0032-523d-b039-2c05cf24154b",
+   "nombre": "Ensalada de frutas enlatadas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 75,
+    "proteinas": 0.4,
+    "grasas": 0.2,
+    "carbohidratos": 19,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2386cdc8-af0e-56f2-8460-d5ceeecae86f",
+   "nombre": "Ensaladas vegetales, mayonesa, enlatada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 83,
+    "proteinas": 1.3,
+    "grasas": 3.8,
+    "carbohidratos": 12.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e0ee7bd5-b98b-5dd8-aa15-b4305f630cc6",
+   "nombre": "Flan en polvo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 395,
+    "proteinas": 0,
+    "grasas": 0.2,
+    "carbohidratos": 98.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a77d6403-4d6d-5574-a153-c423a140380e",
+   "nombre": "Gelatina en polvo (azúcar y sabor)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 392,
+    "proteinas": 9.4,
+    "grasas": 0,
+    "carbohidratos": 88.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c4ce5702-64d0-51ce-a7f7-d22961c78f30",
+   "nombre": "Gelatina seca natural",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 343,
+    "proteinas": 85.6,
+    "grasas": 0.1,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6de802d5-ca74-537c-a5e5-a99c9e802509",
+   "nombre": "Gofio cumanés",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 334,
+    "proteinas": 0.5,
+    "grasas": 1.4,
+    "carbohidratos": 80.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b33c8bf2-fadb-5208-808d-6098423110a0",
+   "nombre": "Helado de crema",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 212,
+    "proteinas": 4.1,
+    "grasas": 12,
+    "carbohidratos": 22,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "df124de6-d09b-5398-9bde-088ba7355f3c",
+   "nombre": "Helado de leche",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 125,
+    "proteinas": 5,
+    "grasas": 4,
+    "carbohidratos": 25.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f3c677f4-bf80-544d-9d1d-998c9af1ac52",
+   "nombre": "Lactovisoy",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 389,
+    "proteinas": 16,
+    "grasas": 0.9,
+    "carbohidratos": 78.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b120185c-0860-5901-bee7-f912ff27251e",
+   "nombre": "Levadura de cerveza, seca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 345,
+    "proteinas": 36.9,
+    "grasas": 1.6,
+    "carbohidratos": 46.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fc16e0e5-dee2-5edf-9713-eadf56470ef1",
+   "nombre": "Manteca de cerdo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 900,
+    "proteinas": 0,
+    "grasas": 100,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2ae51f7c-d8d9-514a-83d4-f2a23deb6a73",
+   "nombre": "Margarina",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 733,
+    "proteinas": 0.6,
+    "grasas": 81,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "71ca9d1a-141d-5a29-a76c-fbfa32012b2e",
+   "nombre": "Mayonesa comercial",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 748,
+    "proteinas": 1.1,
+    "grasas": 80,
+    "carbohidratos": 6.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "63021a34-66b0-523d-9e04-62d49e04d2e1",
+   "nombre": "Melaza",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 260,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 65,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "06bea8d6-c3a3-5f3c-9bad-d8e9064311d3",
+   "nombre": "Mezcla para H/cachapas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 366,
+    "proteinas": 6.9,
+    "grasas": 1.5,
+    "carbohidratos": 81.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "afef5f93-a351-5ad3-aaae-13770fd9e8f1",
+   "nombre": "Mezcla para H/panqueca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 343,
+    "proteinas": 8.8,
+    "grasas": 0.5,
+    "carbohidratos": 77.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "34b12609-c9c5-5573-9c7d-909881454551",
+   "nombre": "Miel de abeja",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 319,
+    "proteinas": 0.3,
+    "grasas": 0,
+    "carbohidratos": 79.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1c36a0f7-665e-5a98-b77b-4f64e358d5ec",
+   "nombre": "Miel de caña",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 296,
+    "proteinas": 0.5,
+    "grasas": 0.2,
+    "carbohidratos": 73.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "73b19616-7544-5d30-abd3-042a04d4848e",
+   "nombre": "Mostaza",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 84,
+    "proteinas": 4.7,
+    "grasas": 4.4,
+    "carbohidratos": 6.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9ce60c27-1c06-5aac-a26a-db2f1d8547bd",
+   "nombre": "Palitos de maíz c/leche en polvo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 528,
+    "proteinas": 6.2,
+    "grasas": 30,
+    "carbohidratos": 58.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "91108435-5c08-576f-b136-6df4cf68655a",
+   "nombre": "Palitos de maíz s/leche en polvo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 496,
+    "proteinas": 6,
+    "grasas": 24,
+    "carbohidratos": 64,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "16358b63-f920-59e8-b9a8-4168b9a14773",
+   "nombre": "Papelón blanco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 371,
+    "proteinas": 0.2,
+    "grasas": 0,
+    "carbohidratos": 92.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "20d7d117-6821-5933-a087-1100f1ec2f22",
+   "nombre": "Papelón negro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 370,
+    "proteinas": 0.6,
+    "grasas": 0,
+    "carbohidratos": 92,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "76c9dc01-bce2-5075-907f-0beec4a35afc",
+   "nombre": "Papelón rojo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 360,
+    "proteinas": 0.7,
+    "grasas": 0,
+    "carbohidratos": 89.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "16c681e8-37be-5f52-b919-25eaa29e13c3",
+   "nombre": "Pasta de tomate",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 78,
+    "proteinas": 5.2,
+    "grasas": 0.2,
+    "carbohidratos": 18.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "28e3f3e1-b282-52c2-bdc3-136ca7e75301",
+   "nombre": "Productos en polvo B/azúcar, cacao y leche",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 393,
+    "proteinas": 6.8,
+    "grasas": 2.3,
+    "carbohidratos": 86.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b4984d48-3774-5191-88d9-25b39e36ad79",
+   "nombre": "Pudin el polvo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 382,
+    "proteinas": 0,
+    "grasas": 0.3,
+    "carbohidratos": 64.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "558f2279-57b6-578f-aff7-7f7fcc5b633a",
+   "nombre": "Sopa deshidratada, Caldo de fideos o arróz",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 320,
+    "proteinas": 18.8,
+    "grasas": 4.3,
+    "carbohidratos": 51.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7112db72-6fba-5dbc-9217-5c4ea8ab1b48",
+   "nombre": "Sopa deshidratada, crema de pollo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 393,
+    "proteinas": 15.2,
+    "grasas": 14.1,
+    "carbohidratos": 51.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "8487df36-4b31-5acd-bfd6-8aec33062b23",
+   "nombre": "Sopa deshidratada, crema de vegetales",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 352,
+    "proteinas": 12.6,
+    "grasas": 9.1,
+    "carbohidratos": 55.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9dcfb754-8726-527a-b4f7-6ad6bf82bfc1",
+   "nombre": "Cubito de carne",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 246,
+    "proteinas": 12.1,
+    "grasas": 15.9,
+    "carbohidratos": 13.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "65d524ca-7dba-598b-ba71-b6a5d2274311",
+   "nombre": "Cubito de pollo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 265,
+    "proteinas": 9.7,
+    "grasas": 17.8,
+    "carbohidratos": 16.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c7593eee-f835-5320-8ce8-d386a24dcafb",
+   "nombre": "Sopa, minestrone",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 0,
+    "proteinas": 13.5,
+    "grasas": 6.7,
+    "carbohidratos": 58.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9d675e8d-ecf8-554d-82c6-ed888bf02cf5",
+   "nombre": "Sorbete de fruta",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 152,
+    "proteinas": 1.1,
+    "grasas": 1.5,
+    "carbohidratos": 33.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a2133a5e-7c7a-5b33-a47a-81e756f1b64d",
+   "nombre": "Puré de Tomate,",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 39,
+    "proteinas": 1.7,
+    "grasas": 0.1,
+    "carbohidratos": 10.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0e232473-a53d-5b80-8cb6-aa0deb23e466",
+   "nombre": "Salsa de Tomate (Ketchup)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 2,
+    "grasas": 0.4,
+    "carbohidratos": 24.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "03be46ef-9061-5fdd-8665-cdabe9e5d6fe",
+   "nombre": "Aguardiente (40% alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 278,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cafdc4db-efd7-5873-83cf-a85bddc38328",
+   "nombre": "Cerveza (5% alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 48,
+    "proteinas": 0.6,
+    "grasas": 0,
+    "carbohidratos": 3.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "75ff1c61-8b38-566c-a1e7-b48102155124",
+   "nombre": "Ginebra (45% alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 263,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b4bf1db3-9ed1-5246-9b7a-8daf588f0e31",
+   "nombre": "Ponche crema (14 % alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 220,
+    "proteinas": 4.5,
+    "grasas": 5.2,
+    "carbohidratos": 14.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "77820d3c-ea15-5380-b8a9-93ef364c6ae2",
+   "nombre": "Ron (44 % alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 305,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d132d79c-3405-5924-aac4-ad7589c64791",
+   "nombre": "Vino (promedio 7,5% alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 53,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 0.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cadd5ffc-05be-57da-861a-f77934cd4182",
+   "nombre": "Vodkal (40% alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 231,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "59ef99de-0bde-5b66-85b2-fa193fa944f0",
+   "nombre": "Whixky (42,2 % alcohol)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 293,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e41612cb-1d1d-51cc-9d12-90b2e313f508",
+   "nombre": "Gaseosas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 48,
+    "proteinas": 0,
+    "grasas": 0,
+    "carbohidratos": 12,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "aa71a359-98eb-5b90-81e3-f2b0e91a9ead",
+   "nombre": "Café, Infusión sin azúcar",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 5,
+    "proteinas": 0.3,
+    "grasas": 0.1,
+    "carbohidratos": 0.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d2651a5a-d8b8-518c-8c04-1b5b71a4374c",
+   "nombre": "Caña, jugo de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 0.2,
+    "grasas": 0,
+    "carbohidratos": 15.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "79bdac0d-d296-5c97-a1d3-7cd78dc39696",
+   "nombre": "Coco, jugo de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 18,
+    "proteinas": 0.2,
+    "grasas": 0.1,
+    "carbohidratos": 4.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b56c6fb0-d932-5942-a98c-c3a9426fa2af",
+   "nombre": "Chicha (9)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 0.6,
+    "grasas": 0,
+    "carbohidratos": 23.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "53f055ac-99cd-54f8-bd99-ca489224febc",
+   "nombre": "Chicha envasada (pur-park)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 85,
+    "proteinas": 1.6,
+    "grasas": 0.1,
+    "carbohidratos": 19.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c15ff3f4-4419-5530-b8a3-619f1812182b",
+   "nombre": "Malta",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 48,
+    "proteinas": 0.6,
+    "grasas": 0,
+    "carbohidratos": 11.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "6586885f-a7a3-5c4f-a259-779b53769f5d",
+   "nombre": "Manzana, jugo fresco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 55,
+    "proteinas": 0.1,
+    "grasas": 0,
+    "carbohidratos": 13.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "2de3a9f5-1bf1-545d-913e-1ae83728cb91",
+   "nombre": "Naranja, jugo fresco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 29,
+    "proteinas": 0.4,
+    "grasas": 0,
+    "carbohidratos": 6.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fa9a7e45-1c2d-5586-b2cc-a6f52f046263",
+   "nombre": "Naranjada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 21,
+    "proteinas": 0.2,
+    "grasas": 0,
+    "carbohidratos": 5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "eab32cc2-c24c-52b4-b26f-30d7bdd6328f",
+   "nombre": "Piña, jugo enlatado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 0.3,
+    "grasas": 0.1,
+    "carbohidratos": 15.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3fbd3099-fa38-58c3-a21a-2e1a70edd147",
+   "nombre": "Té, infusión",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 2,
+    "proteinas": 0.1,
+    "grasas": 0,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4863f5df-f8a1-56b8-affc-921dad29edf7",
+   "nombre": "Uva, jugo de",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 0.4,
+    "grasas": 0,
+    "carbohidratos": 18.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "07d26b76-462b-55c7-9f82-fe42de8a19f5",
+   "nombre": "Almendra",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 579,
+    "proteinas": 18.6,
+    "grasas": 54.1,
+    "carbohidratos": 19.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "54625e07-fe17-53ee-9494-06500d54c641",
+   "nombre": "Avellana",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 622,
+    "proteinas": 12.5,
+    "grasas": 58,
+    "carbohidratos": 18.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "27621f2f-0c38-576a-8db8-c6fa3e1bbfbc",
+   "nombre": "Castaña, cocida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 190,
+    "proteinas": 3.6,
+    "grasas": 1.9,
+    "carbohidratos": 48.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "45c013e7-8582-5cec-9f9e-c18a3bb74b6e",
+   "nombre": "Maní tostado, sin película",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 558,
+    "proteinas": 28.8,
+    "grasas": 45.4,
+    "carbohidratos": 19.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "63634ef8-9fc0-5c13-8f3a-0f531586475a",
+   "nombre": "Nuez",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 772,
+    "proteinas": 14,
+    "grasas": 63.3,
+    "carbohidratos": 17.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "fb307557-e215-5244-9cf5-0248e5fac683",
+   "nombre": "Nuez del brasil",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 692,
+    "proteinas": 15.4,
+    "grasas": 67.7,
+    "carbohidratos": 11.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "4691fc4c-e210-55d0-86b6-36f8e094dd64",
+   "nombre": "Pistacho",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 581,
+    "proteinas": 17.6,
+    "grasas": 51.6,
+    "carbohidratos": 22.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "51113402-6be8-57cc-b5ac-730073ec59af",
+   "nombre": "Carne de tortuga",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 228,
+    "proteinas": 10.5,
+    "grasas": 20.7,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0933bf31-b6ed-5d55-aed8-da2c53f366a4",
+   "nombre": "Copoazú",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 49,
+    "proteinas": 1.2,
+    "grasas": 0.4,
+    "carbohidratos": 11.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "22b0f172-03f4-5bee-96d6-031fadd31130",
+   "nombre": "Chufa",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 317,
+    "proteinas": 4.9,
+    "grasas": 15,
+    "carbohidratos": 45.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "929ae737-543e-5ad8-ab40-61a62d53bdf1",
+   "nombre": "Guayaba brasilera",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 12,
+    "proteinas": 0.5,
+    "grasas": 0,
+    "carbohidratos": 3.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1a9f82f5-0b1f-5b49-a431-198cdbd7f280",
+   "nombre": "Harina de plátano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 330,
+    "proteinas": 2.9,
+    "grasas": 0.2,
+    "carbohidratos": 85.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "734c5342-a2da-5a46-b836-ed73e97bb1d4",
+   "nombre": "Larvas de guásimo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 55,
+    "proteinas": 7.8,
+    "grasas": 1.2,
+    "carbohidratos": 3.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f8c0978f-7adb-55bb-8223-e13edf4c3275",
+   "nombre": "Manirote (Catiguire)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 58,
+    "proteinas": 0.8,
+    "grasas": 0.6,
+    "carbohidratos": 13.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "66458ebb-c107-534a-acb1-08b1721b531f",
+   "nombre": "Mañoco",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 369,
+    "proteinas": 1.6,
+    "grasas": 0.4,
+    "carbohidratos": 86.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c40ab742-f96d-5695-b485-00e97db3e71c",
+   "nombre": "Mañoco de pijiguao",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 378,
+    "proteinas": 4.9,
+    "grasas": 12.1,
+    "carbohidratos": 75,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "339dc443-f990-518d-9f21-513ce9db6dc4",
+   "nombre": "Moriche gusano de, asado",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 230,
+    "proteinas": 8.2,
+    "grasas": 19.2,
+    "carbohidratos": 5.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "127ce328-213a-5750-afac-5e6675c86dad",
+   "nombre": "Pijiguao",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 132,
+    "proteinas": 3.7,
+    "grasas": 5,
+    "carbohidratos": 22.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c65dd191-8063-5a0b-ac49-68fbb8a00784",
+   "nombre": "Tupiro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 20,
+    "proteinas": 0.5,
+    "grasas": 0,
+    "carbohidratos": 6.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "95cb6603-f370-5f95-8c78-5fc7d0df5b90",
+   "nombre": "Yorumo",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 285,
+    "proteinas": 0.2,
+    "grasas": 0.2,
+    "carbohidratos": 70.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0822a268-149e-594f-9a1a-9cfe622859ba",
+   "nombre": "Joghurt griego 10%",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 121,
+    "proteinas": 4.6,
+    "grasas": 10,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ee190c41-b87b-5310-904e-4e5e0aedefd6",
+   "nombre": "Yogurt griego 10%",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 121,
+    "proteinas": 4.6,
+    "grasas": 10,
+    "carbohidratos": 3.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "532e1a13-ea8a-55c8-bdec-9bb57c2700d6",
+   "nombre": "Joghurt griego 2%",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 58,
+    "proteinas": 6,
+    "grasas": 2,
+    "carbohidratos": 4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "9adaf41d-1a1c-57f8-90b4-58aba3e157c5",
+   "nombre": "Yogurt griego 2%",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 58,
+    "proteinas": 6,
+    "grasas": 2,
+    "carbohidratos": 4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dad04d81-fd3a-5e13-b286-1b9efe586b11",
+   "nombre": "Joghurt griego 1,5%",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 61,
+    "proteinas": 5.2,
+    "grasas": 1.5,
+    "carbohidratos": 6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "19307455-e01f-5852-b6a4-43123edfa989",
+   "nombre": "Yogurt griego 1,5%",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 61,
+    "proteinas": 5.2,
+    "grasas": 1.5,
+    "carbohidratos": 6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "e497f6de-203e-5138-9aea-e9cc301cb31c",
+   "nombre": "Leche de Almendras",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 13,
+    "proteinas": 0.5,
+    "grasas": 1.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cfe9f1b8-a643-5ce6-83df-f273917511e7",
+   "nombre": "Speisequark MILBONA (Magerstufe)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 66,
+    "proteinas": 12,
+    "grasas": 0.2,
+    "carbohidratos": 4.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7e57060c-c2a3-5f6e-a53d-f95f78558f2f",
+   "nombre": "Almendras enteras ALESTO LIDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 621,
+    "proteinas": 24.5,
+    "grasas": 53.3,
+    "carbohidratos": 4.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "752ea7c8-dca8-5eef-b529-706e659f3aa9",
+   "nombre": "Semillas de Linaza molida",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 477,
+    "proteinas": 19,
+    "grasas": 31,
+    "carbohidratos": 13,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d05daeeb-a182-56ce-99c4-1a0498acc5b2",
+   "nombre": "Aceite de olivas",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 884,
+    "proteinas": 0,
+    "grasas": 100,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "5b7741f7-6166-54c2-99e7-7af86ccaffc0",
+   "nombre": "Hígado de Bacalao (en Lata) NETTO DREIMASTER",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 563,
+    "proteinas": 4.9,
+    "grasas": 60,
+    "carbohidratos": 0.9,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "55456c3c-3ff0-5381-9e6e-8557edef0e68",
+   "nombre": "Whey Protein Isolate HSN",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 385,
+    "proteinas": 93,
+    "grasas": 1,
+    "carbohidratos": 1.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "edd50a45-5103-592f-b734-dd826b88f62c",
+   "nombre": "Pan de cebolla REWE",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 256,
+    "proteinas": 8.3,
+    "grasas": 3.4,
+    "carbohidratos": 46,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3791b440-043a-5def-b5dd-687ec261c27c",
+   "nombre": "Zwiebelbrot REWE",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 256,
+    "proteinas": 8.3,
+    "grasas": 3.4,
+    "carbohidratos": 46,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "89f9ba00-1188-5470-9acd-0bcad6d8bfc7",
+   "nombre": "Weißkäse MILBONA (Lata)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 283,
+    "proteinas": 14,
+    "grasas": 25,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "13a0860e-a6db-57c1-bd32-10ad615849f0",
+   "nombre": "Queso blanco MILBONA (Lata)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 283,
+    "proteinas": 14,
+    "grasas": 25,
+    "carbohidratos": 0.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "447e0fa0-5d3e-597f-b300-05f584aaa9ab",
+   "nombre": "Semillas de Chia (enteras)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 469,
+    "proteinas": 22,
+    "grasas": 33,
+    "carbohidratos": 6.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ad12ae55-a5b1-5486-8489-d49efd01582a",
+   "nombre": "Anillas de Potas (crudas) LIDL (Griegas)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 41,
+    "proteinas": 8.6,
+    "grasas": 0.6,
+    "carbohidratos": 0.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "11d170f3-e9d1-5bb9-8823-89b438485e5a",
+   "nombre": "Sardinas en salsa de tomate (lata AMAZON)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 178,
+    "proteinas": 16.8,
+    "grasas": 11.7,
+    "carbohidratos": 0.8,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "689d7fb6-39ba-5c14-a2bf-078a338907f7",
+   "nombre": "Sardinas en aceite de olivas (lata AMAZON)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 207,
+    "proteinas": 24.3,
+    "grasas": 12.2,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "ada655ea-96b6-565f-af9c-bc20a20ae3a2",
+   "nombre": "Semillas de calabaza REWE BIO",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 582,
+    "proteinas": 37,
+    "grasas": 46,
+    "carbohidratos": 2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3375b32d-41f8-5f9e-a37d-31201afc5a9c",
+   "nombre": "Walnuss",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 712,
+    "proteinas": 15.5,
+    "grasas": 69.1,
+    "carbohidratos": 3.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "68101998-ba09-52e9-bc42-785a9cc58900",
+   "nombre": "Nueces Nuez",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 712,
+    "proteinas": 15.5,
+    "grasas": 69.1,
+    "carbohidratos": 3.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a4b822e0-77ec-57e9-b48a-1cb3df192062",
+   "nombre": "Avena en hojuelas (cruda) LIDL (Kernige)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 372,
+    "proteinas": 13.5,
+    "grasas": 7,
+    "carbohidratos": 58.7,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "59ea36ed-4291-5307-b9d0-98a482386bd9",
+   "nombre": "Haltbare Bio Ziegenmilch 3.0% Fett BIOLAND (REWE)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 59,
+    "proteinas": 3.1,
+    "grasas": 3.2,
+    "carbohidratos": 4.4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "f1bdb39a-7030-5868-8a30-8eff7a297435",
+   "nombre": "Cambur Banana Importada",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 110,
+    "proteinas": 1.1,
+    "grasas": 0.3,
+    "carbohidratos": 25,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3c287c53-a991-5995-ab81-28eb9c0a197f",
+   "nombre": "Leche de vaca 1,5% BIO REWE",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 48,
+    "proteinas": 3.5,
+    "grasas": 1.5,
+    "carbohidratos": 5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c940a039-9810-5bf1-a18a-ab913a4bf8ba",
+   "nombre": "Pasta Spaghetti (crudos) COMBINO LIDL 'Normales'",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 359,
+    "proteinas": 12,
+    "grasas": 1.9,
+    "carbohidratos": 72,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "eabc96f8-6289-58cc-af82-d337eddf94c8",
+   "nombre": "Queso Grana Padano MILBONA LIDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 398,
+    "proteinas": 33,
+    "grasas": 29,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3ae14c3f-4cd8-55fd-a63f-3e466b9ea9fa",
+   "nombre": "Arroz Basmati (crudo) VOLLKORN DM BIO",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 351,
+    "proteinas": 9.5,
+    "grasas": 2.5,
+    "carbohidratos": 71,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "407c16fa-0649-5190-9138-3eff467ff37c",
+   "nombre": "Arroz Basmati (crudo) LIDL GOLDEN SUN",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 353,
+    "proteinas": 8.2,
+    "grasas": 0.5,
+    "carbohidratos": 78,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "032402fd-d465-5a9c-93d0-9dca5d76341e",
+   "nombre": "Arroz Largo (crudo) VOLLKORN DM BIO",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 363,
+    "proteinas": 7.8,
+    "grasas": 2.3,
+    "carbohidratos": 76,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "732cff0a-7688-5857-8a4b-54dcc7f8cf7a",
+   "nombre": "Semillas de Linaza (entera) DM BIO",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 540,
+    "proteinas": 22,
+    "grasas": 43,
+    "carbohidratos": 3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b2e67861-857a-5041-aa1b-281a36d9c0f6",
+   "nombre": "Tomate Cherry / Dátil",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 20,
+    "proteinas": 0.9,
+    "grasas": 0.2,
+    "carbohidratos": 4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "261abcee-261f-5bfc-a363-e7ef68f02938",
+   "nombre": "Remolacha cocida LIDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 42,
+    "proteinas": 0.9,
+    "grasas": 0.1,
+    "carbohidratos": 8.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "920b7a55-4f75-53e3-ba97-1576839ab02c",
+   "nombre": "Rote Beete",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 42,
+    "proteinas": 0.9,
+    "grasas": 0.1,
+    "carbohidratos": 8.2,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "b35854ec-3d24-53ff-978a-c6525dd11c55",
+   "nombre": "Espirulina Verde SEVENHILLS",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 330,
+    "proteinas": 63,
+    "grasas": 0,
+    "carbohidratos": 15,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "0babc50e-6ea1-5ffe-8990-05396a60ae1d",
+   "nombre": "Pollo Frito Coreano",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 288,
+    "proteinas": 25,
+    "grasas": 20,
+    "carbohidratos": 30,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "3bf9477f-638e-5126-b6ba-c98b6dc72a0b",
+   "nombre": "Arroz Basmati (cocido) LIDL GOLDEN SUN",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 176.5,
+    "proteinas": 4.1,
+    "grasas": 10,
+    "carbohidratos": 39,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "40bcf26a-fb63-5c55-ab19-d60ed260b3d2",
+   "nombre": "Pasta Spaghetti (cocidos) COMBINO LIDL 'Normales'",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 159,
+    "proteinas": 5.3,
+    "grasas": 0.84,
+    "carbohidratos": 32,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "c3b8cd5c-0c7d-5907-a9ce-f63c48f8adc8",
+   "nombre": "Galletas TUC ORIGINAL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 482,
+    "proteinas": 8.3,
+    "grasas": 19,
+    "carbohidratos": 67,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "dbbaab4e-262d-51fe-9cbc-7c2710a82aa4",
+   "nombre": "Jamón Serrano DULANO LIDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 238,
+    "proteinas": 32,
+    "grasas": 12,
+    "carbohidratos": 0.3,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cb41c388-1e51-593e-895d-40c81505884d",
+   "nombre": "Dorada pescado (cruda) fresco entera LIDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 160,
+    "proteinas": 20,
+    "grasas": 8.9,
+    "carbohidratos": 0.1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "1d523874-ad8f-521b-8f79-10c18bc35c4a",
+   "nombre": "Schweine-Minutensteaks LIDL (crudo)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 119,
+    "proteinas": 23,
+    "grasas": 3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "eb237ebd-d25a-5867-87df-ad652e7c20fc",
+   "nombre": "Lomo de cerdo LIDL (crudo)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 119,
+    "proteinas": 23,
+    "grasas": 3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "d3e8866b-2437-5bad-a7ce-a05f4f62f7a4",
+   "nombre": "Harina PAN blanca",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 350,
+    "proteinas": 7.3,
+    "grasas": 1.8,
+    "carbohidratos": 73.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7e388df9-8e21-5348-bac5-b4f91bdcda61",
+   "nombre": "Harina PAN amarilla",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 344,
+    "proteinas": 7,
+    "grasas": 2.2,
+    "carbohidratos": 71,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "a272b516-9c8a-59a9-a2bb-bf41bf638c2e",
+   "nombre": "Lomo de cerdo LIDL (cocido)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 183,
+    "proteinas": 35,
+    "grasas": 4.6,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "cef2a857-59ad-5f91-8507-29d892e7eb3d",
+   "nombre": "Arroz Largo (cocido) VOLLKORN DM BIO",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 127,
+    "proteinas": 2.7,
+    "grasas": 0.8,
+    "carbohidratos": 26.6,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "722745ea-e31a-5b08-8144-f7cedf4dede9",
+   "nombre": "Espinaca (blanqueada y exprimida)",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 47.2,
+    "proteinas": 6.4,
+    "grasas": 0.83,
+    "carbohidratos": 10.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "41c92335-cdc3-5055-9140-b6a31c129de8",
+   "nombre": "Queso mozzarela MILBONA LIDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 248,
+    "proteinas": 17.5,
+    "grasas": 19,
+    "carbohidratos": 1.5,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "009b46be-eac7-5143-8259-e96353902381",
+   "nombre": "Corazones de alcachofas (lata) SOL & MAR",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 27,
+    "proteinas": 1.4,
+    "grasas": 0,
+    "carbohidratos": 4,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "7922d32c-53f5-5257-ad6c-f8bba33d1b2f",
+   "nombre": "Schweine Schnitzel (crudo) LDL",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 115,
+    "proteinas": 22,
+    "grasas": 3,
+    "carbohidratos": 0,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "67e3854f-a6d0-5ab5-897d-d0ab77f5828c",
+   "nombre": "Queso TURCO TRENZADO SALADO con comino negro",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 293,
+    "proteinas": 25,
+    "grasas": 21,
+    "carbohidratos": 1,
+    "origen": "importado"
+   }
+  },
+  {
+   "uuid": "33250339-d8f9-5e8d-9ada-98952fd930f2",
+   "nombre": "Ziegenweichkäse Queso de cabra MILBONA",
+   "tipo": "generico",
+   "unidad": "g",
+   "nutricion": {
+    "kcal": 279,
+    "proteinas": 18,
+    "grasas": 23,
+    "carbohidratos": 0.5,
+    "origen": "importado"
+   }
+  }
+ ]
+}

@@ -190,6 +190,36 @@ class FoodRepositoryImpl implements FoodRepository {
   }
 
   @override
+  Future<Food?> findByUuid(String uuid) async {
+    final row = await (db.select(
+      db.alimentos,
+    )..where((a) => a.uuid.equals(uuid))).getSingleOrNull();
+    return row == null ? null : foodFromRow(row);
+  }
+
+  @override
+  Future<Food?> findByNameAndBrand(String nombre, String marca) async {
+    final n = normalizeText(nombre);
+    final m = normalizeText(marca);
+    if (n.isEmpty) return null;
+    final exacta =
+        await (db.select(db.alimentos)..where(
+              (a) =>
+                  a.nombre.equals(nombre.trim()) & a.marca.equals(marca.trim()),
+            ))
+            .getSingleOrNull();
+    if (exacta != null) return foodFromRow(exacta);
+    for (final filter in [FoodFilter.todos, FoodFilter.archivados]) {
+      for (final f in await search(nombre, filter: filter, limit: 50)) {
+        if (normalizeText(f.nombre) == n && normalizeText(f.marca) == m) {
+          return f;
+        }
+      }
+    }
+    return null;
+  }
+
+  @override
   Future<List<Food>> findSimilar(String nombre, {String marca = ''}) async {
     final key = normalizeText(nombre);
     if (key.isEmpty) return const [];
@@ -212,27 +242,8 @@ class FoodRepositoryImpl implements FoodRepository {
   // Escritura -----------------------------------------------------------------
 
   Future<Food?> _duplicado(Food food) async {
-    final nombre = normalizeText(food.nombre);
-    final marca = normalizeText(food.marca);
-    final candidatos = await search(food.nombre, filter: FoodFilter.todos);
-    final archivados = await search(food.nombre, filter: FoodFilter.archivados);
-    for (final f in [...candidatos, ...archivados]) {
-      if (f.id == food.id) continue;
-      if (normalizeText(f.nombre) == nombre &&
-          normalizeText(f.marca) == marca) {
-        return f;
-      }
-    }
-    // Coincidencia exacta sin FTS (nombres de una letra, signos...).
-    final exacta =
-        await (db.select(db.alimentos)..where(
-              (a) =>
-                  a.nombre.equals(food.nombre.trim()) &
-                  a.marca.equals(food.marca.trim()),
-            ))
-            .getSingleOrNull();
-    if (exacta != null && exacta.id != food.id) return foodFromRow(exacta);
-    return null;
+    final f = await findByNameAndBrand(food.nombre, food.marca);
+    return (f == null || f.id == food.id) ? null : f;
   }
 
   @override
@@ -311,6 +322,16 @@ class FoodRepositoryImpl implements FoodRepository {
   Future<void> resetUsage(int id) async {
     await (db.update(db.alimentos)..where((a) => a.id.equals(id))).write(
       const AlimentosCompanion(usoCount: Value(0), ultimoUso: Value(null)),
+    );
+  }
+
+  @override
+  Future<void> setUsage(int id, int count, DateTime? ultimoUso) async {
+    await (db.update(db.alimentos)..where((a) => a.id.equals(id))).write(
+      AlimentosCompanion(
+        usoCount: Value(count),
+        ultimoUso: Value(ultimoUso?.toIso8601String()),
+      ),
     );
   }
 
@@ -448,6 +469,22 @@ class FoodRepositoryImpl implements FoodRepository {
               ..orderBy([(p) => OrderingTerm.asc(p.id)]))
             .get();
     return rows.map(packageFromRow).toList();
+  }
+
+  @override
+  Future<Map<int, List<FoodPackage>>> getPackagesFor(Iterable<int> ids) async {
+    final set = ids.toSet();
+    if (set.isEmpty) return const {};
+    final rows =
+        await (db.select(db.presentaciones)
+              ..where((p) => p.alimentoId.isIn(set))
+              ..orderBy([(p) => OrderingTerm.asc(p.id)]))
+            .get();
+    final out = <int, List<FoodPackage>>{};
+    for (final r in rows) {
+      out.putIfAbsent(r.alimentoId, () => []).add(packageFromRow(r));
+    }
+    return out;
   }
 
   @override
