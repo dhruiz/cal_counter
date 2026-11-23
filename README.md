@@ -774,7 +774,7 @@ CREATE TABLE IF NOT EXISTS items_comida (
 );
 ```
 
-> **IMPORTANTE**: sqflite **no** activa `PRAGMA foreign_keys` (SQLite las trae desactivadas por defecto) y la app no lo hace en `onConfigure`, así que los `REFERENCES ... ON DELETE CASCADE` son solo documentales. Hoy `deleteMeal` deja huérfanos los `items_comida` de esa comida. Los módulos nuevos borran sus hijos explícitamente en una transacción.
+> **IMPORTANTE**: sqflite **no** activa `PRAGMA foreign_keys` (SQLite las trae desactivadas por defecto) y la app no lo hace en `onConfigure`, así que los `REFERENCES ... ON DELETE CASCADE` son solo documentales. Por eso `deleteMeal` borra los `items_comida` de la comida en la misma transacción, `_createTables` elimina en cada apertura los items huérfanos que dejaban versiones anteriores (`comida_id` sin comida) y `hasMealItems` solo cuenta items de comidas existentes (JOIN). Los módulos nuevos también borran sus hijos explícitamente en transacción.
 
 ### Tablas de recetas, productos y listas de compra
 
@@ -951,8 +951,8 @@ PREPARACIÓN:
 - Producto conocido → detalle + diálogo de compra precargado con el último precio y establecimiento. Desconocido → `ProductFormView` con el código (incluye primera compra opcional). También se pueden añadir productos **sin código** (fruta a granel, mercado...).
 - **Detalle**: último precio, mínimo/promedio/máximo de los últimos 3 meses (`GetPriceStats`), último precio en cada establecimiento con el más barato destacado, historial (mantener pulsado para borrar).
 - **Retención de 3 meses** (`PurgeOldPurchases`): al abrir la app y antes de exportar se borran las compras anteriores a `threeMonthsAgo(hoy)` **salvo la última de cada producto**, que se conserva siempre.
-- **Export CSV** (`ExportPriceHistoryCsv`): `historial_precios_YYYY-MM-DD.csv`, separado por **TAB** como el resto de exports, una fila por compra de los últimos 3 meses ordenada por producto y fecha. Cabecera: `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio`.
-- Precios: se aceptan coma o punto decimal (`RegisterPurchase.parsePrecio`); se muestran con `AppUtils.formatPrecio` ("1.234,50") sin símbolo de moneda.
+- **Export CSV** (`ExportPriceHistoryCsv`): `historial_precios_YYYY-MM-DD.csv`, separado por **TAB** como el resto de exports, una fila por compra de los últimos 3 meses ordenada por producto y fecha. Cabecera: `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio_eur`. El precio va como número sin símbolo (`0.90`) para poder operar con él en la hoja de cálculo; la moneda la indica la cabecera.
+- Precios: se aceptan coma o punto decimal (`RegisterPurchase.parsePrecio`); se muestran en euros con `AppUtils.formatPrecio` ("1.234,50 €", espacio no separable) y los campos de precio llevan el sufijo `€`. Para precargar un campo editable se usa `AppUtils.formatPrecioEditable` ("1234,50").
 
 ### Listas de compra
 
@@ -1085,7 +1085,7 @@ Estas son las reglas de diseño que si se violan romperán la aplicación o su c
 
 17. **Raíz = `MainShell`** (barra inferior). `HomeView` es la primera pestaña y sigue llamando a `HomeNotifier.refresh()` tras sus escrituras; desde recetas/productos se registra comida con `AddFoodPopup.showForToday`, que ya refresca `homeProvider`.
 
-18. **Foreign keys desactivadas**: al borrar recetas, productos o listas, borrar explícitamente los hijos en la misma transacción (ver data sources). No depender de `ON DELETE CASCADE`.
+18. **Foreign keys desactivadas**: al borrar comidas, recetas, productos o listas, borrar explícitamente los hijos en la misma transacción (ver `deleteMeal` y los data sources). No depender de `ON DELETE CASCADE`.
 
 19. **Historial de compras = 3 meses + la última compra de cada producto**. `PurgeOldPurchases` se ejecuta al cargar `ProductsNotifier` y antes de exportar. No borrar nunca la última compra de un producto: es su "último precio".
 

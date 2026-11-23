@@ -208,7 +208,7 @@ void main() {
     await tester.tap(find.text('Productos'));
     await tester.pumpAndSettle();
     expect(find.text('Leche entera'), findsOneWidget);
-    expect(find.textContaining('Último: 1,05'), findsOneWidget);
+    expect(find.textContaining('Último: 1,05\u00A0€'), findsOneWidget);
 
     await tester.tap(find.text('Leche entera'));
     await tester.pumpAndSettle();
@@ -219,6 +219,7 @@ void main() {
     await tester.tap(find.text('Registrar compra'));
     await tester.pumpAndSettle();
     expect(find.text('Compra de Leche entera'), findsOneWidget);
+    expect(find.text('€'), findsOneWidget); // sufijo del campo de precio
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Precio por unidad'),
       '1,10',
@@ -268,6 +269,11 @@ void main() {
     await tester.tap(find.text('Súper'));
     await tester.pumpAndSettle();
     expect(find.text('Total estimado (2 sin precio)'), findsOneWidget);
+    expect(find.text('1,05\u00A0€'), findsOneWidget);
+    expect(
+      find.textContaining('Ref: 1,05\u00A0€ (Súper Centro)'),
+      findsOneWidget,
+    );
     expect(find.text('Comprados (1)'), findsOneWidget);
 
     await tester.tap(find.text('Leche entera'));

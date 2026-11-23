@@ -228,6 +228,7 @@ class _ProductFormViewState extends ConsumerState<ProductFormView> {
                   labelText: 'Precio por unidad',
                   hintText: 'Ej: 2,35',
                   prefixIcon: Icon(Icons.sell_outlined),
+                  suffixText: '€',
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;

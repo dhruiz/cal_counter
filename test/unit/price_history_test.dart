@@ -1,3 +1,4 @@
+import 'package:cal_counter/core/utils.dart';
 import 'package:cal_counter/domain/entities/product.dart';
 import 'package:cal_counter/domain/services/dates.dart';
 import 'package:cal_counter/domain/usecases/export_price_history_csv.dart';
@@ -68,6 +69,18 @@ void main() {
     expect(RegisterPurchase.parsePrecio('1.234,50'), 1234.50);
     expect(RegisterPurchase.parsePrecio('1,234.50'), 1234.50);
     expect(RegisterPurchase.parsePrecio('abc'), isNull);
+  });
+
+  test('formatPrecio muestra euros; formatPrecioEditable solo la cifra', () {
+    // Espacio no separable entre la cifra y el símbolo.
+    expect(AppUtils.formatPrecio(1.05), '1,05\u00A0€');
+    expect(AppUtils.formatPrecio(1234.5), '1.234,50\u00A0€');
+    expect(AppUtils.formatPrecioEditable(1234.5), '1234,50');
+    // Lo que se precarga en el campo se vuelve a leer igual.
+    expect(
+      RegisterPurchase.parsePrecio(AppUtils.formatPrecioEditable(2.35)),
+      2.35,
+    );
   });
 
   test('ExportPriceHistoryCsv.buildTsv', () {

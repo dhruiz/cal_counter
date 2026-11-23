@@ -6,14 +6,16 @@ import '../services/dates.dart';
 /// por TAB (mismo criterio que el resto de exports; extensión `.csv`).
 ///
 /// Columnas: fecha, codigo_barras, producto, marca, presentacion,
-/// establecimiento, precio. Una fila por compra, ordenadas por producto y fecha.
+/// establecimiento, precio_eur. Una fila por compra, ordenadas por producto y
+/// fecha. El precio va como número sin símbolo ("0.90") para que la hoja de
+/// cálculo pueda operar con él; la moneda se indica en la cabecera.
 class ExportPriceHistoryCsv {
   final ProductRepository repository;
 
   ExportPriceHistoryCsv(this.repository);
 
   static const String header =
-      'fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio';
+      'fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio_eur';
 
   Future<String> call({DateTime? now}) async {
     final rows = await repository.getPurchaseHistorySince(

@@ -38,7 +38,7 @@ class _PurchaseDialogState extends ConsumerState<PurchaseDialog> {
     super.initState();
     final last = widget.product.ultimaCompra;
     _priceCtrl = TextEditingController(
-      text: last == null ? '' : AppUtils.formatPrecio(last.precio),
+      text: last == null ? '' : AppUtils.formatPrecioEditable(last.precio),
     );
     _priceCtrl.selection = TextSelection(
       baseOffset: 0,
@@ -104,6 +104,7 @@ class _PurchaseDialogState extends ConsumerState<PurchaseDialog> {
                   labelText: 'Precio por unidad',
                   hintText: 'Ej: 2,35',
                   prefixIcon: Icon(Icons.sell_outlined),
+                  suffixText: '€',
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,

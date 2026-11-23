@@ -36,7 +36,7 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`). La raíz 
 - `items_comida`: macros **ya escalados** a la cantidad consumida (valores absolutos, no por 100g). Guarda el nombre del alimento **desnormalizado** (sin FK al alimento original). `comida_id` con `ON DELETE CASCADE`.
 - `comidas`: `fecha` se guarda como `String` `YYYY-MM-DD` (nunca timestamp). Nuevas comidas se auto-nombran `Comida_N`.
 - DB precargada (`assets/db/db_ctrl_calorias.db`, ~1700 alimentos) se copia a `getApplicationDocumentsDirectory()` en el primer arranque.
-- **Foreign keys desactivadas** (sqflite no activa `PRAGMA foreign_keys`): los `ON DELETE CASCADE` no actúan. Al borrar padres, borrar hijos explícitamente en transacción.
+- **Foreign keys desactivadas** (sqflite no activa `PRAGMA foreign_keys`): los `ON DELETE CASCADE` no actúan. Al borrar padres, borrar hijos explícitamente en transacción. `deleteMeal` ya lo hace con `items_comida`; `_createTables` limpia huérfanos antiguos en cada apertura y `hasMealItems` cuenta con JOIN a `comidas`.
 - Tablas de módulos (DDL en `lib/data/datasources/module_tables.dart`, llamado desde `_createTables`): `recetas` + `ingredientes_receta` (líneas de texto libre), `productos` (`codigo_barras` UNIQUE, NULL si no tiene) + `compras` (`fecha` `YYYY-MM-DD`, precio unitario, establecimiento), `listas_compra` + `items_lista_compra` (`producto_id` opcional). `recetas.alimento_id`/`productos.alimento_id` apuntan a `db_alimentos` sin FK (borrado = sin vincular). Los data sources nuevos reciben `LocalDataSource` y usan su getter `database`.
 
 ## Lógica de negocio crítica
@@ -56,9 +56,11 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`). La raíz 
 - **Búsqueda de recetas por ingredientes** (`SearchRecipesByIngredients`) y normalización en `lib/domain/services/ingredient_matcher.dart` (tildes, plurales, sinónimos regionales, unidades). Es simétrica: lo mismo se aplica a recetas y a lo que escribe el usuario. Los nombres comparables se derivan al vuelo; no guardar columnas derivadas.
 - **Import de recetas** amigable en `lib/data/parsers/recipe_text_codec.dart`: texto/plantilla (formato principal, encabezados tolerantes, texto pegado sin encabezados), JSON y CSV. Export `.txt` reimportable. Duplicados por nombre normalizado se omiten (`ImportRecipes`).
 - **Historial de precios = 3 meses + última compra de cada producto**: `PurgeOldPurchases` se ejecuta al crear `ProductsNotifier` y antes de exportar. Nunca borrar la última compra de un producto.
-- **Export historial** (`ExportPriceHistoryCsv`): TAB, extensión `.csv`, cabecera `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio`.
+- **Export historial** (`ExportPriceHistoryCsv`): TAB, extensión `.csv`, cabecera `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio_eur` (precio numérico, sin símbolo).
 - **Escáner**: `mobile_scanner` (ML Kit empaquetado, sin internet) en `BarcodeScannerView.scan`; permiso `CAMERA` en el manifest con `uses-feature camera required=false`. Siempre ofrecer entrada manual del código. No se consulta ningún servicio online (decisión del usuario: todo local).
 - Tras registrar compras o editar productos, `ProductsNotifier` invalida `productDetailProvider`, `storesProvider` y `shoppingItemsProvider` (precios de referencia de listas).
+
+- **Precios en euros**: mostrar siempre con `AppUtils.formatPrecio` ("1,05 €"); campos de precio con `suffixText: '€'` y precarga con `AppUtils.formatPrecioEditable`. Leer lo escrito con `RegisterPurchase.parsePrecio` (acepta coma o punto).
 
 ## Convenciones
 

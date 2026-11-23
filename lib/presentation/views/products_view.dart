@@ -104,8 +104,8 @@ class ProductsView extends ConsumerWidget {
           'antiguas se borran solas, pero la última compra de cada producto '
           'se conserva siempre.\n\n'
           '• Con "Exportar" obtienes un archivo .csv (separado por '
-          'tabulaciones) para estudiar cómo varían los precios en una hoja '
-          'de cálculo.\n\n'
+          'tabulaciones, precios en euros) para estudiar cómo varían los '
+          'precios en una hoja de cálculo.\n\n'
           '• Si vinculas un producto a un alimento del contador, podrás '
           'registrar lo que comes escaneando el envase.',
         ),
