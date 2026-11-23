@@ -86,10 +86,7 @@ class MealItemsDialog extends ConsumerWidget {
                           child: Align(
                             alignment: const Alignment(1.0, 0.5),
                             child: IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
                                 _showDeleteConfirmation(context, ref, item);
                               },

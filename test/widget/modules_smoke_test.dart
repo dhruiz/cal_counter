@@ -1,13 +1,16 @@
+import 'package:cal_counter/data/db/app_database.dart';
 import 'package:cal_counter/data/parsers/recipe_text_codec.dart';
+import 'package:cal_counter/data/repositories/food_repository_impl.dart';
+import 'package:cal_counter/data/repositories/purchase_repository_impl.dart';
+import 'package:cal_counter/data/repositories/recipe_repository_impl.dart';
+import 'package:cal_counter/data/repositories/shopping_list_repository_impl.dart';
 import 'package:cal_counter/domain/entities/food.dart';
-import 'package:cal_counter/domain/entities/product.dart';
+import 'package:cal_counter/domain/entities/nutrition_facts.dart';
+import 'package:cal_counter/domain/entities/purchase.dart';
 import 'package:cal_counter/domain/entities/recipe.dart';
 import 'package:cal_counter/domain/entities/shopping_list.dart';
-import 'package:cal_counter/presentation/providers/home_provider.dart';
-import 'package:cal_counter/presentation/providers/products_provider.dart';
-import 'package:cal_counter/presentation/providers/recipes_provider.dart';
-import 'package:cal_counter/presentation/providers/search_provider.dart';
-import 'package:cal_counter/presentation/providers/shopping_provider.dart';
+import 'package:cal_counter/domain/repositories/food_repository.dart';
+import 'package:cal_counter/presentation/providers/core_providers.dart';
 import 'package:cal_counter/presentation/views/cart_mode_view.dart';
 import 'package:cal_counter/presentation/views/main_shell.dart';
 import 'package:flutter/material.dart';
@@ -16,89 +19,149 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'fakes.dart';
+import '../helpers/test_db.dart';
 
-/// Recorre las pantallas nuevas con repositorios en memoria para detectar
-/// errores de layout o de flujo (no toca SQLite, cámara ni archivos).
+NutritionFacts _n(double kcal, double p, double g, double c) =>
+    NutritionFacts.basica(
+      kcal: kcal,
+      proteinas: p,
+      grasas: g,
+      carbohidratos: c,
+    );
+
+/// Recorre las pantallas con una base de datos real en memoria (mismo
+/// esquema que en el móvil) para detectar errores de layout o de flujo. No
+/// usa cámara ni archivos.
 void main() {
   setUpAll(() async {
     await initializeDateFormatting('es');
   });
 
-  late FakeRecipeRepository recipes;
-  late FakeProductRepository products;
-  late FakeShoppingListRepository shopping;
+  late AppDatabase db;
+  late FoodRepositoryImpl foods;
+  late PurchaseRepositoryImpl purchases;
+  late ShoppingListRepositoryImpl shopping;
+  late RecipeRepositoryImpl recipes;
+  late int lecheId, panId, huevoId, listaId;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    db = memoryDb();
+    foods = FoodRepositoryImpl(db);
+    purchases = PurchaseRepositoryImpl(db);
+    shopping = ShoppingListRepositoryImpl(db);
+    recipes = RecipeRepositoryImpl(db);
     final now = DateTime.now();
-    recipes = FakeRecipeRepository(const [
-      Recipe(
+
+    await foods.saveFood(
+      Food(nombre: 'Plátano', nutricion: _n(94, 1.2, 0.3, 20)),
+    );
+    huevoId = await foods.saveFood(
+      Food(nombre: 'Huevo', nutricion: _n(143, 12.6, 9.5, 0.7)),
+    );
+    await foods.savePortion(
+      FoodPortion(alimentoId: huevoId, nombre: 'unidad', gramos: 60),
+    );
+    await foods.saveFood(Food(nombre: 'Patata', nutricion: _n(77, 2, 0.1, 17)));
+    await foods.saveFood(
+      Food(nombre: 'Aceite de oliva', nutricion: _n(884, 0, 100, 0)),
+    );
+    lecheId = await foods.saveFood(
+      Food(
+        nombre: 'Leche entera',
+        marca: 'Vaca',
+        tipo: FoodType.envasado,
+        unidad: FoodUnit.ml,
+        nutricion: _n(64, 3.2, 3.6, 4.7),
+      ),
+    );
+    final lechePack = await foods.savePackage(
+      FoodPackage(
+        alimentoId: lecheId,
+        codigoBarras: '8410000000001',
+        descripcion: 'Brick 1 L',
+        contenido: 1000,
+      ),
+    );
+    final cafeId = await foods.saveFood(
+      Food(
+        nombre: 'Café molido',
+        tipo: FoodType.envasado,
+        nutricion: _n(2, 0.1, 0, 0),
+      ),
+    );
+    await foods.savePackage(
+      FoodPackage(alimentoId: cafeId, codigoBarras: '5550001'),
+    );
+    panId = await foods.saveFood(
+      Food(nombre: 'Pan de barra', nutricion: _n(270, 9, 1.5, 55)),
+    );
+    await foods.saveFood(const Food(nombre: 'Tomate triturado'));
+
+    await purchases.addPurchase(
+      Purchase(
+        presentacionId: lechePack,
+        fecha: now.subtract(const Duration(days: 20)),
+        precioCent: 95,
+        establecimiento: 'Mercado',
+      ),
+    );
+    await purchases.addPurchase(
+      Purchase(
+        presentacionId: lechePack,
+        fecha: now.subtract(const Duration(days: 2)),
+        precioCent: 105,
+        establecimiento: 'Súper Centro',
+      ),
+    );
+
+    await recipes.save(
+      Recipe.desdeLineas(
         nombre: 'Tortilla de patatas',
         categoria: 'Plato principal',
         porciones: 4,
         tiempoMin: 40,
-        ingredientes: [
+        lineas: [
           '4 huevos',
           '500 g de patatas',
           '1 cebolla (opcional)',
-          'Aceite de oliva',
+          '50 ml de aceite de oliva',
           'Sal',
         ],
         elaboracion:
             'Pelar y cortar las patatas.\nFreír.\nCuajar con el huevo.',
         notas: 'Mejor jugosa.',
-        alimentoId: 1,
-        pesoPorcionG: 150,
       ),
-      Recipe(
+    );
+    await recipes.save(
+      Recipe.desdeLineas(
         nombre: 'Flan',
-        ingredientes: ['4 huevos', '500 ml de leche', '150 g de azúcar'],
+        lineas: ['4 huevos', '500 ml de leche', '150 g de azúcar'],
         elaboracion: 'Mezclar\nHornear al baño maría',
       ),
-      Recipe(nombre: 'Ensalada', ingredientes: ['2 tomates', '1 pepino']),
-    ]);
-    products = FakeProductRepository();
-    final leche = await products.saveProduct(
-      const Product(
-        codigoBarras: '8410000000001',
-        nombre: 'Leche entera',
-        marca: 'Vaca',
-        presentacion: '1 L',
+    );
+    await recipes.save(
+      Recipe.desdeLineas(nombre: 'Ensalada', lineas: ['2 tomates', '1 pepino']),
+    );
+
+    listaId = await shopping.createList('Súper');
+    await shopping.addItem(
+      ShoppingItem(
+        listaId: listaId,
+        texto: 'Leche entera',
+        alimentoId: lecheId,
       ),
     );
-    await products.saveProduct(const Product(nombre: 'Pan de barra'));
-    // Con código pero sin precio guardado y fuera de la lista.
-    await products.saveProduct(
-      const Product(codigoBarras: '5550001', nombre: 'Café molido'),
-    );
-    await products.addPurchase(
-      Purchase(
-        productoId: leche,
-        fecha: now.subtract(const Duration(days: 20)),
-        precio: 0.95,
-        establecimiento: 'Mercado',
-      ),
-    );
-    await products.addPurchase(
-      Purchase(
-        productoId: leche,
-        fecha: now.subtract(const Duration(days: 2)),
-        precio: 1.05,
-        establecimiento: 'Súper Centro',
-      ),
-    );
-    shopping = FakeShoppingListRepository(productRepo: products);
-    final lista = await shopping.createList('Súper');
     await shopping.addItem(
-      ShoppingItem(listaId: lista, texto: 'Leche entera', productoId: leche),
+      ShoppingItem(listaId: listaId, texto: 'Pan', cantidad: '2'),
     );
     await shopping.addItem(
-      ShoppingItem(listaId: lista, texto: 'Pan', cantidad: '2'),
+      ShoppingItem(listaId: listaId, texto: 'Huevos', comprado: true),
     );
-    await shopping.addItem(
-      ShoppingItem(listaId: lista, texto: 'Huevos', comprado: true),
-    );
+  });
+
+  tearDown(() async {
+    await db.close();
   });
 
   Future<void> pumpApp(
@@ -110,31 +173,126 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          mealRepositoryProvider.overrideWithValue(FakeMealRepository()),
-          recipeRepositoryProvider.overrideWithValue(recipes),
-          productRepositoryProvider.overrideWithValue(products),
-          shoppingListRepositoryProvider.overrideWithValue(shopping),
-          foodRepositoryProvider.overrideWithValue(
-            FakeFoodRepository(const [
-              Food(
-                id: 1,
-                name: 'Tortilla de patatas casera',
-                grasasPer100: 11,
-                carbsPer100: 12,
-                proteinsPer100: 6,
-                kcalPer100: 170,
-              ),
-            ]),
-          ),
-        ],
+        overrides: [appDatabaseProvider.overrideWithValue(db)],
         child: MaterialApp(home: home),
       ),
     );
     await tester.pumpAndSettle();
   }
 
-  testWidgets('recetas: buscar por ingredientes, detalle y lista de compra', (
+  /// Desmonta la app para que se cancelen las consultas observadas.
+  Future<void> unmount(WidgetTester tester) async {
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 1));
+  }
+
+  testWidgets('alimentos: buscar sin tildes, pendientes y completar', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tester.tap(find.text('Alimentos'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('1 alimento pendiente'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField).first, 'platano');
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    expect(find.text('Plátano'), findsOneWidget);
+    expect(find.text('Patata'), findsNothing);
+
+    // Por código de barras.
+    await tester.enterText(find.byType(TextField).first, '8410000000001');
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    expect(find.text('Leche entera'), findsOneWidget);
+    await tester.tap(find.text('Leche entera'));
+    await tester.pumpAndSettle();
+    expect(find.text('Tabla nutricional'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Brick 1 L'), 200);
+    expect(find.text('Brick 1 L'), findsWidgets);
+    expect(find.textContaining('1,05 €/L'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Precios'), 200);
+    expect(
+      find.textContaining('Último: 1,05 € en Súper Centro'),
+      findsOneWidget,
+    );
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    // Pendientes: completar la tabla.
+    await tester.tap(find.text('Ver'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Tomate triturado'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Pendiente: faltan'), findsOneWidget);
+    await tester.tap(find.text('Completar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Completar tabla nutricional'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Valor energético *'),
+      '30',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Grasas *'),
+      '0,2',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Hidratos de carbono *'),
+      '5',
+    );
+    await tester.scrollUntilVisible(
+      find.widgetWithText(TextFormField, 'Proteínas *'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Proteínas *'),
+      '1,3',
+    );
+    await tester.tap(find.byTooltip('Guardar'));
+    await tester.pumpAndSettle();
+    final tomate = (await tester.runAsync(
+      () => foods.search('tomate triturado'),
+    ))!;
+    expect(tomate.single.pendiente, isFalse);
+    expect(tomate.single.nutricion.grasas, 0.2);
+    await unmount(tester);
+  });
+
+  testWidgets('calorías: agregar ingesta y pedir completar un pendiente', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tester.tap(find.text('Agregar Ingesta'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'huevo');
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Huevo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Agregar Huevo'), findsOneWidget);
+    await tester.tap(find.text('1 unidad (60 g)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ok'));
+    await tester.pumpAndSettle();
+    // Vuelve a Calorías con el día actualizado solo.
+    expect(find.text('Agregar Ingesta'), findsOneWidget);
+    expect(find.textContaining('86'), findsWidgets); // 143 × 0,6 ≈ 86 kcal
+
+    await tester.tap(find.text('Agregar Ingesta'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'tomate');
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Tomate triturado'));
+    await tester.pumpAndSettle();
+    expect(find.text('Falta la tabla nutricional'), findsOneWidget);
+    await tester.tap(find.text('Ahora no'));
+    await tester.pumpAndSettle();
+    await unmount(tester);
+  });
+
+  testWidgets('recetas: buscar, vincular, calcular y lista de compra', (
     tester,
   ) async {
     await pumpApp(tester);
@@ -151,23 +309,35 @@ void main() {
     await tester.tap(find.text('Tortilla de patatas'));
     await tester.pumpAndSettle();
     expect(find.text('Ingredientes (5)'), findsOneWidget);
+    expect(find.text('Para calcular las calorías faltan:'), findsOneWidget);
+    await tester.tap(find.text('Vincular automáticamente'));
+    await tester.pumpAndSettle();
+    expect(find.text('Vincular ingredientes'), findsOneWidget);
+    expect(find.textContaining('→ Huevo · 4 unidad'), findsOneWidget);
+    expect(find.textContaining('→ Patata · 500 g'), findsOneWidget);
+    await tester.tap(find.text('Vincular 3 ingredientes'));
+    await tester.pumpAndSettle();
+    expect(find.text('Para calcular las calorías faltan:'), findsNothing);
     expect(find.text('Registrar porción'), findsOneWidget);
-    expect(find.textContaining('por porción (150 g)'), findsOneWidget);
+    expect(find.textContaining('Por porción'), findsOneWidget);
     await tester.pageBack();
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Flan'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Añadir lo que me falta a la lista'),
+      200,
+    );
     await tester.tap(find.text('Añadir lo que me falta a la lista'));
     await tester.pumpAndSettle();
     expect(find.text('Añadir a la lista de compra'), findsOneWidget);
     await tester.tap(find.widgetWithText(ElevatedButton, 'Añadir'));
     await tester.pumpAndSettle();
     expect(find.text('2 artículos añadidos a "Súper"'), findsOneWidget);
-    expect(
-      shopping.items.map((i) => i.texto),
-      containsAll(['Leche', 'Azúcar']),
-    );
+    final items = (await tester.runAsync(() => shopping.getItems(listaId)))!;
+    expect(items.map((i) => i.texto), containsAll(['Leche', 'Azúcar']));
+    await unmount(tester);
   });
 
   testWidgets('recetas: nueva receta y pegar texto', (tester) async {
@@ -187,8 +357,8 @@ void main() {
     );
     await tester.tap(find.byTooltip('Guardar'));
     await tester.pumpAndSettle();
-    expect(recipes.data.values.any((r) => r.nombre == 'Batido'), isTrue);
-    // Deja que se oculte el SnackBar "Receta guardada".
+    var all = (await tester.runAsync(recipes.getAll))!;
+    expect(all.any((r) => r.nombre == 'Batido'), isTrue);
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
 
@@ -200,7 +370,6 @@ void main() {
     await tester.tap(find.text('Revisar recetas'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Se encontraron 2 recetas'), findsOneWidget);
-    // "Tortilla de patatas" ya existe: aparece avisada y desmarcada.
     expect(
       find.textContaining('Ya existe una receta con este nombre'),
       findsOneWidget,
@@ -208,67 +377,12 @@ void main() {
     await tester.tap(find.text('Guardar 1 receta'));
     await tester.pumpAndSettle();
     expect(find.text('1 receta importada'), findsOneWidget);
-    expect(recipes.data.length, 5);
+    all = (await tester.runAsync(recipes.getAll))!;
+    expect(all.length, 5);
+    await unmount(tester);
   });
 
-  testWidgets('productos: listado, detalle y registrar compra', (tester) async {
-    await pumpApp(tester);
-    await tester.tap(find.text('Productos'));
-    await tester.pumpAndSettle();
-    expect(find.text('Leche entera'), findsOneWidget);
-    expect(find.textContaining('Último: 1,05\u00A0€'), findsOneWidget);
-
-    await tester.tap(find.text('Leche entera'));
-    await tester.pumpAndSettle();
-    expect(find.text('Último precio'), findsOneWidget);
-    expect(find.text('Último precio en cada establecimiento'), findsOneWidget);
-    expect(find.text('Vincular al contador de calorías'), findsOneWidget);
-
-    await tester.tap(find.text('Registrar compra'));
-    await tester.pumpAndSettle();
-    expect(find.text('Compra de Leche entera'), findsOneWidget);
-    expect(find.text('€'), findsOneWidget); // sufijo del campo de precio
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Precio por unidad'),
-      '1,10',
-    );
-    await tester.tap(find.text('Guardar'));
-    await tester.pumpAndSettle();
-    expect(find.text('Compra registrada'), findsOneWidget);
-    expect(products.purchases.last.precio, 1.10);
-    expect(products.purchases.last.establecimiento, 'Súper Centro');
-  });
-
-  testWidgets('productos: formulario sin código', (tester) async {
-    await pumpApp(tester);
-    await tester.tap(find.text('Productos'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Añadir producto sin código'));
-    await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Nombre del producto *'),
-      'Manzanas',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Precio por unidad'),
-      '2,40',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Establecimiento'),
-      'Frutería',
-    );
-    await tester.scrollUntilVisible(
-      find.widgetWithText(ElevatedButton, 'Guardar'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Guardar'));
-    await tester.pumpAndSettle();
-    expect(products.products.values.any((p) => p.nombre == 'Manzanas'), isTrue);
-    expect(products.purchases.last.establecimiento, 'Frutería');
-  });
-
-  testWidgets('compras: lista, marcar, añadir y total', (tester) async {
+  testWidgets('compras: lista, marcar, precio y total', (tester) async {
     await pumpApp(tester);
     await tester.tap(find.text('Compras'));
     await tester.pumpAndSettle();
@@ -276,19 +390,14 @@ void main() {
 
     await tester.tap(find.text('Súper'));
     await tester.pumpAndSettle();
-    expect(find.text('Modo carrito'), findsOneWidget);
     expect(
       find.text('Falta por comprar (estimado) · 1 sin precio'),
       findsOneWidget,
     );
-    expect(find.text('1,05\u00A0€'), findsOneWidget);
-    expect(
-      find.textContaining('Ref: 1,05\u00A0€ (Súper Centro)'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('Ref: 1,05 € (Súper Centro)'), findsOneWidget);
     expect(find.text('Comprados (1)'), findsOneWidget);
 
-    // Marcar a mano un artículo con producto → «Añadir precio» → se registra.
+    // Marcar a mano un artículo vinculado → «Añadir precio» → se registra.
     await tester.tap(find.text('Leche entera'));
     await tester.pumpAndSettle();
     expect(find.text('Comprados (2)'), findsOneWidget);
@@ -297,8 +406,10 @@ void main() {
     expect(find.text('Establecimiento'), findsOneWidget);
     await tester.tap(find.text('Añadir al carrito'));
     await tester.pumpAndSettle();
-    expect(products.purchases.length, 3);
-    expect(products.purchases.last.precio, 1.05);
+    final compras = (await tester.runAsync(
+      () => purchases.getPurchasesForFood(lecheId),
+    ))!;
+    expect(compras.length, 3);
     expect(find.textContaining('1 × 1,05 € = 1,05 €'), findsOneWidget);
     expect(find.text('En el carrito (2) · 1 sin precio'), findsOneWidget);
 
@@ -307,9 +418,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Tomates'), findsOneWidget);
     expect(find.text('1 kg'), findsOneWidget);
+    await unmount(tester);
   });
 
-  testWidgets('modo carrito: escanear, precio, total y terminar', (
+  testWidgets('modo carrito: escanear, alta mínima, total y terminar', (
     tester,
   ) async {
     await pumpApp(
@@ -322,7 +434,7 @@ void main() {
                 ctx,
                 MaterialPageRoute(
                   builder: (_) => CartModeView(
-                    listaId: 1,
+                    listaId: listaId,
                     scannerBuilder: (_, onCode) => _FakeScanner(onCode: onCode),
                   ),
                 ),
@@ -339,14 +451,14 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    // Deja que se oculte el aviso flotante de «añadido».
     Future<void> settleToast() async {
       await tester.pump(const Duration(seconds: 3));
       await tester.pumpAndSettle();
     }
 
-    ShoppingItem item(String texto) =>
-        shopping.items.firstWhere((i) => i.texto == texto);
+    Future<ShoppingItem> item(String texto) async => (await tester.runAsync(
+      () => shopping.getItems(listaId),
+    ))!.firstWhere((i) => i.texto == texto);
 
     // 1. Tienda al entrar.
     await tester.tap(find.text('Abrir carrito'));
@@ -354,7 +466,7 @@ void main() {
     expect(find.text('¿En qué tienda estás?'), findsOneWidget);
     await tester.tap(find.text('Empezar'));
     await tester.pumpAndSettle();
-    expect(find.text('Mercado'), findsOneWidget); // chip de la AppBar
+    expect(find.text('Súper Centro'), findsOneWidget); // chip de la AppBar
 
     // 2. Producto con precio guardado: confirmar con un toque.
     await scan('8410000000001');
@@ -364,15 +476,12 @@ void main() {
     );
     await tester.tap(find.text('Añadir al carrito'));
     await tester.pumpAndSettle();
-    expect(item('Leche entera').comprado, isTrue);
-    expect(item('Leche entera').precioPagado, 1.05);
-    expect(item('Leche entera').compraId, isNotNull);
-    expect(products.purchases.length, 3);
-    expect(products.purchases.last.establecimiento, 'Mercado');
+    var leche = await item('Leche entera');
+    expect(leche.comprado, isTrue);
+    expect(leche.precioCent, 105);
     await settleToast();
 
-    // 3. Mismo código otra vez (tras la espera) = una unidad más, sin otra
-    // compra en el historial.
+    // 3. Mismo código otra vez = una unidad más, sin otra compra.
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 2600)),
     );
@@ -380,18 +489,17 @@ void main() {
     expect(find.textContaining('Ya llevas 1 en el carrito'), findsOneWidget);
     await tester.tap(find.text('Añadir al carrito'));
     await tester.pumpAndSettle();
-    expect(item('Leche entera').unidades, 2);
-    expect(products.purchases.length, 3);
+    leche = await item('Leche entera');
+    expect(leche.unidades, 2);
     expect(find.text('2,10 €'), findsWidgets);
     await settleToast();
 
-    // 4. Producto sin precio guardado y fuera de la lista: lo pide.
+    // 4. Producto conocido sin precio y fuera de la lista.
     await scan('5550001');
     expect(
       find.text('Este producto no está en tu lista de compra.'),
       findsOneWidget,
     );
-    expect(find.textContaining('No hay precio guardado'), findsOneWidget);
     await tester.tap(find.text('Añadir aunque no está en la lista'));
     await tester.pumpAndSettle();
     expect(find.text('Escribe un precio válido'), findsOneWidget);
@@ -401,16 +509,20 @@ void main() {
     );
     await tester.tap(find.text('Añadir aunque no está en la lista'));
     await tester.pumpAndSettle();
-    expect(item('Café molido').precioPagado, 3.20);
-    expect(products.purchases.last.precio, 3.20);
+    expect((await item('Café molido')).precioCent, 320);
     await settleToast();
 
-    // 5. Código desconocido: producto nuevo con precio.
+    // 5. Código desconocido: aviso y alta mínima (sin tabla nutricional).
     await scan('7770001');
-    expect(find.text('Producto nuevo'), findsOneWidget);
+    expect(find.text('Producto no registrado'), findsOneWidget);
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Nombre del producto *'),
+      find.widgetWithText(TextFormField, 'Nombre *'),
       'Galletas',
+    );
+    await tester.enterText(find.widgetWithText(TextFormField, 'Marca'), 'Dora');
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Presentación'),
+      'Paquete 500 g',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Precio por unidad *'),
@@ -418,18 +530,25 @@ void main() {
     );
     await tester.tap(find.text('Guardar y añadir al carrito'));
     await tester.pumpAndSettle();
-    expect(
-      products.products.values.any((p) => p.codigoBarras == '7770001'),
-      isTrue,
-    );
-    expect(item('Galletas').comprado, isTrue);
+    final galletas = (await tester.runAsync(
+      () => foods.findByBarcode('7770001'),
+    ))!;
+    expect(galletas.food.nombre, 'Galletas');
+    expect(galletas.food.pendiente, isTrue);
+    expect(galletas.package.descripcion, 'Paquete 500 g');
+    expect((await item('Galletas')).comprado, isTrue);
     expect(find.text('7,70 €'), findsWidgets);
     await settleToast();
 
-    // 6. Pendiente sin código (Pan): se añade tocándolo, sin historial.
+    // 6. Pendiente sin vincular (Pan): se elige su alimento y se añade.
     await tester.tap(find.text('Te falta (1)'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Pan'));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Qué es «Pan»?'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pan de barra'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Precio por unidad'),
@@ -439,28 +558,41 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Añadir al carrito'));
     await tester.pumpAndSettle();
-    expect(item('Pan').unidades, 2);
-    expect(products.purchases.length, 5);
+    final pan = await item('Pan');
+    expect(pan.unidades, 2);
+    expect(pan.alimentoId, panId);
     expect(find.text('9,90 €'), findsWidgets);
+    await settleToast();
 
     // 7. Quitar del carrito borra su compra del historial.
     await tester.tap(find.text('Leche entera'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Quitar del carrito'));
     await tester.pumpAndSettle();
-    expect(item('Leche entera').comprado, isFalse);
-    expect(products.purchases.length, 4);
+    expect((await item('Leche entera')).comprado, isFalse);
+    final compras = (await tester.runAsync(
+      () => purchases.getPurchasesForFood(lecheId),
+    ))!;
+    expect(compras.length, 2);
     expect(find.text('7,80 €'), findsWidgets);
     await settleToast();
 
-    // 8. Terminar compra y quitar comprados de la lista.
+    // 8. Terminar: avisa del producto nuevo pendiente y quita comprados.
     await tester.tap(find.text('Terminar compra'));
     await tester.pumpAndSettle();
-    expect(find.text('7,80 €'), findsWidgets);
+    expect(find.textContaining('1 producto nuevo sin tabla'), findsOneWidget);
     await tester.tap(find.text('Quitar comprados'));
     await tester.pumpAndSettle();
     expect(find.text('Abrir carrito'), findsOneWidget);
-    expect(shopping.items.map((i) => i.texto), ['Leche entera']);
+    final restantes = (await tester.runAsync(
+      () => shopping.getItems(listaId),
+    ))!;
+    expect(restantes.map((i) => i.texto), ['Leche entera']);
+    final pendientes = (await tester.runAsync(
+      () => foods.search('', filter: FoodFilter.pendientes),
+    ))!;
+    expect(pendientes.map((f) => f.nombre), contains('Galletas'));
+    await unmount(tester);
   });
 }
 

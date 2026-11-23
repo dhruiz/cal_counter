@@ -1,33 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils.dart';
+import '../../domain/entities/food.dart';
+import '../../domain/entities/recipe.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../providers/shopping_provider.dart';
 
 /// Diálogo para llevar ingredientes de una receta a una lista de compra
 /// (existente o nueva). [preseleccionados] indica qué líneas van marcadas;
-/// si es null se marcan todas salvo los básicos (sal, aceite...).
+/// si es null se marcan todas salvo los básicos (sal, aceite...). Los
+/// ingredientes vinculados a un alimento conservan el vínculo en la lista.
 class AddToShoppingListDialog extends ConsumerStatefulWidget {
-  final List<String> lineas;
+  final List<RecipeIngredient> ingredientes;
   final Set<String>? preseleccionados;
 
   const AddToShoppingListDialog({
     super.key,
-    required this.lineas,
+    required this.ingredientes,
     this.preseleccionados,
   });
+
+  List<String> get lineas => [for (final i in ingredientes) i.texto];
 
   /// Muestra el diálogo y un SnackBar con el resultado.
   static Future<void> show(
     BuildContext context, {
-    required List<String> lineas,
+    required List<RecipeIngredient> ingredientes,
     Set<String>? preseleccionados,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
     final msg = await showDialog<String>(
       context: context,
       builder: (_) => AddToShoppingListDialog(
-        lineas: lineas,
+        ingredientes: ingredientes,
         preseleccionados: preseleccionados,
       ),
     );
@@ -58,7 +63,7 @@ class _AddToShoppingListDialogState
             !IngredientAvailability.isBasic(widget.lineas[i]))
           i,
     };
-    final lists = ref.read(shoppingListsProvider).lists;
+    final lists = ref.read(shoppingListsProvider).valueOrNull ?? const [];
     _listaId = lists.isEmpty ? _nuevaLista : lists.first.id;
   }
 
@@ -69,7 +74,7 @@ class _AddToShoppingListDialogState
   }
 
   Future<void> _add() async {
-    final notifier = ref.read(shoppingListsProvider.notifier);
+    final notifier = ref.read(shoppingListsActionsProvider);
     setState(() => _saving = true);
     var listaId = _listaId!;
     var nombre = '';
@@ -79,17 +84,15 @@ class _AddToShoppingListDialogState
           : _nameCtrl.text.trim();
       listaId = await notifier.create(nombre);
     } else {
-      nombre = ref
-          .read(shoppingListsProvider)
-          .lists
+      nombre = (ref.read(shoppingListsProvider).valueOrNull ?? const [])
           .firstWhere((l) => l.id == listaId)
           .nombre;
     }
-    final lineas = [
-      for (var i = 0; i < widget.lineas.length; i++)
-        if (_checked.contains(i)) widget.lineas[i],
+    final elegidos = [
+      for (var i = 0; i < widget.ingredientes.length; i++)
+        if (_checked.contains(i)) widget.ingredientes[i],
     ];
-    final n = await notifier.addIngredients(listaId, lineas);
+    final n = await notifier.addIngredients(listaId, elegidos);
     if (!mounted) return;
     Navigator.pop(
       context,
@@ -101,7 +104,7 @@ class _AddToShoppingListDialogState
 
   @override
   Widget build(BuildContext context) {
-    final lists = ref.watch(shoppingListsProvider).lists;
+    final lists = ref.watch(shoppingListsProvider).valueOrNull ?? const [];
     return AlertDialog(
       title: const Text('Añadir a la lista de compra'),
       content: SizedBox(
@@ -164,4 +167,18 @@ class _AddToShoppingListDialogState
       ],
     );
   }
+}
+
+/// Añade un alimento del repertorio a una lista de compra (vinculado).
+class AddFoodToShoppingListDialog {
+  AddFoodToShoppingListDialog._();
+
+  static Future<void> show(BuildContext context, Food food) =>
+      AddToShoppingListDialog.show(
+        context,
+        ingredientes: [
+          RecipeIngredient(texto: food.nombre, alimentoId: food.id),
+        ],
+        preseleccionados: {food.nombre},
+      );
 }

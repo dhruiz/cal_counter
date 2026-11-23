@@ -101,24 +101,24 @@ void main() {
       expect(r4.single.nombre, 'Leche semidesnatada');
     });
 
-    test('búsqueda por código de barras normalizado (UPC-A → EAN-13)', () async {
-      final id = await food('Galletas', marca: 'X', tipo: FoodType.envasado);
-      await foods.savePackage(
-        FoodPackage(alimentoId: id, codigoBarras: '012345678905'),
-      );
-      final r = await foods.search('0012345678905');
-      expect(r.single.id, id);
-      final m = await foods.findByBarcode('012345678905');
-      expect(m!.food.id, id);
-      expect(m.package.codigoBarras, '0012345678905');
-    });
+    test(
+      'búsqueda por código de barras normalizado (UPC-A → EAN-13)',
+      () async {
+        final id = await food('Galletas', marca: 'X', tipo: FoodType.envasado);
+        await foods.savePackage(
+          FoodPackage(alimentoId: id, codigoBarras: '012345678905'),
+        );
+        final r = await foods.search('0012345678905');
+        expect(r.single.id, id);
+        final m = await foods.findByBarcode('012345678905');
+        expect(m!.food.id, id);
+        expect(m.package.codigoBarras, '0012345678905');
+      },
+    );
 
     test('duplicados por nombre y marca (sin tildes ni mayúsculas)', () async {
       await food('Plátano');
-      expect(
-        () => food('platano'),
-        throwsA(isA<DuplicateFoodException>()),
-      );
+      expect(() => food('platano'), throwsA(isA<DuplicateFoodException>()));
       // Misma palabra con otra marca sí se permite.
       await food('Plátano', marca: 'Canarias');
     });
@@ -134,24 +134,27 @@ void main() {
       expect(g.uuid, f.uuid);
     });
 
-    test('pendientes: sin tabla, con prioridad a los usados en recetas', () async {
-      final a = await food('Tomate triturado', n: NutritionFacts.vacia);
-      final b = await food('Yogur', n: const NutritionFacts(kcal: 60));
-      await food('Completo');
-      await recipes.save(
-        const Recipe(
-          nombre: 'Salsa',
-          ingredientes: [RecipeIngredient(texto: 'Yogur')],
-        ).copyWith(
-          ingredientes: [RecipeIngredient(texto: 'Yogur', alimentoId: b)],
-        ),
-      );
-      final pend = await foods.watchPending().first;
-      expect(pend.map((f) => f.id), [b, a]);
-      expect(await foods.watchPendingCount().first, 2);
-      final filtrados = await foods.search('', filter: FoodFilter.pendientes);
-      expect(filtrados.length, 2);
-    });
+    test(
+      'pendientes: sin tabla, con prioridad a los usados en recetas',
+      () async {
+        final a = await food('Tomate triturado', n: NutritionFacts.vacia);
+        final b = await food('Yogur', n: const NutritionFacts(kcal: 60));
+        await food('Completo');
+        await recipes.save(
+          const Recipe(
+            nombre: 'Salsa',
+            ingredientes: [RecipeIngredient(texto: 'Yogur')],
+          ).copyWith(
+            ingredientes: [RecipeIngredient(texto: 'Yogur', alimentoId: b)],
+          ),
+        );
+        final pend = await foods.watchPending().first;
+        expect(pend.map((f) => f.id), [b, a]);
+        expect(await foods.watchPendingCount().first, 2);
+        final filtrados = await foods.search('', filter: FoodFilter.pendientes);
+        expect(filtrados.length, 2);
+      },
+    );
 
     test('borrar sin compras borra; con compras archiva', () async {
       final a = await food('Sin historial');
@@ -229,22 +232,25 @@ void main() {
   });
 
   group('compras', () {
-    test('establecimientos sin duplicar por mayúsculas, recientes primero', () async {
-      final id = await food('Pan');
-      final pid = await foods.defaultPackageId(id);
-      Future<void> compra(String tienda, DateTime f) => purchases.addPurchase(
-        Purchase(
-          presentacionId: pid,
-          fecha: f,
-          precioCent: 100,
-          establecimiento: tienda,
-        ),
-      );
-      await compra('Mercado', DateTime(2026, 10, 1));
-      await compra('  súper  ', DateTime(2026, 11, 1));
-      await compra('mercado', DateTime(2026, 9, 1));
-      expect(await purchases.getStoreNames(), ['súper', 'Mercado']);
-    });
+    test(
+      'establecimientos sin duplicar por mayúsculas, recientes primero',
+      () async {
+        final id = await food('Pan');
+        final pid = await foods.defaultPackageId(id);
+        Future<void> compra(String tienda, DateTime f) => purchases.addPurchase(
+          Purchase(
+            presentacionId: pid,
+            fecha: f,
+            precioCent: 100,
+            establecimiento: tienda,
+          ),
+        );
+        await compra('Mercado', DateTime(2026, 10, 1));
+        await compra('  súper  ', DateTime(2026, 11, 1));
+        await compra('mercado', DateTime(2026, 9, 1));
+        expect(await purchases.getStoreNames(), ['súper', 'Mercado']);
+      },
+    );
 
     test('purga: 3 meses + la última de cada presentación', () async {
       final id = await food('Aceite');
@@ -263,9 +269,9 @@ void main() {
       await compra(p1, DateTime(2026, 1, 1));
       await compra(p1, DateTime(2026, 11, 1));
       await compra(p2, DateTime(2026, 2, 1)); // vieja pero la última de p2
-      final borradas = await PurgeOldPurchases(
-        purchases,
-      )(now: DateTime(2026, 11, 23));
+      final borradas = await PurgeOldPurchases(purchases)(
+        now: DateTime(2026, 11, 23),
+      );
       expect(borradas, 1);
       final restantes = await purchases.getPurchasesForFood(id);
       expect(restantes.length, 2);
@@ -494,27 +500,30 @@ void main() {
   });
 
   group('comidas', () {
-    test('watchDay agrupa items y updateMealItem escala por proporción', () async {
-      final day = DateTime(2026, 11, 23);
-      final mealId = await meals.createMeal('Comida_1', day);
-      final itemId = await meals.addItemToMeal(
-        MealItem(
-          mealId: mealId,
-          alimento: 'Arroz',
-          cantidad: 100,
-          grasas: 1,
-          carbohidratos: 78,
-          proteinas: 7,
-          kcal: 350,
-        ),
-      );
-      await meals.updateMealItem(itemId, 50);
-      final dia = await meals.watchDay(day).first;
-      final item = dia.single.items.single;
-      expect(item.cantidad, 50);
-      expect(item.kcal, 175);
-      expect(item.carbohidratos, 39);
-    });
+    test(
+      'watchDay agrupa items y updateMealItem escala por proporción',
+      () async {
+        final day = DateTime(2026, 11, 23);
+        final mealId = await meals.createMeal('Comida_1', day);
+        final itemId = await meals.addItemToMeal(
+          MealItem(
+            mealId: mealId,
+            alimento: 'Arroz',
+            cantidad: 100,
+            grasas: 1,
+            carbohidratos: 78,
+            proteinas: 7,
+            kcal: 350,
+          ),
+        );
+        await meals.updateMealItem(itemId, 50);
+        final dia = await meals.watchDay(day).first;
+        final item = dia.single.items.single;
+        expect(item.cantidad, 50);
+        expect(item.kcal, 175);
+        expect(item.carbohidratos, 39);
+      },
+    );
 
     test('CSV diario: TAB, cabecera fija y total', () async {
       final day = DateTime(2023, 12, 1);

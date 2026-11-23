@@ -88,7 +88,10 @@ ParsedQuantity? parseQuantity(String linea) {
 
   // Separa número y unidad pegados ("200g", "1.5kg").
   final spaced = texto
-      .replaceAllMapped(RegExp(r'(\d)([a-zA-Záéíóú])'), (m) => '${m[1]} ${m[2]}')
+      .replaceAllMapped(
+        RegExp(r'(\d)([a-zA-Záéíóú])'),
+        (m) => '${m[1]} ${m[2]}',
+      )
       .trim();
   final words = spaced.split(RegExp(r'\s+'));
 

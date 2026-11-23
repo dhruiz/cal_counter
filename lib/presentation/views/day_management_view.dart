@@ -5,7 +5,7 @@ import '../../core/styles.dart';
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/meal_item.dart';
 import '../providers/home_provider.dart';
-import '../providers/search_provider.dart';
+import '../../domain/services/ingredient_matcher.dart';
 import '../widgets/meal_items_dialog.dart';
 
 /// Vista de gestión del día: lista las comidas registradas, permite editar las
@@ -76,7 +76,10 @@ class DayManagementView extends ConsumerWidget {
                             horizontal: AppStyles.paddingMedium,
                           ),
                           children: state.meals
-                              .map((meal) => _buildMealCard(context, ref, state, meal))
+                              .map(
+                                (meal) =>
+                                    _buildMealCard(context, ref, state, meal),
+                              )
                               .toList(),
                         ),
                 ),
@@ -189,13 +192,10 @@ class DayManagementView extends ConsumerWidget {
               onPressed: () async {
                 final export = ref.read(exportDayToCsvProvider);
                 final path = await export(state.selectedDate);
-                if (path.isNotEmpty) {
-                  ref.read(homeProvider.notifier).refresh();
-                }
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Exportado a: $path')),
-                  );
+                if (context.mounted && path.isNotEmpty) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Exportado a: $path')));
                 }
               },
               icon: const Icon(Icons.download),
@@ -236,7 +236,9 @@ class DayManagementView extends ConsumerWidget {
               final name = controller.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('El nombre no puede estar vacío')),
+                  const SnackBar(
+                    content: Text('El nombre no puede estar vacío'),
+                  ),
                 );
                 return;
               }
@@ -322,7 +324,9 @@ class DayManagementView extends ConsumerWidget {
               final name = nameController.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('El nombre no puede estar vacío')),
+                  const SnackBar(
+                    content: Text('El nombre no puede estar vacío'),
+                  ),
                 );
                 return;
               }
@@ -354,11 +358,19 @@ class DayManagementView extends ConsumerWidget {
     List<MealItem> items,
     double totalGrams,
   ) async {
-    // ¿Ya existe un alimento con ese nombre? (coincidencia exacta).
-    final matches = await ref.read(foodRepositoryProvider).searchFoods(name);
-    final exists = matches.any((f) => f.name.toLowerCase() == name.toLowerCase());
+    // ¿Ya existe un alimento genérico con ese nombre (sin tildes ni
+    // mayúsculas)? Si se sobrescribe se ACTUALIZA ese alimento: conserva su
+    // id, sus vínculos en recetas y su uso.
+    final matches = await ref.read(foodRepositoryProvider).search(name);
+    final existing = matches
+        .where(
+          (f) =>
+              normalizeText(f.nombre) == normalizeText(name) &&
+              f.marca.trim().isEmpty,
+        )
+        .firstOrNull;
 
-    if (exists) {
+    if (existing != null) {
       if (!context.mounted) return;
       final overwrite = await showDialog<bool>(
         context: context,
@@ -385,8 +397,12 @@ class DayManagementView extends ConsumerWidget {
     try {
       await ref
           .read(saveMealAsFoodProvider)
-          .call(name: name, items: items, totalGrams: totalGrams);
-      ref.invalidate(mostUsedFoodsProvider);
+          .call(
+            name: name,
+            items: items,
+            totalGrams: totalGrams,
+            sobrescribir: existing,
+          );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

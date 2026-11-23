@@ -14,8 +14,15 @@ class AppUtils {
   /// separable, así el símbolo no se parte de la cifra al saltar de línea).
   static String formatPrecio(double v) => _precio.format(v);
 
+  /// Precio en euros a partir de céntimos: 105 → "1,05 €".
+  static String formatPrecioCent(int cents) => _precio.format(cents / 100);
+
   /// Precio para precargar un campo editable: "1,05" (sin símbolo ni miles).
   static String formatPrecioEditable(double v) => _precioEditable.format(v);
+
+  /// Como [formatPrecioEditable] a partir de céntimos.
+  static String formatPrecioEditableCent(int cents) =>
+      _precioEditable.format(cents / 100);
 
   static String formatFecha(DateTime d) => _fecha.format(d);
 

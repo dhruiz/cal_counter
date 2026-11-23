@@ -76,9 +76,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
       final values = RecetasCompanion(
         nombre: Value(nombre),
         categoria: Value(emptyToNull(recipe.categoria)),
-        porciones: Value(
-          (recipe.porciones ?? 0) > 0 ? recipe.porciones : null,
-        ),
+        porciones: Value((recipe.porciones ?? 0) > 0 ? recipe.porciones : null),
         tiempoMin: Value(recipe.tiempoMin),
         elaboracion: Value(recipe.elaboracion.trim()),
         notas: Value(emptyToNull(recipe.notas)),

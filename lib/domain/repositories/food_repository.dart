@@ -43,6 +43,10 @@ abstract class FoodRepository {
   Future<Food?> getFood(int id);
   Stream<Food?> watchFood(int id);
   Future<Map<int, Food>> getFoodsByIds(Iterable<int> ids);
+
+  /// Alimentos (por id) con sus porciones; emite de nuevo si cambian (p. ej.
+  /// al completar la tabla de un ingrediente con la receta abierta).
+  Stream<FoodsWithPortions> watchFoodsWithPortions(Set<int> ids);
   Future<List<Food>> getAllFoods({bool incluirArchivados = false});
 
   /// Alimento y presentación de un código de barras (se normaliza).
@@ -90,4 +94,14 @@ abstract class FoodRepository {
   /// Presentación sin código ("Sin presentación") del alimento, creada si no
   /// existe. Se usa para registrar compras de algo sin presentación elegida.
   Future<int> defaultPackageId(int alimentoId);
+}
+
+/// Alimentos y porciones por id de alimento.
+class FoodsWithPortions {
+  final Map<int, Food> alimentos;
+  final Map<int, List<FoodPortion>> porciones;
+
+  const FoodsWithPortions(this.alimentos, this.porciones);
+
+  static const vacio = FoodsWithPortions({}, {});
 }

@@ -1,18 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/styles.dart';
-import '../../data/models/food_model.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
-import '../providers/search_provider.dart';
+import '../../domain/entities/nutrition_facts.dart';
+import '../../domain/errors/domain_errors.dart';
+import '../../domain/services/barcode.dart';
+import '../../domain/services/money.dart';
+import '../../domain/usecases/food_registration.dart';
+import '../providers/foods_provider.dart';
+import '../widgets/food_widgets.dart';
+import '../widgets/label_reader.dart';
+import 'barcode_scanner_view.dart';
 
+/// Alta o edición de un alimento EN CASA: datos básicos y tabla nutricional
+/// por 100 g/ml (lo que se deje vacío queda como "desconocido"). Al crear se
+/// puede indicar la presentación y su código de barras. Devuelve el id.
+///
+/// Con [completar] se abre centrado en la tabla nutricional (alimentos
+/// pendientes dados de alta en la tienda).
 class FoodFormView extends ConsumerStatefulWidget {
-  final Food? foodToEdit;
+  final Food? food;
+  final String? nombreInicial;
+  final String? codigoBarras;
+  final bool completar;
 
-  /// Nombre propuesto al crear (p. ej. el de un producto escaneado).
-  final String? initialName;
+  const FoodFormView({
+    super.key,
+    this.food,
+    this.nombreInicial,
+    this.codigoBarras,
+    this.completar = false,
+  });
 
-  const FoodFormView({super.key, this.foodToEdit, this.initialName});
+  /// Abre el formulario y devuelve el id guardado (o null si se cancela).
+  static Future<int?> open(
+    BuildContext context, {
+    Food? food,
+    String? nombreInicial,
+    String? codigoBarras,
+    bool completar = false,
+  }) {
+    return Navigator.push<int>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FoodFormView(
+          food: food,
+          nombreInicial: nombreInicial,
+          codigoBarras: codigoBarras,
+          completar: completar,
+        ),
+      ),
+    );
+  }
 
   @override
   ConsumerState<FoodFormView> createState() => _FoodFormViewState();
@@ -20,151 +61,401 @@ class FoodFormView extends ConsumerStatefulWidget {
 
 class _FoodFormViewState extends ConsumerState<FoodFormView> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _kcalController;
-  late TextEditingController _protController;
-  late TextEditingController _fatsController;
-  late TextEditingController _carbsController;
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _brandCtrl;
+  late final TextEditingController _notesCtrl;
+  late final TextEditingController _codeCtrl;
+  late final TextEditingController _packCtrl;
+  late final TextEditingController _contentCtrl;
+  late final Map<Nutrient, TextEditingController> _nutrientCtrls;
+  late FoodType _tipo;
+  late FoodUnit _unidad;
+  NutritionSource? _origen;
+  bool _saving = false;
+
+  bool get _isNew => widget.food == null;
 
   @override
   void initState() {
     super.initState();
-    final f = widget.foodToEdit;
-    _nameController = TextEditingController(
-      text: f?.name ?? widget.initialName ?? '',
+    final f = widget.food;
+    _nameCtrl = TextEditingController(
+      text: f?.nombre ?? widget.nombreInicial ?? '',
     );
-    _kcalController = TextEditingController(
-      text: f?.kcalPer100.toString() ?? '',
-    );
-    _protController = TextEditingController(
-      text: f?.proteinsPer100.toString() ?? '',
-    );
-    _fatsController = TextEditingController(
-      text: f?.grasasPer100.toString() ?? '',
-    );
-    _carbsController = TextEditingController(
-      text: f?.carbsPer100.toString() ?? '',
-    );
+    _brandCtrl = TextEditingController(text: f?.marca ?? '');
+    _notesCtrl = TextEditingController(text: f?.notas ?? '');
+    _codeCtrl = TextEditingController(text: widget.codigoBarras ?? '');
+    _packCtrl = TextEditingController();
+    _contentCtrl = TextEditingController();
+    _nutrientCtrls = {
+      for (final n in Nutrient.values)
+        n: TextEditingController(text: _fmt(f?.nutricion[n])),
+    };
+    _tipo =
+        f?.tipo ??
+        (widget.codigoBarras != null ? FoodType.envasado : FoodType.generico);
+    _unidad = f?.unidad ?? FoodUnit.g;
+    _origen = f?.origenNutricion;
   }
+
+  static String _fmt(double? v) =>
+      v == null ? '' : AppUtils.formatNumero(v).replaceAll('.', ',');
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _kcalController.dispose();
-    _protController.dispose();
-    _fatsController.dispose();
-    _carbsController.dispose();
+    for (final c in [
+      _nameCtrl,
+      _brandCtrl,
+      _notesCtrl,
+      _codeCtrl,
+      _packCtrl,
+      _contentCtrl,
+      ..._nutrientCtrls.values,
+    ]) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  NutritionFacts get _nutricion => NutritionFacts.desdeMapa({
+    for (final e in _nutrientCtrls.entries) e.key: parseDecimal(e.value.text),
+  });
+
+  Future<void> _scanCode() async {
+    final code = await BarcodeScannerView.scan(context);
+    if (code != null && mounted) {
+      setState(() => _codeCtrl.text = normalizeBarcode(code) ?? code);
+    }
+  }
+
+  /// Rellena la tabla con lo leído de la etiqueta (OCR). El usuario revisa
+  /// antes de guardar.
+  Future<void> _readLabel() async {
+    final res = await LabelReader.read(context, unidad: _unidad.clave);
+    if (res == null || !mounted) return;
+    setState(() {
+      for (final n in Nutrient.values) {
+        final v = res.nutricion[n];
+        if (v != null) _nutrientCtrls[n]!.text = _fmt(v);
+      }
+      if (res.contenido != null && _contentCtrl.text.trim().isEmpty) {
+        _contentCtrl.text = _fmt(res.contenido);
+      }
+      if (res.unidad != null) _unidad = FoodUnit.fromClave(res.unidad);
+      _origen = NutritionSource.etiquetaOcr;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Revisa los valores leídos antes de guardar.'),
+      ),
+    );
+  }
+
+  Future<bool> _confirmAvisos(List<String> avisos) async {
+    if (avisos.isEmpty) return true;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Revisa la tabla nutricional'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final a in avisos)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text('• $a'),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Corregir'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Guardar igualmente'),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final nutricion = _nutricion;
+    if (!await _confirmAvisos(nutricion.avisos)) return;
 
-    final name = _nameController.text.trim();
-    final kcal = double.parse(_kcalController.text);
-    final prot = double.parse(_protController.text);
-    final fats = double.parse(_fatsController.text);
-    final carbs = double.parse(_carbsController.text);
+    final base = widget.food ?? const Food(nombre: '');
+    final cambioTabla = nutricion != (widget.food?.nutricion);
+    final food = base.copyWith(
+      nombre: _nameCtrl.text.trim(),
+      marca: _brandCtrl.text.trim(),
+      tipo: _tipo,
+      unidad: _unidad,
+      nutricion: nutricion,
+      origenNutricion: cambioTabla && _origen != NutritionSource.etiquetaOcr
+          ? NutritionSource.manual
+          : (_origen ?? NutritionSource.manual),
+      notas: _notesCtrl.text.trim(),
+    );
 
-    final repo = ref.read(foodRepositoryProvider);
-
+    setState(() => _saving = true);
     try {
-      if (widget.foodToEdit == null) {
-        // Create
-        final newFood = FoodModel(
-          name: name,
-          kcalPer100: kcal,
-          proteinsPer100: prot,
-          grasasPer100: fats,
-          carbsPer100: carbs,
+      final int id;
+      if (_isNew) {
+        id = await ref.read(saveFoodWithPackageProvider)(
+          food,
+          presentacion: PackageDraft(
+            codigoBarras: _codeCtrl.text,
+            descripcion: _packCtrl.text,
+            contenido: parseDecimal(_contentCtrl.text),
+          ),
         );
-        await repo.insertFood(newFood);
       } else {
-        // Update
-        final updatedFood = FoodModel(
-          id: widget.foodToEdit!.id,
-          name: name,
-          kcalPer100: kcal,
-          proteinsPer100: prot,
-          grasasPer100: fats,
-          carbsPer100: carbs,
-        );
-        await repo.updateFood(updatedFood);
+        id = await ref.read(foodRepositoryProvider).saveFood(food);
       }
-
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Alimento guardado')));
-        Navigator.pop(context, true);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            food.pendiente
+                ? '"${food.nombre}" guardado (pendiente de completar).'
+                : '"${food.nombre}" guardado.',
+          ),
+        ),
+      );
+      Navigator.pop(context, id);
+    } on DuplicateFoodException catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      final abrir = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Ya existe'),
+          content: Text(
+            'Ya tienes "${e.existente.nombreCompleto}"'
+            '${e.existente.archivado ? ' (archivado)' : ''}. '
+            'Cambia el nombre o la marca, o usa el que ya existe.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cambiar nombre'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Usar el existente'),
+            ),
+          ],
+        ),
+      );
+      if (abrir == true && mounted) {
+        if (e.existente.archivado) {
+          await ref
+              .read(foodRepositoryProvider)
+              .setArchived(e.existente.id!, false);
+        }
+        if (mounted) Navigator.pop(context, e.existente.id);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo guardar: $e')));
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isEditing = widget.foodToEdit != null;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Editar Alimento' : 'Nuevo Alimento'),
-        backgroundColor: AppStyles.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
-              ),
-              const SizedBox(height: 16),
-              _buildNumField(_kcalController, 'Kcal (por 100g)'),
-              const SizedBox(height: 16),
-              _buildNumField(_fatsController, 'Grasas (g)'),
-              const SizedBox(height: 16),
-              _buildNumField(_carbsController, 'Carbohidratos (g)'),
-              const SizedBox(height: 16),
-              _buildNumField(_protController, 'Proteínas (g)'),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppStyles.primary,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text('Guardar'),
-              ),
-            ],
-          ),
+  Widget _nutrientField(Nutrient n) {
+    return Padding(
+      padding: EdgeInsets.only(left: n.esSubcategoria ? 24 : 0, bottom: 8),
+      child: TextFormField(
+        controller: _nutrientCtrls[n],
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: InputDecoration(
+          labelText: n.etiqueta + (n.esencial ? ' *' : ''),
+          suffixText: n.unidad,
+          isDense: true,
         ),
+        onChanged: (_) => setState(() {}),
+        validator: (v) {
+          if (v == null || v.trim().isEmpty) return null;
+          final d = parseDecimal(v);
+          if (d == null || d < 0) return 'Número no válido';
+          return null;
+        },
       ),
     );
   }
 
-  Widget _buildNumField(TextEditingController controller, String label) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(labelText: label),
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-      ],
-      validator: (v) {
-        if (v == null || v.isEmpty) return 'Requerido';
-        if (double.tryParse(v) == null) return 'Inválido';
-        return null;
-      },
+  @override
+  Widget build(BuildContext context) {
+    final faltan = _nutricion.faltantes;
+    final title = widget.completar
+        ? 'Completar tabla nutricional'
+        : (_isNew ? 'Nuevo alimento' : 'Editar alimento');
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: AppStyles.primary,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: 'Guardar',
+            icon: const Icon(Icons.check),
+            onPressed: _saving ? null : _save,
+          ),
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(AppStyles.paddingMedium),
+          children: [
+            TextFormField(
+              controller: _nameCtrl,
+              autofocus: _isNew && _nameCtrl.text.isEmpty,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(labelText: 'Nombre *'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Escribe un nombre' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _brandCtrl,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Marca (vacío = genérico)',
+              ),
+            ),
+            const SizedBox(height: 12),
+            SegmentedButton<FoodType>(
+              segments: [
+                for (final t in FoodType.values)
+                  ButtonSegment(value: t, label: Text(t.etiqueta)),
+              ],
+              selected: {_tipo},
+              onSelectionChanged: (s) => setState(() => _tipo = s.first),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Tabla nutricional',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                SegmentedButton<FoodUnit>(
+                  showSelectedIcon: false,
+                  segments: const [
+                    ButtonSegment(value: FoodUnit.g, label: Text('100 g')),
+                    ButtonSegment(value: FoodUnit.ml, label: Text('100 ml')),
+                  ],
+                  selected: {_unidad},
+                  onSelectionChanged: (s) => setState(() => _unidad = s.first),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: _readLabel,
+              icon: const Icon(Icons.document_scanner_outlined),
+              label: const Text('Leer la etiqueta con la cámara'),
+            ),
+            if (faltan.isNotEmpty)
+              InfoBanner(
+                color: AppStyles.semaphOrange,
+                icon: Icons.info_outline,
+                text:
+                    'Faltan: ${faltan.map((n) => n.etiqueta.toLowerCase()).join(', ')}. '
+                    'Puedes guardar igualmente: quedará pendiente y no se '
+                    'podrá registrar en el contador hasta completarlo.',
+              ),
+            const SizedBox(height: 12),
+            for (final n in Nutrient.values) _nutrientField(n),
+            if (_isNew) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Presentación y código de barras (opcional)',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _codeCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Código de barras',
+                  suffixIcon: IconButton(
+                    tooltip: 'Escanear',
+                    icon: const Icon(Icons.qr_code_scanner),
+                    onPressed: _scanCode,
+                  ),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+              if (normalizeBarcode(_codeCtrl.text) != null &&
+                  !isValidGtin(_codeCtrl.text))
+                const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text(
+                    'El dígito de control no cuadra: revisa el código '
+                    '(se permite guardarlo por si es un código de tienda).',
+                    style: TextStyle(color: AppStyles.semaphOrange),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: TextFormField(
+                      controller: _packCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Presentación',
+                        hintText: 'Brick 1 L, pack 6...',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: TextFormField(
+                      controller: _contentCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Contenido',
+                        suffixText: _unidad.clave,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _notesCtrl,
+              maxLines: 2,
+              decoration: const InputDecoration(labelText: 'Notas (opcional)'),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _saving ? null : _save,
+              icon: const Icon(Icons.save),
+              label: const Text('Guardar'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

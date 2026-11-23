@@ -50,8 +50,7 @@ class SaveMealAsFood {
     ).escalada(100.0 / grams).redondeada();
 
     final base =
-        sobrescribir ??
-        Food(nombre: name.trim(), tipo: FoodType.preparado);
+        sobrescribir ?? Food(nombre: name.trim(), tipo: FoodType.preparado);
     return repository.saveFood(
       base.copyWith(
         nombre: name.trim(),

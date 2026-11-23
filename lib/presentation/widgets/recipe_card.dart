@@ -34,8 +34,15 @@ class RecipeCard extends StatelessWidget {
       if (recipe.porciones != null)
         _Meta(Icons.people_outline, '${recipe.porciones}'),
       _Meta(Icons.format_list_bulleted, '${recipe.ingredientes.length} ingr.'),
-      if (recipe.alimentoId != null)
-        const _Meta(Icons.local_fire_department_outlined, 'con calorías'),
+      if (recipe.ingredientes.isNotEmpty &&
+          recipe.ingredientes.every((i) => i.vinculado || i.opcional))
+        const _Meta(Icons.local_fire_department_outlined, 'calculable')
+      else if (recipe.ingredientes.any((i) => i.vinculado))
+        _Meta(
+          Icons.link,
+          '${recipe.ingredientes.where((i) => i.vinculado).length}/'
+          '${recipe.ingredientes.length} vinculados',
+        ),
     ];
 
     return Card(

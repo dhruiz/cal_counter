@@ -44,7 +44,14 @@ class RecipeIngredient extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, texto, alimentoId, cantidad, unidad, opcional];
+  List<Object?> get props => [
+    id,
+    texto,
+    alimentoId,
+    cantidad,
+    unidad,
+    opcional,
+  ];
 }
 
 /// Receta personal del usuario.

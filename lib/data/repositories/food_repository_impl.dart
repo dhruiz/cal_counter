@@ -40,7 +40,9 @@ class FoodRepositoryImpl implements FoodRepository {
       final variants = searchVariants(w).where((v) => v.isNotEmpty).toList()
         ..sort();
       if (variants.isEmpty) continue;
-      final ors = variants.map((v) => '"${v.replaceAll('"', '')}"*').join(' OR ');
+      final ors = variants
+          .map((v) => '"${v.replaceAll('"', '')}"*')
+          .join(' OR ');
       parts.add(variants.length == 1 ? ors : '($ors)');
     }
     return parts.isEmpty ? null : parts.join(' AND ');
@@ -139,6 +141,26 @@ class FoodRepositoryImpl implements FoodRepository {
   }
 
   @override
+  Stream<FoodsWithPortions> watchFoodsWithPortions(Set<int> ids) {
+    if (ids.isEmpty) return Stream.value(FoodsWithPortions.vacio);
+    final marks = List.filled(ids.length, '?').join(', ');
+    return db
+        .customSelect(
+          'SELECT * FROM alimentos WHERE id IN ($marks)',
+          variables: [for (final id in ids) Variable.withInt(id)],
+          readsFrom: {db.alimentos, db.porciones},
+        )
+        .watch()
+        .asyncMap((rows) async {
+          final foods = {
+            for (final r in rows)
+              r.read<int>('id'): foodFromRow(db.alimentos.map(r.data)),
+          };
+          return FoodsWithPortions(foods, await getPortionsFor(foods.keys));
+        });
+  }
+
+  @override
   Future<List<Food>> getAllFoods({bool incluirArchivados = false}) async {
     final q = db.select(db.alimentos)
       ..orderBy([(a) => OrderingTerm.asc(a.nombre)]);
@@ -193,10 +215,7 @@ class FoodRepositoryImpl implements FoodRepository {
     final nombre = normalizeText(food.nombre);
     final marca = normalizeText(food.marca);
     final candidatos = await search(food.nombre, filter: FoodFilter.todos);
-    final archivados = await search(
-      food.nombre,
-      filter: FoodFilter.archivados,
-    );
+    final archivados = await search(food.nombre, filter: FoodFilter.archivados);
     for (final f in [...candidatos, ...archivados]) {
       if (f.id == food.id) continue;
       if (normalizeText(f.nombre) == nombre &&
@@ -298,7 +317,9 @@ class FoodRepositoryImpl implements FoodRepository {
   @override
   Stream<List<Food>> watchMostUsed({int limit = 20}) {
     final q = db.select(db.alimentos)
-      ..where((a) => a.usoCount.isBiggerThanValue(0) & a.archivado.equals(false))
+      ..where(
+        (a) => a.usoCount.isBiggerThanValue(0) & a.archivado.equals(false),
+      )
       ..orderBy([
         (a) => OrderingTerm.desc(a.usoCount),
         (a) => OrderingTerm.desc(a.ultimoUso),

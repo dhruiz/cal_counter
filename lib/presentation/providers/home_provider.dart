@@ -1,45 +1,28 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/meal_item.dart';
 import '../../domain/repositories/meal_repository.dart';
-import '../../data/repositories/meal_repository_impl.dart';
-import '../../data/datasources/local_data_source.dart';
 import '../../domain/usecases/check_new_day_on_startup.dart';
 import '../../domain/usecases/export_day_csv.dart';
-import '../../domain/usecases/export_foods_tsv.dart';
-import '../../domain/usecases/import_foods_tsv.dart';
+import 'core_providers.dart';
 
-// Providers
-final localDataSourceProvider = Provider<LocalDataSource>((ref) {
-  return LocalDataSourceImpl();
-});
+export 'core_providers.dart';
 
-final mealRepositoryProvider = Provider<MealRepository>((ref) {
-  return MealRepositoryImpl(ref.watch(localDataSourceProvider));
-});
+final checkNewDayOnStartupProvider = Provider<CheckNewDayOnStartup>(
+  (ref) => CheckNewDayOnStartup(ref.watch(mealRepositoryProvider)),
+);
 
-final checkNewDayOnStartupProvider = Provider<CheckNewDayOnStartup>((ref) {
-  return CheckNewDayOnStartup(ref.watch(mealRepositoryProvider));
-});
+final exportDayToCsvProvider = Provider<ExportDayToCsv>(
+  (ref) => ExportDayToCsv(ref.watch(mealRepositoryProvider)),
+);
 
-final exportDayToCsvProvider = Provider<ExportDayToCsv>((ref) {
-  return ExportDayToCsv(ref.watch(mealRepositoryProvider));
-});
+final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>(
+  (ref) => HomeNotifier(ref.watch(mealRepositoryProvider)),
+);
 
-final exportFoodsTsvProvider = Provider<ExportFoodsTsv>((ref) {
-  return ExportFoodsTsv(ref.watch(localDataSourceProvider));
-});
-
-final importFoodsTsvProvider = Provider<ImportFoodsTsv>((ref) {
-  return ImportFoodsTsv(ref.watch(localDataSourceProvider));
-});
-
-final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>((ref) {
-  final repository = ref.watch(mealRepositoryProvider);
-  return HomeNotifier(repository);
-});
-
-// State
 class HomeState {
   final DateTime selectedDate;
   final List<Meal> meals;
@@ -84,37 +67,38 @@ class HomeState {
   }
 }
 
-// Notifier
+/// Día actual del contador. Observa la base de datos: cualquier cambio en las
+/// comidas (desde cualquier pantalla) se refleja solo, sin refrescos manuales.
 class HomeNotifier extends StateNotifier<HomeState> {
   final MealRepository repository;
+  StreamSubscription<List<MealWithItems>>? _sub;
 
   HomeNotifier(this.repository)
-    : super(HomeState(selectedDate: DateTime.now())) {
-    loadDailyData();
+    : super(HomeState(selectedDate: DateTime.now(), isLoading: true)) {
+    _listen();
   }
 
-  Future<void> loadDailyData() async {
-    state = state.copyWith(isLoading: true);
-    final date = state.selectedDate;
-    final meals = await repository.getMealsByDate(date);
+  void _listen() {
+    _sub?.cancel();
+    _sub = repository.watchDay(state.selectedDate).listen(_apply);
+  }
 
-    Map<int, List<MealItem>> itemsMap = {};
+  void _apply(List<MealWithItems> day) {
+    if (!mounted) return;
+    final items = <int, List<MealItem>>{};
     double k = 0, p = 0, f = 0, c = 0;
-
-    for (var meal in meals) {
-      final items = await repository.getMealItems(meal.id!);
-      itemsMap[meal.id!] = items;
-      for (var item in items) {
-        k += item.kcal;
-        p += item.proteinas;
-        f += item.grasas;
-        c += item.carbohidratos;
+    for (final m in day) {
+      items[m.meal.id!] = m.items;
+      for (final i in m.items) {
+        k += i.kcal;
+        p += i.proteinas;
+        f += i.grasas;
+        c += i.carbohidratos;
       }
     }
-
     state = state.copyWith(
-      meals: meals,
-      mealItems: itemsMap,
+      meals: [for (final m in day) m.meal],
+      mealItems: items,
       totalKcal: k,
       totalProteins: p,
       totalFats: f,
@@ -123,27 +107,30 @@ class HomeNotifier extends StateNotifier<HomeState> {
     );
   }
 
-  Future<void> deleteMeal(int id) async {
-    await repository.deleteMeal(id);
-    await loadDailyData();
-  }
-
-  Future<void> deleteMealItem(int id) async {
-    await repository.deleteMealItem(id);
-    await loadDailyData();
-  }
-
-  Future<void> updateMealItemQuantity(int id, double newCantidad) async {
-    await repository.updateMealItem(id, newCantidad);
-    await loadDailyData();
-  }
-
-  Future<void> renameMeal(int id, String name) async {
-    await repository.updateMealName(id, name);
-    await loadDailyData();
-  }
-
+  /// Si cambió el día (la app quedó abierta pasada la medianoche), vuelve a
+  /// observar el día de hoy.
   Future<void> refresh() async {
-    await loadDailyData();
+    final now = DateTime.now();
+    final d = state.selectedDate;
+    if (now.year != d.year || now.month != d.month || now.day != d.day) {
+      state = state.copyWith(selectedDate: now);
+      _listen();
+    }
+  }
+
+  Future<void> deleteMeal(int id) => repository.deleteMeal(id);
+
+  Future<void> deleteMealItem(int id) => repository.deleteMealItem(id);
+
+  Future<void> updateMealItemQuantity(int id, double newCantidad) =>
+      repository.updateMealItem(id, newCantidad);
+
+  Future<void> renameMeal(int id, String name) =>
+      repository.updateMealName(id, name);
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 }

@@ -35,7 +35,9 @@ class PurchaseRepositoryImpl implements PurchaseRepository {
   /// Id del establecimiento (sin distinguir mayúsculas), creado si no existe.
   Future<int> _storeId(String nombre) async {
     final n = normalizarEstablecimiento(nombre);
-    if (n.isEmpty) throw const ValidationException('Indica el establecimiento.');
+    if (n.isEmpty) {
+      throw const ValidationException('Indica el establecimiento.');
+    }
     final existing = await (db.select(
       db.establecimientos,
     )..where((e) => e.nombre.equals(n))).getSingleOrNull();
@@ -59,14 +61,12 @@ class PurchaseRepositoryImpl implements PurchaseRepository {
 
   @override
   Future<Purchase?> getPurchase(int id) async {
-    final row =
-        await (db.select(db.compras).join([
-              innerJoin(
-                db.establecimientos,
-                db.establecimientos.id.equalsExp(db.compras.establecimientoId),
-              ),
-            ])..where(db.compras.id.equals(id)))
-            .getSingleOrNull();
+    final row = await (db.select(db.compras).join([
+      innerJoin(
+        db.establecimientos,
+        db.establecimientos.id.equalsExp(db.compras.establecimientoId),
+      ),
+    ])..where(db.compras.id.equals(id))).getSingleOrNull();
     if (row == null) return null;
     return purchaseFromRows(
       row.readTable(db.compras),

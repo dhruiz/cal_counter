@@ -68,11 +68,7 @@ Triturar y servir caliente.
       expect(res.length, 1);
       final r = res.first;
       expect(r.nombre, 'Crema de calabaza');
-      expect(r.lineas, [
-        '1 kg de calabaza',
-        '2 zanahorias',
-        'Una cebolla',
-      ]);
+      expect(r.lineas, ['1 kg de calabaza', '2 zanahorias', 'Una cebolla']);
       expect(r.pasos, [
         'Cocer todo 20 minutos en agua.',
         'Triturar y servir caliente.',
@@ -145,11 +141,7 @@ Triturar y servir caliente.
       expect(res.length, 2);
       expect(res[0].nombre, 'Pancakes');
       expect(res[0].porciones, 2);
-      expect(res[0].lineas, [
-        '1 huevo',
-        '200 ml de leche',
-        '100 g de harina',
-      ]);
+      expect(res[0].lineas, ['1 huevo', '200 ml de leche', '100 g de harina']);
       expect(res[0].pasos, ['Mezclar', 'Cocinar en sartén']);
       expect(res[1].lineas, ['agua', 'té']);
     });

@@ -107,7 +107,8 @@ class Compras extends Table {
     onDelete: KeyAction.restrict,
   )();
   TextColumn get fecha => text()();
-  IntColumn get precioCent => integer().check(precioCent.isBiggerThanValue(0))();
+  IntColumn get precioCent =>
+      integer().check(precioCent.isBiggerThanValue(0))();
   IntColumn get unidades => integer()
       .withDefault(const Constant(1))
       .check(unidades.isBiggerOrEqualValue(1))();

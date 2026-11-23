@@ -19,8 +19,7 @@ enum Nutrient {
   const Nutrient(this.etiqueta, this.unidad, {this.esencial = false});
 
   /// Subcategoría de otro nutriente (se muestra sangrada).
-  bool get esSubcategoria =>
-      this == grasasSaturadas || this == azucares;
+  bool get esSubcategoria => this == grasasSaturadas || this == azucares;
 }
 
 /// De dónde salen los valores nutricionales de un alimento.

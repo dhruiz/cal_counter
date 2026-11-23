@@ -152,7 +152,10 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
   /// reutilizar una lista no debe perder historial de precios.
   static ItemsListaCompanion _bought(bool comprado) => comprado
       ? const ItemsListaCompanion(comprado: Value(true))
-      : const ItemsListaCompanion(comprado: Value(false), compraId: Value(null));
+      : const ItemsListaCompanion(
+          comprado: Value(false),
+          compraId: Value(null),
+        );
 
   @override
   Future<void> setItemBought(int itemId, bool comprado) async {
@@ -168,10 +171,9 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
   @override
   Future<void> deleteBoughtItems(int listaId) async {
-    await (db.delete(db.itemsLista)..where(
-          (i) => i.listaId.equals(listaId) & i.comprado.equals(true),
-        ))
-        .go();
+    await (db.delete(
+      db.itemsLista,
+    )..where((i) => i.listaId.equals(listaId) & i.comprado.equals(true))).go();
   }
 
   @override

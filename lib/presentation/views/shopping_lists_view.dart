@@ -5,6 +5,7 @@ import '../../core/utils.dart';
 import '../../domain/entities/shopping_list.dart';
 import '../providers/shopping_provider.dart';
 import '../widgets/empty_state.dart';
+import 'price_history_view.dart';
 import 'shopping_list_detail_view.dart';
 
 /// Pestaña "Compras": listas de compra.
@@ -53,7 +54,7 @@ class ShoppingListsView extends ConsumerWidget {
       initial: 'Compra ${AppUtils.formatFechaCorta(DateTime.now())}',
     );
     if (name == null || !context.mounted) return;
-    final id = await ref.read(shoppingListsProvider.notifier).create(name);
+    final id = await ref.read(shoppingListsActionsProvider).create(name);
     if (!context.mounted) return;
     Navigator.push(
       context,
@@ -72,7 +73,7 @@ class ShoppingListsView extends ConsumerWidget {
       initial: list.nombre,
     );
     if (name != null) {
-      await ref.read(shoppingListsProvider.notifier).rename(list.id!, name);
+      await ref.read(shoppingListsActionsProvider).rename(list.id!, name);
     }
   }
 
@@ -99,19 +100,30 @@ class ShoppingListsView extends ConsumerWidget {
       ),
     );
     if (ok == true) {
-      await ref.read(shoppingListsProvider.notifier).delete(list.id!);
+      await ref.read(shoppingListsActionsProvider).delete(list.id!);
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(shoppingListsProvider);
+    final async = ref.watch(shoppingListsProvider);
+    final lists = async.valueOrNull ?? const <ShoppingList>[];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Listas de compra'),
         backgroundColor: AppStyles.primary,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: 'Historial de precios',
+            icon: const Icon(Icons.query_stats),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PriceHistoryView()),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'nueva_lista',
@@ -119,9 +131,9 @@ class ShoppingListsView extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('Nueva lista'),
       ),
-      body: state.isLoading
+      body: async.isLoading && lists.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : state.lists.isEmpty
+          : lists.isEmpty
           ? EmptyState(
               icon: Icons.shopping_cart_outlined,
               title: 'Aún no tienes listas',
@@ -138,9 +150,9 @@ class ShoppingListsView extends ConsumerWidget {
             )
           : ListView.builder(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
-              itemCount: state.lists.length,
+              itemCount: lists.length,
               itemBuilder: (ctx, i) {
-                final list = state.lists[i];
+                final list = lists[i];
                 final done =
                     list.totalItems > 0 && list.comprados == list.totalItems;
                 return Card(

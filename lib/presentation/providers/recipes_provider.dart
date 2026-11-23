@@ -1,27 +1,40 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/datasources/recipe_local_data_source.dart';
-import '../../data/repositories/recipe_repository_impl.dart';
+
+import '../../domain/entities/food.dart';
+import '../../domain/entities/nutrition_facts.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/entities/recipe_match.dart';
 import '../../domain/repositories/recipe_repository.dart';
 import '../../domain/services/ingredient_matcher.dart';
+import '../../domain/services/nutrition_calculator.dart';
 import '../../domain/usecases/import_recipes.dart';
+import '../../domain/usecases/recipe_food.dart';
 import '../../domain/usecases/search_recipes_by_ingredients.dart';
-import 'home_provider.dart'; // localDataSourceProvider
+import 'core_providers.dart';
 
-final recipeRepositoryProvider = Provider<RecipeRepository>((ref) {
-  return RecipeRepositoryImpl(
-    RecipeLocalDataSourceImpl(ref.watch(localDataSourceProvider)),
-  );
-});
+export 'core_providers.dart';
 
 final searchRecipesByIngredientsProvider = Provider<SearchRecipesByIngredients>(
   (ref) => SearchRecipesByIngredients(),
 );
 
-final importRecipesProvider = Provider<ImportRecipes>((ref) {
-  return ImportRecipes(ref.watch(recipeRepositoryProvider));
-});
+final importRecipesProvider = Provider<ImportRecipes>(
+  (ref) => ImportRecipes(ref.watch(recipeRepositoryProvider)),
+);
+
+final suggestIngredientLinksProvider = Provider<SuggestIngredientLinks>(
+  (ref) => SuggestIngredientLinks(ref.watch(foodRepositoryProvider)),
+);
+
+final saveRecipeAsFoodProvider = Provider<SaveRecipeAsFood>(
+  (ref) => SaveRecipeAsFood(
+    ref.watch(foodRepositoryProvider),
+    ref.watch(recipeRepositoryProvider),
+    ref.watch(transactionRunnerProvider),
+  ),
+);
 
 enum RecipeSearchMode { ingredientes, nombre }
 
@@ -67,19 +80,20 @@ class RecipesState {
   }
 }
 
+/// Recetas (observa la base de datos) y estado de la búsqueda.
 class RecipesNotifier extends StateNotifier<RecipesState> {
   final Ref _ref;
+  StreamSubscription<List<Recipe>>? _sub;
+
+  RecipesNotifier(this._ref) : super(const RecipesState(isLoading: true)) {
+    _sub = _repo.watchAll().listen((recipes) {
+      if (mounted) {
+        state = state.copyWith(recipes: recipes, isLoading: false);
+      }
+    });
+  }
+
   RecipeRepository get _repo => _ref.read(recipeRepositoryProvider);
-
-  RecipesNotifier(this._ref) : super(const RecipesState()) {
-    load();
-  }
-
-  Future<void> load() async {
-    state = state.copyWith(isLoading: true);
-    final recipes = await _repo.getAllRecipes();
-    state = state.copyWith(recipes: recipes, isLoading: false);
-  }
 
   void setQuery(String q) => state = state.copyWith(query: q);
   void setMode(RecipeSearchMode m) => state = state.copyWith(mode: m);
@@ -92,29 +106,22 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
     state = state.copyWith(query: rest);
   }
 
-  Future<int> save(Recipe recipe) async {
-    final id = await _repo.saveRecipe(recipe);
-    _ref.invalidate(recipeDetailProvider(id));
-    await load();
-    return id;
-  }
+  Future<int> save(Recipe recipe) => _repo.save(recipe);
 
-  Future<void> delete(int id) async {
-    await _repo.deleteRecipe(id);
-    await load();
-  }
+  Future<void> delete(int id) => _repo.delete(id);
 
   Future<void> toggleFavorite(Recipe recipe) async {
     if (recipe.id == null) return;
     await _repo.setFavorite(recipe.id!, !recipe.favorita);
-    _ref.invalidate(recipeDetailProvider(recipe.id!));
-    await load();
   }
 
-  Future<int> importRecipes(List<Recipe> recipes) async {
-    final saved = await _ref.read(importRecipesProvider)(recipes);
-    await load();
-    return saved;
+  Future<int> importRecipes(List<Recipe> recipes) =>
+      _ref.read(importRecipesProvider)(recipes);
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 }
 
@@ -148,9 +155,61 @@ final recipesByNameProvider = Provider<List<Recipe>>((ref) {
       .toList();
 });
 
-final recipeDetailProvider = FutureProvider.autoDispose.family<Recipe?, int>((
-  ref,
-  id,
-) {
-  return ref.watch(recipeRepositoryProvider).getRecipe(id);
-});
+final recipeDetailProvider = StreamProvider.autoDispose.family<Recipe?, int>(
+  (ref, id) => ref.watch(recipeRepositoryProvider).watch(id),
+);
+
+/// Receta + alimentos de sus ingredientes + nutrición calculada. Se recalcula
+/// solo al editar la receta o completar cualquiera de sus alimentos.
+class RecipeAnalysis {
+  final Recipe receta;
+  final Map<int, Food> alimentos;
+  final Map<int, List<FoodPortion>> porciones;
+  final RecipeNutrition nutricion;
+
+  const RecipeAnalysis({
+    required this.receta,
+    required this.alimentos,
+    required this.porciones,
+    required this.nutricion,
+  });
+
+  /// Comida virtual con la nutrición por 100 g, para registrar una porción
+  /// en el contador.
+  Food? get comoAlimento {
+    final p100 = nutricion.por100;
+    if (p100 == null || !nutricion.completa) return null;
+    return Food(
+      id: receta.alimentoId,
+      nombre: receta.nombre,
+      tipo: FoodType.preparado,
+      nutricion: p100,
+      origenNutricion: NutritionSource.calculado,
+    );
+  }
+}
+
+final recipeAnalysisProvider = StreamProvider.autoDispose
+    .family<RecipeAnalysis?, int>((ref, id) {
+      final recipe = ref.watch(recipeDetailProvider(id)).valueOrNull;
+      if (recipe == null) return Stream.value(null);
+      final ids = {
+        for (final i in recipe.ingredientes)
+          if (i.alimentoId != null) i.alimentoId!,
+      };
+      return ref
+          .watch(foodRepositoryProvider)
+          .watchFoodsWithPortions(ids)
+          .map(
+            (d) => RecipeAnalysis(
+              receta: recipe,
+              alimentos: d.alimentos,
+              porciones: d.porciones,
+              nutricion: calculateRecipeNutrition(
+                recipe,
+                alimentos: d.alimentos,
+                porciones: d.porciones,
+              ),
+            ),
+          );
+    });

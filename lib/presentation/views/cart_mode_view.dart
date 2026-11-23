@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/styles.dart';
 import '../../core/utils.dart';
-import '../../domain/entities/product.dart';
+import '../../domain/entities/food.dart';
 import '../../domain/entities/shopping_list.dart';
+import '../../domain/errors/domain_errors.dart';
 import '../../domain/services/cart_matching.dart';
-import '../providers/products_provider.dart';
+import '../../domain/usecases/food_registration.dart';
 import '../providers/shopping_provider.dart';
 import '../widgets/cart_price_sheet.dart';
 import 'barcode_scanner_view.dart';
+import 'food_picker_view.dart';
 
 /// Construye el lector de códigos; permite sustituir la cámara en tests.
 typedef CartScannerBuilder =
@@ -19,6 +22,9 @@ typedef CartScannerBuilder =
 /// en el carrito. Cada producto se confirma con su precio (precargado si hay
 /// historial; si no, se pide), suma al total, marca la lista y registra la
 /// compra en el historial con la tienda elegida al entrar.
+///
+/// Un código desconocido NO pide la tabla nutricional: avisa y da de alta lo
+/// básico (nombre, marca, presentación); se completa luego en casa.
 class CartModeView extends ConsumerStatefulWidget {
   final int listaId;
   final CartScannerBuilder? scannerBuilder;
@@ -39,6 +45,9 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
   String? _lastCode;
   DateTime? _lastAt;
 
+  /// Alimentos dados de alta en esta compra (pendientes de completar).
+  final Set<int> _nuevos = {};
+
   ShoppingItemsNotifier get _notifier =>
       ref.read(shoppingItemsProvider(widget.listaId).notifier);
 
@@ -51,7 +60,7 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
   Future<void> _chooseStore() async {
     List<String> tiendas;
     try {
-      tiendas = await ref.read(productRepositoryProvider).getStores();
+      tiendas = await ref.read(purchaseRepositoryProvider).getStoreNames();
     } catch (_) {
       tiendas = const [];
     }
@@ -92,14 +101,12 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
     }
     _busy = true;
     try {
-      final product = await ref
-          .read(productRepositoryProvider)
-          .getProductByBarcode(code);
+      final match = await ref.read(foodRepositoryProvider).findByBarcode(code);
       if (!mounted) return;
-      if (product == null) {
+      if (match == null) {
         await _addNewProduct(code);
       } else {
-        await _addKnownProduct(product);
+        await _addKnown(match.food, presentacion: match.package);
       }
     } catch (e) {
       if (mounted) _toast('No se pudo añadir: $e');
@@ -111,47 +118,59 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
     }
   }
 
-  Future<void> _addKnownProduct(Product product) async {
+  Future<void> _addKnown(
+    Food food, {
+    FoodPackage? presentacion,
+    int? itemId,
+  }) async {
     final items = ref.read(shoppingItemsProvider(widget.listaId)).items;
-    final target = findItemForProduct(items, product);
-    final enCarrito =
-        target != null &&
-        target.comprado &&
-        (target.precioPagado != null || target.compraId != null);
+    ShoppingItem? target;
+    if (itemId != null) {
+      target = items.where((i) => i.id == itemId).firstOrNull;
+    }
+    target ??= findItemForFood(items, food);
+    final enCarrito = target != null && target.enCarrito;
+    final last = await ref
+        .read(purchaseRepositoryProvider)
+        .lastPurchaseForFood(food.id!, establecimiento: _tienda);
+    if (!mounted) return;
     final detalle = [
-      if ((product.marca ?? '').isNotEmpty) product.marca!,
-      if ((product.presentacion ?? '').isNotEmpty) product.presentacion!,
+      if (food.marca.isNotEmpty) food.marca,
+      if ((presentacion?.descripcion ?? '').isNotEmpty)
+        presentacion!.descripcion,
     ].join(' · ');
 
     final res = await CartPriceSheet.show(
       context,
       CartPriceSheet(
-        titulo: product.nombre,
+        titulo: food.nombre,
         detalle: detalle,
-        ultima: product.ultimaCompra,
-        precioInicial: enCarrito
-            ? target.precioPagado
-            : product.ultimaCompra?.precio,
+        ultima: last?.compra,
+        precioInicialCent: enCarrito
+            ? target.precioCent
+            : last?.compra.precioCent,
         yaEnCarrito: enCarrito ? target.unidades : 0,
         marcaraItem:
-            target != null && !target.comprado && target.texto != product.nombre
+            target != null && !target.comprado && target.texto != food.nombre
             ? target.texto
             : null,
         fueraDeLista: target == null,
       ),
     );
     if (res == null || !mounted) return;
-    await _notifier.addProductToCart(
-      producto: product,
-      precio: res.precio,
+    await _notifier.addToCart(
+      alimento: food,
+      presentacionId: presentacion?.id,
+      itemId: target?.id,
+      precioCent: res.precioCent,
       unidades: res.unidades,
       establecimiento: _tienda!,
     );
     HapticFeedback.lightImpact();
     if (mounted) {
       _toast(
-        '✓ ${product.nombre} · '
-        '${AppUtils.formatPrecio(res.precio * res.unidades)}',
+        '✓ ${food.nombre} · '
+        '${AppUtils.formatPrecioCent(res.precioCent * res.unidades)}',
       );
     }
   }
@@ -159,40 +178,62 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
   Future<void> _addNewProduct(String code) async {
     final res = await NewProductSheet.show(context, code);
     if (res == null || !mounted) return;
-    final productsNotifier = ref.read(productsProvider.notifier);
-    final id = await productsNotifier.saveProduct(
-      Product(codigoBarras: code, nombre: res.nombre, marca: res.marca),
-    );
-    final product = await ref.read(productRepositoryProvider).getProduct(id);
-    if (product == null || !mounted) return;
-    // saveProduct recrea los providers de la lista: se relee el notifier.
-    await _notifier.addProductToCart(
-      producto: product,
-      precio: res.precio,
+    int? existenteId;
+    if (res.otraPresentacion) {
+      final food = await FoodPickerView.pick(
+        context,
+        title: '¿De qué alimento es este código?',
+      );
+      if (food == null || !mounted) return;
+      existenteId = food.id;
+    }
+    final BarcodeMatch match;
+    try {
+      match = await ref.read(registerFoodInStoreProvider)(
+        nombre: res.nombre,
+        marca: res.marca,
+        unidad: FoodUnit.fromClave(res.unidad),
+        alimentoExistenteId: existenteId,
+        presentacion: PackageDraft(
+          codigoBarras: code,
+          descripcion: res.presentacion,
+          contenido: res.contenido,
+        ),
+      );
+    } on DuplicateBarcodeException catch (e) {
+      if (mounted) _toast(e.toString());
+      return;
+    }
+    if (!mounted) return;
+    if (match.food.pendiente) _nuevos.add(match.food.id!);
+    await _notifier.addToCart(
+      alimento: match.food,
+      presentacionId: match.package.id,
+      precioCent: res.precioCent,
       unidades: res.unidades,
       establecimiento: _tienda!,
     );
     HapticFeedback.lightImpact();
     if (mounted) {
       _toast(
-        '✓ ${product.nombre} · '
-        '${AppUtils.formatPrecio(res.precio * res.unidades)}',
+        '✓ ${match.food.nombre} · '
+        '${AppUtils.formatPrecioCent(res.precioCent * res.unidades)}',
       );
     }
   }
 
   /// Tocar un artículo del carrito: corregir precio/unidades o quitarlo.
   Future<void> _editCartItem(ShoppingItem item) async {
+    if (item.compraId == null) return _addPendingItem(item);
     _busy = true;
     try {
       final res = await CartPriceSheet.show(
         context,
         CartPriceSheet(
           titulo: item.texto,
-          precioInicial: item.precioPagado,
+          precioInicialCent: item.precioCent,
           unidadesIniciales: item.unidades,
           edicion: true,
-          sinHistorial: item.productoId == null,
         ),
       );
       if (res == null || !mounted) return;
@@ -202,7 +243,7 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
       } else {
         await _notifier.updateCartItem(
           item,
-          precio: res.precio,
+          precioCent: res.precioCent,
           unidades: res.unidades,
         );
       }
@@ -212,36 +253,33 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
   }
 
   /// Tocar un pendiente: meterlo en el carrito sin escanear (fruta a granel,
-  /// productos sin código...).
+  /// productos sin código...). Si no está vinculado a un alimento se elige o
+  /// se crea (todo lo comprado entra en el repertorio).
   Future<void> _addPendingItem(ShoppingItem item) async {
     _busy = true;
     try {
-      if (item.productoId != null) {
-        final product = await ref
-            .read(productRepositoryProvider)
-            .getProduct(item.productoId!);
-        if (product != null && mounted) {
-          await _addKnownProduct(product);
-          return;
-        }
+      Food? food;
+      if (item.alimentoId != null) {
+        food = await ref.read(foodRepositoryProvider).getFood(item.alimentoId!);
       }
-      if (!mounted) return;
-      final res = await CartPriceSheet.show(
-        context,
-        CartPriceSheet(titulo: item.texto, sinHistorial: true),
-      );
-      if (res == null || !mounted) return;
-      await _notifier.updateCartItem(
-        item,
-        precio: res.precio,
-        unidades: res.unidades,
-      );
+      if (food == null) {
+        if (!mounted) return;
+        food = await FoodPickerView.pick(
+          context,
+          initialQuery: item.texto,
+          title: '¿Qué es «${item.texto}»?',
+        );
+      }
+      if (food == null || !mounted) return;
+      if (food.pendiente) _nuevos.add(food.id!);
+      await _addKnown(food, itemId: item.id);
     } finally {
       _busy = false;
     }
   }
 
   Future<void> _finish(ShoppingItemsState state) async {
+    final pendientesNuevos = _nuevos.length;
     final action = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -251,7 +289,7 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppUtils.formatPrecio(state.totalCarrito),
+              AppUtils.formatPrecioCent(state.totalCarritoCent),
               style: Theme.of(
                 ctx,
               ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -263,15 +301,28 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
             ),
             if (state.compradosSinPrecio > 0)
               Text(
-                '${state.compradosSinPrecio} sin precio (no suman)',
+                '${state.compradosSinPrecio} marcados sin precio (no suman)',
                 style: const TextStyle(color: AppStyles.semaphOrange),
               ),
             if (state.pendientes.isNotEmpty)
               Text('Quedan ${state.pendientes.length} pendientes en la lista.'),
+            if (pendientesNuevos > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  pendientesNuevos == 1
+                      ? 'Has añadido 1 producto nuevo sin tabla nutricional: '
+                            'lo verás en Alimentos → Pendientes para '
+                            'completarlo en casa.'
+                      : 'Has añadido $pendientesNuevos productos nuevos sin '
+                            'tabla nutricional: los verás en Alimentos → '
+                            'Pendientes para completarlos en casa.',
+                  style: const TextStyle(color: AppStyles.semaphBlue),
+                ),
+              ),
             const SizedBox(height: 8),
             const Text(
-              'Los precios de los productos ya están guardados en el '
-              'historial.',
+              'Los precios ya están guardados en el historial.',
               style: AppStyles.labelText,
             ),
           ],
@@ -298,7 +349,7 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
   }
 
   Widget _cartTile(ShoppingItem item) {
-    final precio = item.precioPagado;
+    final precio = item.precioCent;
     return ListTile(
       dense: true,
       leading: CircleAvatar(
@@ -315,9 +366,9 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
               'Sin precio · toca para añadirlo',
               style: TextStyle(color: AppStyles.semaphOrange),
             )
-          : Text('${AppUtils.formatPrecio(precio)} / ud.'),
+          : Text('${AppUtils.formatPrecioCent(precio)} / ud.'),
       trailing: Text(
-        precio == null ? '—' : AppUtils.formatPrecio(item.subtotal!),
+        precio == null ? '—' : AppUtils.formatPrecioCent(item.subtotalCent!),
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       onTap: () => _editCartItem(item),
@@ -394,14 +445,14 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
                               if (pendientes.isNotEmpty)
                                 Text(
                                   'Te faltan ${pendientes.length}'
-                                  '${state.estimadoPendiente > 0 ? ' (≈ ${AppUtils.formatPrecio(state.estimadoPendiente)})' : ''}',
+                                  '${state.estimadoPendienteCent > 0 ? ' (≈ ${AppUtils.formatPrecioCent(state.estimadoPendienteCent)})' : ''}',
                                   style: AppStyles.labelText,
                                 ),
                             ],
                           ),
                         ),
                         Text(
-                          AppUtils.formatPrecio(state.totalCarrito),
+                          AppUtils.formatPrecioCent(state.totalCarritoCent),
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -430,22 +481,21 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
                           initiallyExpanded: comprados.isEmpty,
                           leading: const Icon(Icons.checklist),
                           title: Text('Te falta (${pendientes.length})'),
-                          children: pendientes
-                              .map(
-                                (i) => ListTile(
-                                  dense: true,
-                                  leading: const Icon(
-                                    Icons.check_box_outline_blank,
-                                  ),
-                                  title: Text(i.texto),
-                                  subtitle: (i.cantidad ?? '').isEmpty
-                                      ? null
-                                      : Text(i.cantidad!),
-                                  trailing: const Icon(Icons.add_shopping_cart),
-                                  onTap: () => _addPendingItem(i),
+                          children: [
+                            for (final i in pendientes)
+                              ListTile(
+                                dense: true,
+                                leading: const Icon(
+                                  Icons.check_box_outline_blank,
                                 ),
-                              )
-                              .toList(),
+                                title: Text(i.texto),
+                                subtitle: (i.cantidad ?? '').isEmpty
+                                    ? null
+                                    : Text(i.cantidad!),
+                                trailing: const Icon(Icons.add_shopping_cart),
+                                onTap: () => _addPendingItem(i),
+                              ),
+                          ],
                         ),
                     ],
                   ),
