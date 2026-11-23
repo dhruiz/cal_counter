@@ -16,10 +16,16 @@ abstract class ShoppingListRepository {
   /// Añade al final de la lista. Devuelve el id.
   Future<int> addItem(ShoppingItem item);
 
-  /// Actualiza texto, cantidad, producto y estado comprado.
+  /// Actualiza texto, cantidad, producto, estado comprado y datos del carrito
+  /// (unidades, precio pagado, compra registrada).
   Future<void> updateItem(ShoppingItem item);
+
+  /// Marca o desmarca. Desmarcar saca el artículo del carrito (unidades = 1,
+  /// sin precio pagado ni compra vinculada) sin borrar la compra del historial.
   Future<void> setItemBought(int itemId, bool comprado);
   Future<void> deleteItem(int itemId);
   Future<void> deleteBoughtItems(int listaId);
+
+  /// Como [setItemBought] para toda la lista.
   Future<void> setAllBought(int listaId, bool comprado);
 }

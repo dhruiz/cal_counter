@@ -24,6 +24,9 @@ class ShoppingItemModel {
       productoId: m['producto_id'] as int?,
       comprado: (m['comprado'] as int? ?? 0) == 1,
       orden: (m['orden'] as int?) ?? 0,
+      unidades: (m['unidades'] as int?) ?? 1,
+      precioPagado: (m['precio_pagado'] as num?)?.toDouble(),
+      compraId: m['compra_id'] as int?,
       precioReferencia: (m['ref_precio'] as num?)?.toDouble(),
       establecimientoReferencia: m['ref_establecimiento'] as String?,
     );
@@ -37,6 +40,9 @@ class ShoppingItemModel {
       'cantidad': (cantidad == null || cantidad.isEmpty) ? null : cantidad,
       'producto_id': i.productoId,
       'comprado': i.comprado ? 1 : 0,
+      'unidades': i.unidades < 1 ? 1 : i.unidades,
+      'precio_pagado': i.precioPagado,
+      'compra_id': i.compraId,
     };
   }
 }

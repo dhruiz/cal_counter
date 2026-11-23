@@ -80,11 +80,38 @@ Future<void> createModuleTables(DatabaseExecutor db) async {
       cantidad TEXT,
       producto_id INTEGER,
       comprado INTEGER NOT NULL DEFAULT 0,
-      orden INTEGER NOT NULL
+      orden INTEGER NOT NULL,
+      unidades INTEGER NOT NULL DEFAULT 1,
+      precio_pagado REAL,
+      compra_id INTEGER
     )
   ''');
+  // Modo carrito: migración para tablas creadas antes de estas columnas.
+  // precio_pagado = precio unitario pagado en esta compra; compra_id = fila de
+  // `compras` registrada desde el artículo (para corregirla o deshacerla).
+  await ensureColumn(
+    db,
+    'items_lista_compra',
+    'unidades',
+    'INTEGER NOT NULL DEFAULT 1',
+  );
+  await ensureColumn(db, 'items_lista_compra', 'precio_pagado', 'REAL');
+  await ensureColumn(db, 'items_lista_compra', 'compra_id', 'INTEGER');
   await db.execute(
     'CREATE INDEX IF NOT EXISTS idx_items_lista_compra '
     'ON items_lista_compra(lista_id)',
   );
+}
+
+/// Añade [column] a [table] solo si aún no existe (ALTER idempotente).
+Future<void> ensureColumn(
+  DatabaseExecutor db,
+  String table,
+  String column,
+  String definition,
+) async {
+  final info = await db.rawQuery('PRAGMA table_info($table)');
+  if (!info.any((row) => row['name'] == column)) {
+    await db.execute('ALTER TABLE $table ADD COLUMN $column $definition');
+  }
 }

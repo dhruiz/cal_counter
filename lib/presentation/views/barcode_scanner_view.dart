@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../core/styles.dart';
 
-/// Lector de códigos de barras con la cámara. Devuelve el código leído
+/// Lector de códigos de barras a pantalla completa. Devuelve el código leído
 /// (`Navigator.pop(context, codigo)`) o null si se cancela. Permite escribir
 /// el código a mano si la cámara no está disponible.
 class BarcodeScannerView extends StatefulWidget {
@@ -27,8 +27,87 @@ class BarcodeScannerView extends StatefulWidget {
 }
 
 class _BarcodeScannerViewState extends State<BarcodeScannerView> {
+  bool _handled = false;
+
+  void _onCode(String code) {
+    if (_handled) return;
+    _handled = true;
+    Navigator.pop(context, code);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text(widget.title),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
+      body: BarcodeScannerPanel(onCode: _onCode),
+    );
+  }
+}
+
+/// Pide el código escrito a mano. Devuelve null si se cancela.
+Future<String?> askBarcodeManually(BuildContext context) async {
+  final ctrl = TextEditingController();
+  final code = await showDialog<String>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Escribir código'),
+      content: TextField(
+        controller: ctrl,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          labelText: 'Números bajo las barras',
+          hintText: 'Ej: 8410000000000',
+        ),
+        onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+          child: const Text('Aceptar'),
+        ),
+      ],
+    ),
+  );
+  ctrl.dispose();
+  return (code == null || code.isEmpty) ? null : code;
+}
+
+/// Cámara con marco, linterna, mensajes de error y entrada manual del código.
+///
+/// Llama a [onCode] por cada código detectado (con vibración). No filtra
+/// repeticiones: quien lo usa decide (la vista a pantalla completa se cierra
+/// con el primero; el modo carrito aplica su propia espera). Con [compacto]
+/// se adapta a una franja de la pantalla.
+class BarcodeScannerPanel extends StatefulWidget {
+  final ValueChanged<String> onCode;
+  final bool compacto;
+  final String instrucciones;
+
+  const BarcodeScannerPanel({
+    super.key,
+    required this.onCode,
+    this.compacto = false,
+    this.instrucciones = 'Apunta al código de barras del envase',
+  });
+
+  @override
+  State<BarcodeScannerPanel> createState() => _BarcodeScannerPanelState();
+}
+
+class _BarcodeScannerPanelState extends State<BarcodeScannerPanel> {
   final MobileScannerController _controller = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
+    detectionSpeed: DetectionSpeed.normal,
+    detectionTimeoutMs: 500,
     formats: const [
       BarcodeFormat.ean13,
       BarcodeFormat.ean8,
@@ -39,7 +118,6 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
       BarcodeFormat.itf14,
     ],
   );
-  bool _handled = false;
 
   @override
   void dispose() {
@@ -48,50 +126,19 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
   }
 
   void _onDetect(BarcodeCapture capture) {
-    if (_handled) return;
     for (final b in capture.barcodes) {
       final code = b.rawValue?.trim();
       if (code != null && code.isNotEmpty) {
-        _handled = true;
         HapticFeedback.mediumImpact();
-        Navigator.pop(context, code);
+        widget.onCode(code);
         return;
       }
     }
   }
 
   Future<void> _typeManually() async {
-    final ctrl = TextEditingController();
-    final code = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Escribir código'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Números bajo las barras',
-            hintText: 'Ej: 8410000000000',
-          ),
-          onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: const Text('Aceptar'),
-          ),
-        ],
-      ),
-    );
-    ctrl.dispose();
-    if (!mounted || code == null || code.isEmpty) return;
-    _handled = true;
-    Navigator.pop(context, code);
+    final code = await askBarcodeManually(context);
+    if (code != null && mounted) widget.onCode(code);
   }
 
   Widget _buildError(BuildContext context, MobileScannerException error) {
@@ -99,7 +146,7 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
     switch (error.errorCode) {
       case MobileScannerErrorCode.permissionDenied:
         message =
-            'La app no tiene permiso para usar la cámara.\n\n'
+            'La app no tiene permiso para usar la cámara.\n'
             'Actívalo en Ajustes del teléfono → Aplicaciones → cal_counter → '
             'Permisos → Cámara, o escribe el código a mano.';
       case MobileScannerErrorCode.unsupported:
@@ -114,16 +161,23 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
     return ColoredBox(
       color: Colors.black,
       child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppStyles.paddingLarge),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppStyles.paddingMedium),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.no_photography, color: Colors.white70, size: 64),
-              const SizedBox(height: AppStyles.paddingMedium),
+              Icon(
+                Icons.no_photography,
+                color: Colors.white70,
+                size: widget.compacto ? 32 : 64,
+              ),
+              const SizedBox(height: AppStyles.paddingSmall),
               Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: widget.compacto ? 13 : 16,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -133,43 +187,43 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
     );
   }
 
+  Widget _torchButton() {
+    return ValueListenableBuilder<MobileScannerState>(
+      valueListenable: _controller,
+      builder: (context, state, _) {
+        if (state.torchState == TorchState.unavailable) {
+          return const SizedBox.shrink();
+        }
+        final on = state.torchState == TorchState.on;
+        return IconButton(
+          tooltip: on ? 'Apagar linterna' : 'Encender linterna',
+          color: Colors.white,
+          icon: Icon(on ? Icons.flash_on : Icons.flash_off),
+          onPressed: _controller.toggleTorch,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        actions: [
-          ValueListenableBuilder<MobileScannerState>(
-            valueListenable: _controller,
-            builder: (context, state, _) {
-              if (state.torchState == TorchState.unavailable) {
-                return const SizedBox.shrink();
-              }
-              final on = state.torchState == TorchState.on;
-              return IconButton(
-                tooltip: on ? 'Apagar linterna' : 'Encender linterna',
-                icon: Icon(on ? Icons.flash_on : Icons.flash_off),
-                onPressed: _controller.toggleTorch,
-              );
-            },
-          ),
-        ],
-      ),
-      body: Stack(
+    final compacto = widget.compacto;
+    return ColoredBox(
+      color: Colors.black,
+      child: Stack(
         children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-            errorBuilder: _buildError,
+          Positioned.fill(
+            child: MobileScanner(
+              controller: _controller,
+              onDetect: _onDetect,
+              errorBuilder: _buildError,
+            ),
           ),
           IgnorePointer(
             child: Center(
               child: Container(
-                width: 280,
-                height: 160,
+                width: compacto ? 240 : 280,
+                height: compacto ? 110 : 160,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: 3),
                   borderRadius: BorderRadius.circular(16),
@@ -177,40 +231,68 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(AppStyles.paddingMedium),
-                padding: const EdgeInsets.all(AppStyles.paddingMedium),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Apunta al código de barras del envase',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                      textAlign: TextAlign.center,
+          Positioned(top: 4, right: 4, child: _torchButton()),
+          if (compacto)
+            Positioned(
+              left: 8,
+              right: 8,
+              bottom: 6,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.instrucciones,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      maxLines: 2,
                     ),
-                    const SizedBox(height: AppStyles.paddingSmall),
-                    OutlinedButton.icon(
-                      onPressed: _typeManually,
-                      icon: const Icon(Icons.keyboard),
-                      label: const Text('Escribir el código a mano'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white70),
+                  ),
+                  TextButton.icon(
+                    onPressed: _typeManually,
+                    style: TextButton.styleFrom(foregroundColor: Colors.white),
+                    icon: const Icon(Icons.keyboard, size: 18),
+                    label: const Text('A mano'),
+                  ),
+                ],
+              ),
+            )
+          else
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.all(AppStyles.paddingMedium),
+                  padding: const EdgeInsets.all(AppStyles.paddingMedium),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.instrucciones,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppStyles.paddingSmall),
+                      OutlinedButton.icon(
+                        onPressed: _typeManually,
+                        icon: const Icon(Icons.keyboard),
+                        label: const Text('Escribir el código a mano'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(color: Colors.white70),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

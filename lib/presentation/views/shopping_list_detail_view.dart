@@ -8,14 +8,13 @@ import '../../domain/entities/shopping_list.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../providers/products_provider.dart';
 import '../providers/shopping_provider.dart';
-import '../widgets/purchase_dialog.dart';
-import 'barcode_scanner_view.dart';
-import 'product_form_view.dart';
+import '../widgets/cart_price_sheet.dart';
+import 'cart_mode_view.dart';
 import 'product_picker_view.dart';
 import 'shopping_lists_view.dart';
 
 /// Una lista de compra: añadir artículos (texto o productos), marcarlos como
-/// comprados, precio estimado y modo "escanear en el súper".
+/// comprados con su precio, total del carrito y acceso al «Modo carrito».
 class ShoppingListDetailView extends ConsumerStatefulWidget {
   final int listaId;
 
@@ -61,11 +60,87 @@ class _ShoppingListDetailViewState
     return ref.read(productRepositoryProvider).getProduct(item.productoId!);
   }
 
+  /// Precio y unidades de un artículo marcado a mano (fuera del modo
+  /// carrito). Con producto vinculado se pide también la tienda y se registra
+  /// en el historial; sin producto, solo cuenta para el total del carrito.
   Future<void> _askPrice(ShoppingItem item) async {
     final product = await _productOf(item);
-    if (product == null || !mounted) return;
-    final ok = await PurchaseDialog.show(context, product);
-    if (ok && mounted) {
+    if (!mounted) return;
+    if (product == null) {
+      final res = await CartPriceSheet.show(
+        context,
+        CartPriceSheet(
+          titulo: item.texto,
+          precioInicial: item.precioPagado,
+          unidadesIniciales: item.unidades,
+          sinHistorial: true,
+          edicion: item.precioPagado != null,
+        ),
+      );
+      if (res == null || !mounted) return;
+      if (res.quitar) {
+        await _notifier.removeFromCart(item);
+      } else {
+        await _notifier.updateCartItem(
+          item,
+          precio: res.precio,
+          unidades: res.unidades,
+        );
+      }
+      return;
+    }
+
+    if (item.compraId != null) {
+      // Ya registrado: corregir precio/unidades o quitarlo del carrito.
+      final res = await CartPriceSheet.show(
+        context,
+        CartPriceSheet(
+          titulo: product.nombre,
+          precioInicial: item.precioPagado,
+          unidadesIniciales: item.unidades,
+          edicion: true,
+        ),
+      );
+      if (res == null || !mounted) return;
+      if (res.quitar) {
+        await _notifier.removeFromCart(item);
+      } else {
+        await _notifier.updateCartItem(
+          item,
+          precio: res.precio,
+          unidades: res.unidades,
+        );
+      }
+      return;
+    }
+
+    List<String> tiendas;
+    try {
+      tiendas = await ref.read(productRepositoryProvider).getStores();
+    } catch (_) {
+      tiendas = const [];
+    }
+    if (!mounted) return;
+    final res = await CartPriceSheet.show(
+      context,
+      CartPriceSheet(
+        titulo: product.nombre,
+        ultima: product.ultimaCompra,
+        precioInicial: product.ultimaCompra?.precio,
+        tiendas: tiendas,
+        tiendaInicial:
+            product.ultimaCompra?.establecimiento ??
+            (tiendas.isEmpty ? null : tiendas.first),
+      ),
+    );
+    if (res == null || !mounted) return;
+    await _notifier.addProductToCart(
+      producto: product,
+      precio: res.precio,
+      unidades: res.unidades,
+      establecimiento: res.tienda ?? '',
+    );
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Precio de ${product.nombre} registrado')),
       );
@@ -75,81 +150,34 @@ class _ShoppingListDetailViewState
   Future<void> _toggle(ShoppingItem item) async {
     final comprado = !item.comprado;
     await _notifier.setBought(item, comprado);
-    if (!mounted || !comprado || item.productoId == null) return;
+    if (!mounted || !comprado) return;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${item.texto} comprado'),
         action: SnackBarAction(
-          label: 'Registrar precio',
-          onPressed: () => _askPrice(item),
+          label: 'Añadir precio',
+          onPressed: () {
+            // Relee el artículo: el estado ya cambió al marcarlo.
+            final current = ref
+                .read(shoppingItemsProvider(widget.listaId))
+                .items
+                .where((i) => i.id == item.id)
+                .firstOrNull;
+            if (current != null) _askPrice(current);
+          },
         ),
       ),
     );
   }
 
-  /// Escanear en el súper: marca el artículo (o lo añade) y pide el precio.
-  Future<void> _scan() async {
-    final code = await BarcodeScannerView.scan(
+  /// Modo carrito: escanear lo que se mete en el carrito con total en vivo.
+  Future<void> _openCartMode() async {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    await Navigator.push(
       context,
-      title: 'Escanear en el súper',
+      MaterialPageRoute(builder: (_) => CartModeView(listaId: widget.listaId)),
     );
-    if (code == null || !mounted) return;
-    final product = await ref
-        .read(productRepositoryProvider)
-        .getProductByBarcode(code);
-    if (!mounted) return;
-
-    if (product == null) {
-      final create = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Producto nuevo'),
-          content: Text(
-            'El código $code no está registrado. ¿Quieres registrarlo ahora? '
-            'Se añadirá a la lista como comprado.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Registrar'),
-            ),
-          ],
-        ),
-      );
-      if (create != true || !mounted) return;
-      final id = await Navigator.push<int>(
-        context,
-        MaterialPageRoute(builder: (_) => ProductFormView(codigoBarras: code)),
-      );
-      if (id == null || !mounted) return;
-      final created = await ref.read(productRepositoryProvider).getProduct(id);
-      if (created == null) return;
-      await _notifier.add(
-        texto: created.nombre,
-        productoId: created.id,
-        comprado: true,
-      );
-      return;
-    }
-
-    final items = ref.read(shoppingItemsProvider(widget.listaId)).items;
-    final match = items.where((i) => i.productoId == product.id && !i.comprado);
-    if (match.isNotEmpty) {
-      await _notifier.setBought(match.first, true);
-    } else {
-      await _notifier.add(
-        texto: product.nombre,
-        productoId: product.id,
-        comprado: true,
-      );
-    }
-    if (!mounted) return;
-    await PurchaseDialog.show(context, product);
   }
 
   Future<void> _edit(ShoppingItem item) async {
@@ -225,6 +253,7 @@ class _ShoppingListDetailViewState
       ),
     );
     if (save == true && textCtrl.text.trim().isNotEmpty) {
+      // Se conservan unidades, precio pagado y compra del carrito.
       await _notifier.update(
         ShoppingItem(
           id: item.id,
@@ -233,6 +262,10 @@ class _ShoppingListDetailViewState
           cantidad: qtyCtrl.text.trim(),
           productoId: productoId,
           comprado: item.comprado,
+          orden: item.orden,
+          unidades: item.unidades,
+          precioPagado: item.precioPagado,
+          compraId: productoId == item.productoId ? item.compraId : null,
         ),
       );
     }
@@ -304,9 +337,13 @@ class _ShoppingListDetailViewState
 
   Widget _itemTile(ShoppingItem item) {
     final theme = Theme.of(context);
+    final pagado = item.precioPagado;
     final info = [
       if ((item.cantidad ?? '').isNotEmpty) item.cantidad!,
-      if (item.precioReferencia != null)
+      if (item.comprado && pagado != null)
+        '${item.unidades} × ${AppUtils.formatPrecio(pagado)} = '
+            '${AppUtils.formatPrecio(item.subtotal!)}'
+      else if (item.precioReferencia != null)
         'Ref: ${AppUtils.formatPrecio(item.precioReferencia!)}'
             '${item.establecimientoReferencia == null ? '' : ' (${item.establecimientoReferencia})'}',
     ].join(' · ');
@@ -335,10 +372,10 @@ class _ShoppingListDetailViewState
               : null,
         ),
         subtitle: info.isEmpty ? null : Text(info),
-        trailing: item.productoId == null
+        trailing: item.productoId == null && !item.comprado
             ? null
             : IconButton(
-                tooltip: 'Registrar precio',
+                tooltip: 'Precio',
                 icon: const Icon(Icons.sell_outlined),
                 onPressed: () => _askPrice(item),
               ),
@@ -363,9 +400,9 @@ class _ShoppingListDetailViewState
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            tooltip: 'Escanear en el súper',
+            tooltip: 'Modo carrito',
             icon: const Icon(Icons.qr_code_scanner),
-            onPressed: _scan,
+            onPressed: _openCartMode,
           ),
           PopupMenuButton<String>(
             onSelected: (v) => _onMenu(v, list),
@@ -420,7 +457,8 @@ class _ShoppingListDetailViewState
                       padding: EdgeInsets.all(AppStyles.paddingLarge),
                       child: Text(
                         'Lista vacía. Escribe arriba lo que necesitas, '
-                        'añade productos guardados o escanea en el súper.',
+                        'añade productos guardados o abre el modo carrito '
+                        'en el súper.',
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -438,7 +476,7 @@ class _ShoppingListDetailViewState
                         ),
                       ...comprados.map(_itemTile),
                       const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 12, 16, 24),
+                        padding: EdgeInsets.fromLTRB(16, 12, 16, 88),
                         child: Text(
                           'Toca para marcar · mantén pulsado para editar · '
                           'desliza a la izquierda para borrar',
@@ -448,40 +486,62 @@ class _ShoppingListDetailViewState
                     ],
                   ),
           ),
-          if (state.items.any((i) => i.precioReferencia != null))
-            Material(
-              elevation: 4,
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calculate_outlined),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          state.sinPrecio == 0
-                              ? 'Total estimado'
-                              : 'Total estimado (${state.sinPrecio} sin precio)',
-                        ),
-                      ),
-                      Text(
-                        AppUtils.formatPrecio(state.totalEstimado),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'modo_carrito',
+        onPressed: _openCartMode,
+        icon: const Icon(Icons.shopping_cart_checkout),
+        label: const Text('Modo carrito'),
+      ),
+      bottomNavigationBar: _totalsBar(state),
+    );
+  }
+
+  /// Barra inferior: total del carrito y estimación de lo que falta.
+  Widget? _totalsBar(ShoppingItemsState state) {
+    final hayCarrito = state.comprados.any((i) => i.precioPagado != null);
+    final hayEstimado = state.estimadoPendiente > 0;
+    if (!hayCarrito && !hayEstimado) return null;
+    Widget row(String label, double value, {bool bold = false}) {
+      return Row(
+        children: [
+          Expanded(child: Text(label)),
+          Text(
+            AppUtils.formatPrecio(value),
+            style: TextStyle(
+              fontSize: bold ? 18 : 15,
+              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Material(
+      elevation: 4,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              row(
+                'En el carrito (${state.articulosEnCarrito})'
+                '${state.compradosSinPrecio > 0 ? ' · ${state.compradosSinPrecio} sin precio' : ''}',
+                state.totalCarrito,
+                bold: true,
+              ),
+              if (hayEstimado)
+                row(
+                  'Falta por comprar (estimado)'
+                  '${state.pendientesSinPrecio > 0 ? ' · ${state.pendientesSinPrecio} sin precio' : ''}',
+                  state.estimadoPendiente,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

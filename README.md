@@ -816,8 +816,12 @@ CREATE TABLE items_lista_compra (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   lista_id INTEGER NOT NULL, texto TEXT NOT NULL, cantidad TEXT,
   producto_id INTEGER,                    -- vínculo opcional: precio de referencia
-  comprado INTEGER NOT NULL DEFAULT 0, orden INTEGER NOT NULL
+  comprado INTEGER NOT NULL DEFAULT 0, orden INTEGER NOT NULL,
+  unidades INTEGER NOT NULL DEFAULT 1,    -- modo carrito: unidades en el carrito
+  precio_pagado REAL,                     -- precio unitario pagado en esta compra
+  compra_id INTEGER                       -- fila de compras registrada desde el artículo
 );
+-- unidades/precio_pagado/compra_id se añaden con ensureColumn (PRAGMA + ALTER) a tablas antiguas.
 -- Índices: ingredientes_receta(receta_id, orden), compras(producto_id, fecha), items_lista_compra(lista_id)
 ```
 
@@ -910,7 +914,7 @@ Los tres módulos son independientes del contador (pestañas propias) pero compa
 | Conexión | Dónde |
 | --- | --- |
 | Receta → lista de compra | `RecipeDetailView` → "Añadir lo que me falta a la lista" (`AddIngredientsToShoppingList` separa nombre y cantidad y omite los ya pendientes) |
-| Lista ↔ productos | Artículos vinculados a un producto muestran su último precio y suman al **total estimado**; al marcarlos se ofrece "Registrar precio"; el escáner de la lista marca/añade el producto y abre el diálogo de compra |
+| Lista ↔ productos | Artículos vinculados a un producto muestran su último precio (estimación de lo que falta); al marcarlos se ofrece "Añadir precio"; el **Modo carrito** escanea lo que metes en el carrito, suma el total, marca la lista y registra cada precio en el historial |
 | Receta ↔ calorías | `recetas.alimento_id` + `peso_porcion_g`: el detalle muestra kcal/macros por 100 g y por porción y "Registrar porción" abre `AddFoodPopup` con esa cantidad |
 | Producto ↔ calorías | `productos.alimento_id`: en `SearchView` el botón de escáner busca el producto y abre `AddFoodPopup` con su alimento (ofrece registrar/vincular si falta) |
 
@@ -959,6 +963,23 @@ PREPARACIÓN:
 - Añadir rápido escribiendo ("2 L de leche" → artículo "Leche", cantidad "2 L") o desde el catálogo de productos.
 - Pendientes arriba, comprados tachados abajo. Tocar = marcar; mantener pulsado = editar (texto, cantidad, producto vinculado); deslizar a la izquierda = borrar.
 - Menú: copiar como texto (para WhatsApp), desmarcar todo, quitar comprados, renombrar, eliminar.
+- Barra inferior: **En el carrito** (unidades × precio pagado de lo comprado) y **Falta por comprar (estimado)** con el último precio conocido de los pendientes.
+- Marcar a mano → SnackBar «Añadir precio»: con producto vinculado pide precio, unidades y tienda y lo registra en el historial (`AddProductToCart`); sin producto, el precio solo cuenta para el total. Desmarcar (o «Desmarcar todo») saca el artículo del carrito pero **conserva** la compra del historial.
+
+### Modo carrito (`CartModeView`)
+
+Botón/FAB «Modo carrito» en una lista: cámara siempre abierta para ir escaneando lo que se mete en el carrito.
+
+1. Al entrar pregunta **«¿En qué tienda estás?»** (autocompletado + accesos rápidos a las últimas tiendas); se usa para registrar todas las compras y se puede cambiar desde la AppBar.
+2. Cada código escaneado (`BarcodeScannerPanel` incrustado, escaneo continuo; el mismo código se acepta de nuevo tras ~2,5 s = una unidad más):
+   - **Producto con precio guardado** → tarjeta con el último precio precargado y unidades: **un toque** en «Añadir al carrito» (se puede corregir el precio de la etiqueta ahí mismo; no abre el teclado).
+   - **Producto sin precio** → el campo queda vacío y es obligatorio: «No hay precio guardado: escribe el de la etiqueta y quedará registrado».
+   - **No está en la lista** → aviso naranja y botón «Añadir aunque no está en la lista» (pregunta antes de sumarlo).
+   - **Código desconocido** → tarjeta «Producto nuevo» (nombre, marca, precio, unidades): crea el producto, registra la compra y lo mete en el carrito.
+3. `findItemForProduct` (`lib/domain/services/cart_matching.dart`) decide qué artículo marcar: el que ya está en el carrito (suma unidades) → pendiente vinculado al producto → pendiente sin vincular cuyo texto coincide ("Leche" ↔ "Leche entera", misma normalización que las recetas).
+4. `AddProductToCart` registra la compra en `compras` (precio unitario, tienda, hoy) y guarda en el artículo `unidades`, `precio_pagado` y `compra_id`. Escanear otra vez el mismo producto suma unidades sin duplicar la compra (si cambió el precio, la corrige). `UpdateCartItem` corrige precio/unidades (y la compra); `RemoveFromCart` («Quitar del carrito») borra la compra y devuelve el artículo a pendiente.
+5. Total en vivo, lista de lo que llevas («2× Leche 1,05 €/ud. = 2,10 €», tocar para editar o quitar) y sección «Te falta»: tocar un pendiente lo mete sin escanear (fruta a granel, productos sin código).
+6. «Terminar compra»: resumen (total, artículos, tienda) y opción de quitar los comprados de la lista o mantenerla.
 
 ---
 

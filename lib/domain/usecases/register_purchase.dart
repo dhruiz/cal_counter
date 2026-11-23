@@ -14,22 +14,36 @@ class RegisterPurchase {
     required String establecimiento,
     DateTime? fecha,
   }) async {
-    if (precio <= 0 || precio.isNaN || precio.isInfinite) {
-      throw ArgumentError('El precio debe ser mayor que 0.');
-    }
-    final store = establecimiento.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (store.isEmpty) {
-      throw ArgumentError('Indica el establecimiento.');
-    }
+    validarPrecio(precio);
     return repository.addPurchase(
       Purchase(
         productoId: productoId,
         fecha: dateOnly(fecha ?? DateTime.now()),
-        precio: (precio * 100).roundToDouble() / 100,
-        establecimiento: store,
+        precio: redondear(precio),
+        establecimiento: normalizarEstablecimiento(establecimiento),
       ),
     );
   }
+
+  /// Lanza [ArgumentError] si el precio no es un número mayor que 0.
+  static void validarPrecio(double precio) {
+    if (precio <= 0 || precio.isNaN || precio.isInfinite) {
+      throw ArgumentError('El precio debe ser mayor que 0.');
+    }
+  }
+
+  /// Espacios normalizados; lanza [ArgumentError] si queda vacío.
+  static String normalizarEstablecimiento(String establecimiento) {
+    final store = establecimiento.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (store.isEmpty) {
+      throw ArgumentError('Indica el establecimiento.');
+    }
+    return store;
+  }
+
+  /// Redondea a céntimos.
+  static double redondear(double precio) =>
+      (precio * 100).roundToDouble() / 100;
 
   /// Interpreta un precio escrito por el usuario: "2,35", "2.35", "1.234,50",
   /// "€ 3". Devuelve null si no es válido.

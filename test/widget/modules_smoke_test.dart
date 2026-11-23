@@ -8,6 +8,7 @@ import 'package:cal_counter/presentation/providers/products_provider.dart';
 import 'package:cal_counter/presentation/providers/recipes_provider.dart';
 import 'package:cal_counter/presentation/providers/search_provider.dart';
 import 'package:cal_counter/presentation/providers/shopping_provider.dart';
+import 'package:cal_counter/presentation/views/cart_mode_view.dart';
 import 'package:cal_counter/presentation/views/main_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,6 +68,10 @@ void main() {
       ),
     );
     await products.saveProduct(const Product(nombre: 'Pan de barra'));
+    // Con código pero sin precio guardado y fuera de la lista.
+    await products.saveProduct(
+      const Product(codigoBarras: '5550001', nombre: 'Café molido'),
+    );
     await products.addPurchase(
       Purchase(
         productoId: leche,
@@ -96,7 +101,10 @@ void main() {
     );
   });
 
-  Future<void> pumpApp(WidgetTester tester) async {
+  Future<void> pumpApp(
+    WidgetTester tester, {
+    Widget home = const MainShell(),
+  }) async {
     tester.view.physicalSize = const Size(393 * 3, 851 * 3);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
@@ -120,7 +128,7 @@ void main() {
             ]),
           ),
         ],
-        child: const MaterialApp(home: MainShell()),
+        child: MaterialApp(home: home),
       ),
     );
     await tester.pumpAndSettle();
@@ -268,7 +276,11 @@ void main() {
 
     await tester.tap(find.text('Súper'));
     await tester.pumpAndSettle();
-    expect(find.text('Total estimado (2 sin precio)'), findsOneWidget);
+    expect(find.text('Modo carrito'), findsOneWidget);
+    expect(
+      find.text('Falta por comprar (estimado) · 1 sin precio'),
+      findsOneWidget,
+    );
     expect(find.text('1,05\u00A0€'), findsOneWidget);
     expect(
       find.textContaining('Ref: 1,05\u00A0€ (Súper Centro)'),
@@ -276,10 +288,19 @@ void main() {
     );
     expect(find.text('Comprados (1)'), findsOneWidget);
 
+    // Marcar a mano un artículo con producto → «Añadir precio» → se registra.
     await tester.tap(find.text('Leche entera'));
     await tester.pumpAndSettle();
-    expect(find.text('Registrar precio'), findsWidgets);
     expect(find.text('Comprados (2)'), findsOneWidget);
+    await tester.tap(find.text('Añadir precio'));
+    await tester.pumpAndSettle();
+    expect(find.text('Establecimiento'), findsOneWidget);
+    await tester.tap(find.text('Añadir al carrito'));
+    await tester.pumpAndSettle();
+    expect(products.purchases.length, 3);
+    expect(products.purchases.last.precio, 1.05);
+    expect(find.textContaining('1 × 1,05 € = 1,05 €'), findsOneWidget);
+    expect(find.text('En el carrito (2) · 1 sin precio'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).first, 'Tomates 1 kg');
     await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -287,4 +308,178 @@ void main() {
     expect(find.text('Tomates'), findsOneWidget);
     expect(find.text('1 kg'), findsOneWidget);
   });
+
+  testWidgets('modo carrito: escanear, precio, total y terminar', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      home: Builder(
+        builder: (ctx) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.push(
+                ctx,
+                MaterialPageRoute(
+                  builder: (_) => CartModeView(
+                    listaId: 1,
+                    scannerBuilder: (_, onCode) => _FakeScanner(onCode: onCode),
+                  ),
+                ),
+              ),
+              child: const Text('Abrir carrito'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Future<void> scan(String code) async {
+      await tester.tap(find.text('escanear $code'));
+      await tester.pumpAndSettle();
+    }
+
+    // Deja que se oculte el aviso flotante de «añadido».
+    Future<void> settleToast() async {
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+    }
+
+    ShoppingItem item(String texto) =>
+        shopping.items.firstWhere((i) => i.texto == texto);
+
+    // 1. Tienda al entrar.
+    await tester.tap(find.text('Abrir carrito'));
+    await tester.pumpAndSettle();
+    expect(find.text('¿En qué tienda estás?'), findsOneWidget);
+    await tester.tap(find.text('Empezar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mercado'), findsOneWidget); // chip de la AppBar
+
+    // 2. Producto con precio guardado: confirmar con un toque.
+    await scan('8410000000001');
+    expect(
+      find.textContaining('Último: 1,05 € en Súper Centro'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Añadir al carrito'));
+    await tester.pumpAndSettle();
+    expect(item('Leche entera').comprado, isTrue);
+    expect(item('Leche entera').precioPagado, 1.05);
+    expect(item('Leche entera').compraId, isNotNull);
+    expect(products.purchases.length, 3);
+    expect(products.purchases.last.establecimiento, 'Mercado');
+    await settleToast();
+
+    // 3. Mismo código otra vez (tras la espera) = una unidad más, sin otra
+    // compra en el historial.
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 2600)),
+    );
+    await scan('8410000000001');
+    expect(find.textContaining('Ya llevas 1 en el carrito'), findsOneWidget);
+    await tester.tap(find.text('Añadir al carrito'));
+    await tester.pumpAndSettle();
+    expect(item('Leche entera').unidades, 2);
+    expect(products.purchases.length, 3);
+    expect(find.text('2,10 €'), findsWidgets);
+    await settleToast();
+
+    // 4. Producto sin precio guardado y fuera de la lista: lo pide.
+    await scan('5550001');
+    expect(
+      find.text('Este producto no está en tu lista de compra.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('No hay precio guardado'), findsOneWidget);
+    await tester.tap(find.text('Añadir aunque no está en la lista'));
+    await tester.pumpAndSettle();
+    expect(find.text('Escribe un precio válido'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Precio por unidad'),
+      '3,20',
+    );
+    await tester.tap(find.text('Añadir aunque no está en la lista'));
+    await tester.pumpAndSettle();
+    expect(item('Café molido').precioPagado, 3.20);
+    expect(products.purchases.last.precio, 3.20);
+    await settleToast();
+
+    // 5. Código desconocido: producto nuevo con precio.
+    await scan('7770001');
+    expect(find.text('Producto nuevo'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Nombre del producto *'),
+      'Galletas',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Precio por unidad *'),
+      '2,40',
+    );
+    await tester.tap(find.text('Guardar y añadir al carrito'));
+    await tester.pumpAndSettle();
+    expect(
+      products.products.values.any((p) => p.codigoBarras == '7770001'),
+      isTrue,
+    );
+    expect(item('Galletas').comprado, isTrue);
+    expect(find.text('7,70 €'), findsWidgets);
+    await settleToast();
+
+    // 6. Pendiente sin código (Pan): se añade tocándolo, sin historial.
+    await tester.tap(find.text('Te falta (1)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pan'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Precio por unidad'),
+      '1,10',
+    );
+    await tester.tap(find.byTooltip('Una más'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Añadir al carrito'));
+    await tester.pumpAndSettle();
+    expect(item('Pan').unidades, 2);
+    expect(products.purchases.length, 5);
+    expect(find.text('9,90 €'), findsWidgets);
+
+    // 7. Quitar del carrito borra su compra del historial.
+    await tester.tap(find.text('Leche entera'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Quitar del carrito'));
+    await tester.pumpAndSettle();
+    expect(item('Leche entera').comprado, isFalse);
+    expect(products.purchases.length, 4);
+    expect(find.text('7,80 €'), findsWidgets);
+    await settleToast();
+
+    // 8. Terminar compra y quitar comprados de la lista.
+    await tester.tap(find.text('Terminar compra'));
+    await tester.pumpAndSettle();
+    expect(find.text('7,80 €'), findsWidgets);
+    await tester.tap(find.text('Quitar comprados'));
+    await tester.pumpAndSettle();
+    expect(find.text('Abrir carrito'), findsOneWidget);
+    expect(shopping.items.map((i) => i.texto), ['Leche entera']);
+  });
+}
+
+/// Sustituye a la cámara: un botón por código.
+class _FakeScanner extends StatelessWidget {
+  final ValueChanged<String> onCode;
+
+  const _FakeScanner({required this.onCode});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: [
+        for (final code in ['8410000000001', '5550001', '7770001'])
+          TextButton(
+            onPressed: () => onCode(code),
+            child: Text('escanear $code'),
+          ),
+      ],
+    );
+  }
 }
