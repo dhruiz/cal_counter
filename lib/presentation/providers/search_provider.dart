@@ -36,6 +36,14 @@ final saveMealAsFoodProvider = Provider<SaveMealAsFood>((ref) {
   return SaveMealAsFood(ref.watch(foodRepositoryProvider));
 });
 
+/// Alimento por id (vínculos desde recetas y productos). null si se borró.
+final foodByIdProvider = FutureProvider.autoDispose.family<Food?, int>((
+  ref,
+  id,
+) {
+  return ref.watch(foodRepositoryProvider).getFoodById(id);
+});
+
 /// Lista de alimentos más usados (frecuencia desc). autoDispose → se recarga
 /// cada vez que se vuelve a entrar en SearchView, recogiendo los usos nuevos.
 final mostUsedFoodsProvider = FutureProvider.autoDispose<List<Food>>((ref) {

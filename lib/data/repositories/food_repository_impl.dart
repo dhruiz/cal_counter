@@ -14,6 +14,11 @@ class FoodRepositoryImpl implements FoodRepository {
   }
 
   @override
+  Future<Food?> getFoodById(int id) async {
+    return await localDataSource.getFoodById(id);
+  }
+
+  @override
   Future<int> insertFood(FoodModel food) async {
     return await localDataSource.insertFood(food);
   }

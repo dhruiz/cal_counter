@@ -18,10 +18,11 @@ Aplicación Flutter de seguimiento de calorías y macronutrientes. Interfaz y da
 10. [Esquema de la base de datos SQLite](#esquema-de-la-base-de-datos-sqlite)
 11. [Persistencia de configuración (SharedPreferences)](#persistencia-de-configuración-sharedpreferences)
 12. [Lógica de negocio crítica](#lógica-de-negocio-crítica)
-13. [Configuración Android](#configuración-android)
-14. [Dependencias](#dependencias)
-15. [Cómo ejecutar el proyecto](#cómo-ejecutar-el-proyecto)
-16. [Convenciones y reglas que NO deben romperse](#convenciones-y-reglas-que-no-deben-romperse)
+13. [Módulos: Recetas, Listas de compra y Productos](#módulos-recetas-listas-de-compra-y-productos)
+14. [Configuración Android](#configuración-android)
+15. [Dependencias](#dependencias)
+16. [Cómo ejecutar el proyecto](#cómo-ejecutar-el-proyecto)
+17. [Convenciones y reglas que NO deben romperse](#convenciones-y-reglas-que-no-deben-romperse)
 
 ---
 
@@ -36,6 +37,14 @@ Aplicación Flutter de seguimiento de calorías y macronutrientes. Interfaz y da
 - Configura sus metas personales y calcula su TDEE automáticamente.
 - Exporta el día a CSV (vacía las tablas tras éxito).
 - Exporta/importa la lista de alimentos (`db_alimentos`) en formato TSV mediante SAF (Android 13+).
+
+Además, en pestañas independientes (barra inferior), la app incluye:
+
+- **Recetas**: repertorio personal con búsqueda por los ingredientes que el usuario tiene a mano, importación desde texto pegado / plantilla `.txt` / `.csv` / `.json` y vínculo opcional con el contador de calorías.
+- **Compras**: listas de compra con precio de referencia, total estimado y modo "escanear en el súper".
+- **Productos**: alta por código de barras (cámara), historial de precios por establecimiento (3 meses) y exportación CSV.
+
+Ver [Módulos: Recetas, Listas de compra y Productos](#módulos-recetas-listas-de-compra-y-productos).
 
 ---
 
@@ -121,6 +130,31 @@ cal_counter/
 ├── pubspec.yaml
 ├── pubspec.lock
 └── analysis_options.yaml
+```
+
+Archivos de los módulos de recetas, compras y productos:
+
+```
+lib/
+├── domain/
+│   ├── entities/        recipe.dart, recipe_match.dart, product.dart (Product + Purchase),
+│   │                    price_stats.dart, shopping_list.dart (ShoppingList + ShoppingItem)
+│   ├── repositories/    recipe_repository.dart, product_repository.dart, shopping_list_repository.dart
+│   ├── services/        ingredient_matcher.dart (normalizar/comparar ingredientes), dates.dart
+│   └── usecases/        search_recipes_by_ingredients, import_recipes, add_ingredients_to_shopping_list,
+│                        register_purchase, get_price_stats, purge_old_purchases, export_price_history_csv
+├── data/
+│   ├── datasources/     module_tables.dart (DDL), recipe_/product_/shopping_local_data_source.dart
+│   ├── models/          recipe_model.dart, product_model.dart, shopping_model.dart
+│   ├── parsers/         recipe_text_codec.dart (import txt/json/csv, export txt, plantilla)
+│   └── repositories/    recipe_/product_/shopping_list_repository_impl.dart
+└── presentation/
+    ├── providers/       recipes_provider.dart, products_provider.dart, shopping_provider.dart
+    ├── views/           main_shell.dart (barra inferior), recipes_view, recipe_detail_view,
+    │                    recipe_form_view, recipe_import_view, shopping_lists_view,
+    │                    shopping_list_detail_view, products_view, product_detail_view,
+    │                    product_form_view, barcode_scanner_view, food_picker_view, product_picker_view
+    └── widgets/         recipe_card, purchase_dialog, add_to_shopping_list_dialog, empty_state
 ```
 
 ---
@@ -666,16 +700,25 @@ static const String dbName  = 'db_ctrl_calorias.db';
 
 ```
 MyApp (MaterialApp)
-  └── HomeView  ← pantalla raíz, nunca se hace pop de ella
+  └── MainShell  ← raíz: NavigationBar + IndexedStack (cada pestaña conserva su estado)
+        ├── [0] HomeView      (Calorías)
+        ├── [1] RecipesView   (Recetas)  → RecipeDetailView / RecipeFormView / RecipeImportView
+        ├── [2] ShoppingListsView (Compras) → ShoppingListDetailView
+        └── [3] ProductsView  (Productos) → ProductDetailView / ProductFormView / BarcodeScannerView
+
+HomeView (pestaña Calorías)
         ├── [push] SettingsView
         │           └── [pop] → HomeView.refresh()
         ├── [push] SearchView
         │           ├── [push] FoodFormView (crear)
         │           │           └── [pop] → SearchView
-        │           └── [push] FoodFormView (editar)
-        │                       └── [pop] → SearchView
+        │           ├── [push] FoodFormView (editar)
+        │           │           └── [pop] → SearchView
+        │           └── [push] BarcodeScannerView (registrar ingesta escaneando el envase)
         └── [showDialog] AlertDialog (confirmar eliminación, nuevo día, etc.)
 ```
+
+> Las subpantallas de los módulos se abren con `Navigator.push` sobre la barra inferior. Los selectores reutilizables (`FoodPickerView`, `ProductPickerView`, `BarcodeScannerView.scan`) devuelven su resultado con `Navigator.pop(context, valor)`.
 
 > La navegación usa `Navigator.push` y `MaterialPageRoute` en todos los casos. No hay `go_router` ni ningún paquete de navegación declarativa. Las rutas con nombre no están definidas.
 
@@ -731,7 +774,52 @@ CREATE TABLE IF NOT EXISTS items_comida (
 );
 ```
 
-> **IMPORTANTE**: `ON DELETE CASCADE` en `items_comida.comida_id` garantiza que al eliminar una comida se eliminan automáticamente todos sus items. Esto funciona gracias a que sqflite respeta las foreign keys cuando se activan (en versiones modernas de SQLite están activadas por defecto).
+> **IMPORTANTE**: sqflite **no** activa `PRAGMA foreign_keys` (SQLite las trae desactivadas por defecto) y la app no lo hace en `onConfigure`, así que los `REFERENCES ... ON DELETE CASCADE` son solo documentales. Hoy `deleteMeal` deja huérfanos los `items_comida` de esa comida. Los módulos nuevos borran sus hijos explícitamente en una transacción.
+
+### Tablas de recetas, productos y listas de compra
+
+Definidas en `lib/data/datasources/module_tables.dart` (`createModuleTables`, llamado desde `_createTables`; todo `IF NOT EXISTS`). Los `alimento_id` apuntan a `db_alimentos.id` sin FK: si el alimento se borra, el vínculo se trata como "sin vincular".
+
+```sql
+CREATE TABLE recetas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL, categoria TEXT, porciones INTEGER, tiempo_min INTEGER,
+  elaboracion TEXT NOT NULL DEFAULT '',   -- un paso por línea
+  notas TEXT, favorita INTEGER NOT NULL DEFAULT 0,
+  alimento_id INTEGER,                    -- vínculo opcional a db_alimentos
+  peso_porcion_g REAL,                    -- gramos de una porción (para "Registrar porción")
+  creada TEXT NOT NULL, actualizada TEXT NOT NULL
+);
+CREATE TABLE ingredientes_receta (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  receta_id INTEGER NOT NULL, orden INTEGER NOT NULL,
+  texto TEXT NOT NULL                     -- línea tal cual: "200 g de arroz"
+);
+CREATE TABLE productos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  codigo_barras TEXT UNIQUE,              -- NULL si no tiene (varios NULL permitidos)
+  nombre TEXT NOT NULL, marca TEXT, presentacion TEXT,
+  alimento_id INTEGER,                    -- vínculo opcional a db_alimentos
+  creado TEXT NOT NULL
+);
+CREATE TABLE compras (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  producto_id INTEGER NOT NULL,
+  fecha TEXT NOT NULL,                    -- "YYYY-MM-DD"
+  precio REAL NOT NULL,                   -- precio unitario, 2 decimales
+  establecimiento TEXT NOT NULL
+);
+CREATE TABLE listas_compra (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL, creada TEXT NOT NULL
+);
+CREATE TABLE items_lista_compra (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  lista_id INTEGER NOT NULL, texto TEXT NOT NULL, cantidad TEXT,
+  producto_id INTEGER,                    -- vínculo opcional: precio de referencia
+  comprado INTEGER NOT NULL DEFAULT 0, orden INTEGER NOT NULL
+);
+-- Índices: ingredientes_receta(receta_id, orden), compras(producto_id, fecha), items_lista_compra(lista_id)
+```
 
 ---
 
@@ -815,6 +903,65 @@ Cada fila contiene los 6 campos separados por TAB. Reglas:
 
 ---
 
+## Módulos: Recetas, Listas de compra y Productos
+
+Los tres módulos son independientes del contador (pestañas propias) pero comparten la BD y se conectan entre sí y con las calorías:
+
+| Conexión | Dónde |
+| --- | --- |
+| Receta → lista de compra | `RecipeDetailView` → "Añadir lo que me falta a la lista" (`AddIngredientsToShoppingList` separa nombre y cantidad y omite los ya pendientes) |
+| Lista ↔ productos | Artículos vinculados a un producto muestran su último precio y suman al **total estimado**; al marcarlos se ofrece "Registrar precio"; el escáner de la lista marca/añade el producto y abre el diálogo de compra |
+| Receta ↔ calorías | `recetas.alimento_id` + `peso_porcion_g`: el detalle muestra kcal/macros por 100 g y por porción y "Registrar porción" abre `AddFoodPopup` con esa cantidad |
+| Producto ↔ calorías | `productos.alimento_id`: en `SearchView` el botón de escáner busca el producto y abre `AddFoodPopup` con su alimento (ofrece registrar/vincular si falta) |
+
+### Recetas
+
+- **Búsqueda por ingredientes** (`SearchRecipesByIngredients`, Dart puro): el usuario escribe "huevo, patata y cebolla". `ingredient_matcher.dart` normaliza (sin tildes, minúsculas), singulariza de forma consistente (tomates→tomate, limones→limon, nueces→nuez), descarta cantidades/unidades/palabras vacías y unifica sinónimos regionales (papa=patata, palta=aguacate, choclo=elote=maíz...). Un ingrediente coincide si los tokens de uno contienen a los del otro ("pollo" ↔ "pechuga de pollo").
+- **Ranking**: primero las recetas completas ("¡Puedes hacerla!"), luego mayor % cubierto, más coincidencias y nombre. Las líneas con "(opcional)" no cuentan como faltantes. Opción para asumir **básicos** (sal, pimienta, agua, aceite) y para mostrar solo las completas. Una receta solo aparece si al menos un ingrediente lo indicó el usuario (los básicos no bastan).
+- **Datos**: los ingredientes se guardan como líneas libres (`ingredientes_receta.texto`); el nombre para comparar se calcula al vuelo, así que mejorar el parser no requiere migrar datos.
+- **Importación** (`RecipeTextCodec.parse`, por extensión o contenido) con vista previa (`RecipeImportView`) y omisión de duplicados por nombre (`ImportRecipes`):
+  - **Texto / plantilla `.txt` o texto pegado** (formato principal, pensado para usuarios no técnicos). Encabezados sin importar mayúsculas ni tildes y con sinónimos: `RECETA/NOMBRE/TÍTULO`, `CATEGORÍA/TIPO`, `PORCIONES/RACIONES/PERSONAS`, `TIEMPO` ("1 h 30 min" = 90), `INGREDIENTES`, `PREPARACIÓN/ELABORACIÓN/PASOS/INSTRUCCIONES`, `NOTAS`. Viñetas y numeración se eliminan sin romper "1.5 kg"; `#` = comentario; recetas separadas por `---` o un nuevo `RECETA:`. Sin encabezados (p. ej. copiado de WhatsApp) la 1ª línea es el nombre y las líneas con viñeta o cantidad se toman como ingredientes.
+  - **JSON**: lista, `{"recetas": [...]}` u objeto; claves flexibles; ingredientes/pasos como lista o texto.
+  - **CSV**: cabecera obligatoria, delimitador `;`, `,` o TAB autodetectado; ingredientes separados por salto de línea, `|`, `;` o coma (sin partir "1,5").
+- **Exportación**: "Exportar todas" guarda un `.txt` en el mismo formato (copia de seguridad reimportable); "Copiar como texto" lleva una receta al portapapeles; "Ver plantilla" permite copiarla o guardarla.
+
+Ejemplo de plantilla:
+
+```
+RECETA: Tortilla de patatas
+CATEGORÍA: Plato principal
+PORCIONES: 4
+TIEMPO: 40 min
+
+INGREDIENTES:
+- 4 huevos
+- 500 g de patatas
+- 1 cebolla (opcional)
+- Sal
+
+PREPARACIÓN:
+1. Pelar y cortar las patatas.
+2. Freírlas y cuajar con el huevo batido.
+---
+```
+
+### Productos y precios
+
+- **Escáner** (`BarcodeScannerView`, paquete `mobile_scanner` con ML Kit empaquetado → funciona sin internet): formatos de comercio EAN-13/8, UPC-A/E, Code128/39, ITF-14; linterna; entrada manual del código; mensaje claro si se niega el permiso de cámara.
+- Producto conocido → detalle + diálogo de compra precargado con el último precio y establecimiento. Desconocido → `ProductFormView` con el código (incluye primera compra opcional). También se pueden añadir productos **sin código** (fruta a granel, mercado...).
+- **Detalle**: último precio, mínimo/promedio/máximo de los últimos 3 meses (`GetPriceStats`), último precio en cada establecimiento con el más barato destacado, historial (mantener pulsado para borrar).
+- **Retención de 3 meses** (`PurgeOldPurchases`): al abrir la app y antes de exportar se borran las compras anteriores a `threeMonthsAgo(hoy)` **salvo la última de cada producto**, que se conserva siempre.
+- **Export CSV** (`ExportPriceHistoryCsv`): `historial_precios_YYYY-MM-DD.csv`, separado por **TAB** como el resto de exports, una fila por compra de los últimos 3 meses ordenada por producto y fecha. Cabecera: `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio`.
+- Precios: se aceptan coma o punto decimal (`RegisterPurchase.parsePrecio`); se muestran con `AppUtils.formatPrecio` ("1.234,50") sin símbolo de moneda.
+
+### Listas de compra
+
+- Añadir rápido escribiendo ("2 L de leche" → artículo "Leche", cantidad "2 L") o desde el catálogo de productos.
+- Pendientes arriba, comprados tachados abajo. Tocar = marcar; mantener pulsado = editar (texto, cantidad, producto vinculado); deslizar a la izquierda = borrar.
+- Menú: copiar como texto (para WhatsApp), desmarcar todo, quitar comprados, renombrar, eliminar.
+
+---
+
 ## Configuración Android
 
 ### `AndroidManifest.xml`
@@ -827,6 +974,15 @@ Permisos declarados:
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
     android:maxSdkVersion="29"/>
 ```
+
+Lector de códigos de barras (la cámara es opcional: sin ella se escribe el código a mano):
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-feature android:name="android.hardware.camera" android:required="false" />
+```
+
+`mobile_scanner` pide el permiso de cámara en tiempo de ejecución al abrir el escáner y exige `minSdk 23` (Flutter 3.44 usa 24). Con AGP 8.x y `android.builtInKotlin=false` el plugin aplica KGP por sí mismo.
 
 Flag de almacenamiento legacy (para compatibilidad):
 
@@ -858,6 +1014,7 @@ El paquete `permission_handler` gestiona los permisos de almacenamiento en tiemp
 | `shared_preferences` | `^2.3.5`  | Persistencia de settings y tema       |
 | `permission_handler` | `^11.3.1` | Permisos de almacenamiento en Android |
 | `file_picker`        | `^11.0.2` | Selección y guardado de archivos      |
+| `mobile_scanner`     | `^7.5.0`  | Lector de códigos de barras (cámara, ML Kit empaquetado) |
 | `cupertino_icons`    | `^1.0.8`  | Iconos iOS (incluidos por defecto)    |
 
 ### Dev
@@ -925,6 +1082,14 @@ Estas son las reglas de diseño que si se violan romperán la aplicación o su c
 15. **El TSV de `db_alimentos` usa header fijo**: `id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas`. La importación lo valida exactamente. Cambiar nombres de columnas o añadir/quitar campos rompe los archivos exportados previamente. Si se debe migrar el formato, mantener compatibilidad detectando el header.
 
 16. **SAF en Android 13+**: la app evita `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` en versiones modernas usando `FilePicker.saveFile(bytes:)` y `FilePicker.pickFiles(withData: true)`. No reintroducir manejo manual de paths absolutos ni añadir permisos al manifest sin justificación clara.
+
+17. **Raíz = `MainShell`** (barra inferior). `HomeView` es la primera pestaña y sigue llamando a `HomeNotifier.refresh()` tras sus escrituras; desde recetas/productos se registra comida con `AddFoodPopup.showForToday`, que ya refresca `homeProvider`.
+
+18. **Foreign keys desactivadas**: al borrar recetas, productos o listas, borrar explícitamente los hijos en la misma transacción (ver data sources). No depender de `ON DELETE CASCADE`.
+
+19. **Historial de compras = 3 meses + la última compra de cada producto**. `PurgeOldPurchases` se ejecuta al cargar `ProductsNotifier` y antes de exportar. No borrar nunca la última compra de un producto: es su "último precio".
+
+20. **Ingredientes de recetas como texto libre**: el nombre comparable se deriva con `ingredient_matcher.dart`; no guardar columnas derivadas. Cambios en la normalización deben aplicarse por igual a recetas y búsqueda (son simétricos) y cubrirse en `test/unit/ingredient_matcher_test.dart`.
 
 \*\*
 NOTA PERSONAL:

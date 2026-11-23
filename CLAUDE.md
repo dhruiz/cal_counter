@@ -17,7 +17,8 @@ flutter build apk --release                        # APK → build/app/outputs/f
 ```
 
 - Build que falla por caché: `flutter clean && flutter pub get && flutter build apk --release`.
-- Los tests que tocan SQLite usan `sqflite_common_ffi`: requieren `sqfliteFfiInit(); databaseFactory = databaseFactoryFfi;` en `setUpAll` (ver `test/unit/local_data_source_test.dart`). `path_provider` se mockea vía `MethodChannel`.
+- Los tests que tocan SQLite usan `sqflite_common_ffi`: requieren `sqfliteFfiInit(); databaseFactory = databaseFactoryFfi;` en `setUpAll` (ver `test/unit/local_data_source_test.dart`). `path_provider` se mockea vía `MethodChannel`. Con FFI las rutas relativas se resuelven en `.dart_tool/sqflite_common_ffi/databases/`: limpiar con `databaseFactory.deleteDatabase(...)`, no borrando el directorio.
+- Tests de widgets de los módulos nuevos: `test/widget/modules_smoke_test.dart` con repositorios en memoria (`test/widget/fakes.dart`) inyectados vía `ProviderScope(overrides: ...)`.
 
 ## Arquitectura
 
@@ -25,9 +26,9 @@ Clean Architecture en 3 capas, dependencias hacia el dominio:
 
 - **`lib/domain/`** — Dart puro (solo `equatable`). Entidades, interfaces de repositorio, casos de uso (cada uno una clase con un único `call(...)`).
 - **`lib/data/`** — implementa las interfaces. `LocalDataSourceImpl` (SQLite vía `sqflite`) con `static Database? _database` singleton; `SettingsRepositoryImpl` (SharedPreferences); `FoodModel` serializa filas SQLite ↔ entidad.
-- **`lib/presentation/`** — Riverpod `StateNotifierProvider` (sin `setState` salvo dentro de formularios). Providers en `home_provider.dart` (incluye `localDataSourceProvider`, el único punto de creación del data source) y `search_provider.dart`. Vistas y widgets consumen providers; nunca acceden a `data/` directamente.
+- **`lib/presentation/`** — Riverpod `StateNotifierProvider` (sin `setState` salvo dentro de formularios). Providers en `home_provider.dart` (incluye `localDataSourceProvider`, el único punto de creación del data source) y `search_provider.dart`; módulos nuevos en `recipes_provider.dart`, `products_provider.dart`, `shopping_provider.dart`. Vistas y widgets consumen providers; nunca acceden a `data/` directamente.
 
-Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`); `HomeView` es la raíz. Tras cada `push(...).then(...)` o escritura en DB se llama a `HomeNotifier.refresh()`.
+Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`). La raíz es `MainShell` (`NavigationBar` + `IndexedStack`): pestañas Calorías (`HomeView`), Recetas, Compras y Productos. Tras cada `push(...).then(...)` o escritura en DB de comidas se llama a `HomeNotifier.refresh()`; desde recetas/productos usar `AddFoodPopup.showForToday`, que ya lo hace.
 
 ## Modelo de datos (claves)
 
@@ -35,6 +36,8 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`); `HomeView
 - `items_comida`: macros **ya escalados** a la cantidad consumida (valores absolutos, no por 100g). Guarda el nombre del alimento **desnormalizado** (sin FK al alimento original). `comida_id` con `ON DELETE CASCADE`.
 - `comidas`: `fecha` se guarda como `String` `YYYY-MM-DD` (nunca timestamp). Nuevas comidas se auto-nombran `Comida_N`.
 - DB precargada (`assets/db/db_ctrl_calorias.db`, ~1700 alimentos) se copia a `getApplicationDocumentsDirectory()` en el primer arranque.
+- **Foreign keys desactivadas** (sqflite no activa `PRAGMA foreign_keys`): los `ON DELETE CASCADE` no actúan. Al borrar padres, borrar hijos explícitamente en transacción.
+- Tablas de módulos (DDL en `lib/data/datasources/module_tables.dart`, llamado desde `_createTables`): `recetas` + `ingredientes_receta` (líneas de texto libre), `productos` (`codigo_barras` UNIQUE, NULL si no tiene) + `compras` (`fecha` `YYYY-MM-DD`, precio unitario, establecimiento), `listas_compra` + `items_lista_compra` (`producto_id` opcional). `recetas.alimento_id`/`productos.alimento_id` apuntan a `db_alimentos` sin FK (borrado = sin vincular). Los data sources nuevos reciben `LocalDataSource` y usan su getter `database`.
 
 ## Lógica de negocio crítica
 
@@ -47,6 +50,15 @@ Navegación imperativa (`Navigator.push`/`pop` + `MaterialPageRoute`); `HomeView
 - Export/import en Android 13+ usa SAF (`FilePicker.saveFile` con `bytes:` / `FilePicker.pickFiles` con `withData: true`); evita permisos de almacenamiento manuales. `file_saver` se eliminó (aplicaba KGP y bloqueaba el toolchain); no reintroducirlo.
 - Toolchain Android anclado a AGP 8.13.1 + flags `android.builtInKotlin/newDsl=false`: Flutter 3.44 no soporta aún el DSL nuevo de AGP 9, y bajo AGP 9 `file_picker` deja de aplicar KGP y no compila. Revisar al actualizar Flutter.
 - **Lista "más usados"** (`SearchView` con buscador vacío): `mostUsedFoodsProvider` (`FutureProvider.autoDispose`) lee `getMostUsedFoods` (orden `uso_count DESC`). El contador se incrementa en `AddFoodPopup._submit` vía `recordFoodUsageProvider` tras agregar a una comida (solo si `food.id != null`). `AddFoodToMeal` no se tocó. Invalidar `mostUsedFoodsProvider` tras alta/edición/baja/import de alimentos.
+
+## Módulos Recetas / Compras / Productos (claves)
+
+- **Búsqueda de recetas por ingredientes** (`SearchRecipesByIngredients`) y normalización en `lib/domain/services/ingredient_matcher.dart` (tildes, plurales, sinónimos regionales, unidades). Es simétrica: lo mismo se aplica a recetas y a lo que escribe el usuario. Los nombres comparables se derivan al vuelo; no guardar columnas derivadas.
+- **Import de recetas** amigable en `lib/data/parsers/recipe_text_codec.dart`: texto/plantilla (formato principal, encabezados tolerantes, texto pegado sin encabezados), JSON y CSV. Export `.txt` reimportable. Duplicados por nombre normalizado se omiten (`ImportRecipes`).
+- **Historial de precios = 3 meses + última compra de cada producto**: `PurgeOldPurchases` se ejecuta al crear `ProductsNotifier` y antes de exportar. Nunca borrar la última compra de un producto.
+- **Export historial** (`ExportPriceHistoryCsv`): TAB, extensión `.csv`, cabecera `fecha\tcodigo_barras\tproducto\tmarca\tpresentacion\testablecimiento\tprecio`.
+- **Escáner**: `mobile_scanner` (ML Kit empaquetado, sin internet) en `BarcodeScannerView.scan`; permiso `CAMERA` en el manifest con `uses-feature camera required=false`. Siempre ofrecer entrada manual del código. No se consulta ningún servicio online (decisión del usuario: todo local).
+- Tras registrar compras o editar productos, `ProductsNotifier` invalida `productDetailProvider`, `storesProvider` y `shoppingItemsProvider` (precios de referencia de listas).
 
 ## Convenciones
 

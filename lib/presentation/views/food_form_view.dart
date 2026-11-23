@@ -9,7 +9,10 @@ import '../providers/search_provider.dart';
 class FoodFormView extends ConsumerStatefulWidget {
   final Food? foodToEdit;
 
-  const FoodFormView({super.key, this.foodToEdit});
+  /// Nombre propuesto al crear (p. ej. el de un producto escaneado).
+  final String? initialName;
+
+  const FoodFormView({super.key, this.foodToEdit, this.initialName});
 
   @override
   ConsumerState<FoodFormView> createState() => _FoodFormViewState();
@@ -27,7 +30,9 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   void initState() {
     super.initState();
     final f = widget.foodToEdit;
-    _nameController = TextEditingController(text: f?.name ?? '');
+    _nameController = TextEditingController(
+      text: f?.name ?? widget.initialName ?? '',
+    );
     _kcalController = TextEditingController(
       text: f?.kcalPer100.toString() ?? '',
     );
