@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/app_database.dart';
+import '../../data/ocr/mlkit_text_recognizer.dart';
 import '../../data/repositories/drift_transaction_runner.dart';
 import '../../data/repositories/food_repository_impl.dart';
 import '../../data/repositories/meal_repository_impl.dart';
@@ -13,6 +14,7 @@ import '../../domain/repositories/purchase_repository.dart';
 import '../../domain/repositories/recipe_repository.dart';
 import '../../domain/repositories/shopping_list_repository.dart';
 import '../../domain/repositories/transaction_runner.dart';
+import '../../domain/services/label_text_recognizer.dart';
 import '../../domain/usecases/add_food_to_meal.dart';
 import '../../domain/usecases/add_ingredients_to_shopping_list.dart';
 import '../../domain/usecases/cart.dart';
@@ -129,3 +131,8 @@ final addIngredientsToShoppingListProvider =
         ref.watch(shoppingListRepositoryProvider),
       ),
     );
+
+/// OCR de etiquetas (ML Kit en el dispositivo). En tests se sustituye.
+final labelRecognizerProvider = Provider<LabelTextRecognizer>(
+  (ref) => MlKitLabelRecognizer(),
+);
