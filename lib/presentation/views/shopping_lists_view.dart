@@ -4,6 +4,7 @@ import '../../core/styles.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/shopping_list.dart';
 import '../providers/shopping_provider.dart';
+import '../widgets/dialog_controllers.dart';
 import '../widgets/empty_state.dart';
 import 'price_history_view.dart';
 import 'shopping_list_detail_view.dart';
@@ -18,34 +19,40 @@ class ShoppingListsView extends ConsumerWidget {
     required String title,
     required String initial,
   }) async {
-    final ctrl = TextEditingController(text: initial);
-    ctrl.selection = TextSelection(baseOffset: 0, extentOffset: initial.length);
     final name = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(labelText: 'Nombre'),
-          onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: const Text('Aceptar'),
-          ),
-        ],
+      builder: (_) => DialogControllers(
+        iniciales: [initial],
+        builder: (ctx, c) => _nameDialog(ctx, title, c.first),
       ),
     );
-    ctrl.dispose();
     return (name == null || name.isEmpty) ? null : name;
   }
+
+  static Widget _nameDialog(
+    BuildContext ctx,
+    String title,
+    TextEditingController ctrl,
+  ) => AlertDialog(
+    title: Text(title),
+    content: TextField(
+      controller: ctrl,
+      autofocus: true,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: const InputDecoration(labelText: 'Nombre'),
+      onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(ctx),
+        child: const Text('Cancelar'),
+      ),
+      ElevatedButton(
+        onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+        child: const Text('Aceptar'),
+      ),
+    ],
+  );
 
   Future<void> _create(BuildContext context, WidgetRef ref) async {
     final name = await askName(

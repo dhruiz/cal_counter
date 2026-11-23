@@ -7,7 +7,7 @@ import '../../domain/services/barcode.dart';
 /// Alimentos en TSV (separador TAB) para hojas de cálculo.
 ///
 /// Cabecera actual:
-/// `uuid	nombre	marca	tipo	unidad	codigos	kcal	grasas	grasas_saturadas	carbohidratos	azucares	fibra	proteinas	sal`
+/// `uuid	nombre	marca	tipo	unidad	codigos	kcal	grasas	grasas_saturadas	carbohidratos	azucares	fibra	proteinas	sal	categoria`
 /// (`codigos`: códigos de barras separados por comas; celdas vacías =
 /// desconocido). Al importar también se acepta la cabecera antigua de
 /// 6 columnas `id	alimento	kCal	grasas	carbohidratos	proteinas` (el id se
@@ -30,6 +30,7 @@ class FoodsTsvCodec {
     'fibra',
     'proteinas',
     'sal',
+    'categoria',
   ];
 
   static const List<String> columnasLegado = [
@@ -76,7 +77,9 @@ class FoodsTsvCodec {
           f.tipo.clave,
           f.unidad.clave,
           codigos,
-          for (final c in columnas.skip(6)) _num(f.nutricion[_nutrientes[c]!]),
+          for (final c in columnas.skip(6).take(8))
+            _num(f.nutricion[_nutrientes[c]!]),
+          _clean(rf.categoria ?? ''),
         ].join('\t'),
       );
     }
@@ -140,8 +143,10 @@ class FoodsTsvCodec {
         n = n.conValor(nut, _parse(cell(cols, col)));
       });
       final uuid = cell(cols, 'uuid');
+      final categoria = cell(cols, 'categoria');
       out.add(
         RepertoireFood(
+          categoria: categoria.isEmpty ? null : categoria,
           alimento: Food(
             uuid: uuid.isEmpty ? null : uuid,
             nombre: nombre,

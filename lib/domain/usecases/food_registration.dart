@@ -92,9 +92,16 @@ class SaveFoodWithPackage {
 
   SaveFoodWithPackage(this.foods, this.tx);
 
-  Future<int> call(Food food, {PackageDraft? presentacion}) {
+  Future<int> call(
+    Food food, {
+    PackageDraft? presentacion,
+    bool adivinarCategoria = true,
+  }) {
     return tx(() async {
-      final id = await foods.saveFood(food);
+      final id = await foods.saveFood(
+        food,
+        adivinarCategoria: adivinarCategoria,
+      );
       final p = presentacion;
       if (p != null && !p.vacia) {
         await foods.savePackage(

@@ -12,6 +12,8 @@ import '../../domain/services/barcode.dart';
 import '../../domain/services/money.dart';
 import '../providers/foods_provider.dart';
 import '../widgets/add_to_shopping_list_dialog.dart';
+import '../widgets/category_widgets.dart';
+import '../widgets/dialog_controllers.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/food_widgets.dart';
 import '../widgets/purchase_dialog.dart';
@@ -138,14 +140,16 @@ class FoodDetailView extends ConsumerWidget {
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   final Food food;
 
   const _Header({required this.food});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final cats = ref.watch(categoriesProvider(null)).valueOrNull ?? const [];
+    final categoria = cats.where((c) => c.id == food.categoriaId).firstOrNull;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
@@ -159,6 +163,22 @@ class _Header extends StatelessWidget {
             spacing: 8,
             runSpacing: 4,
             children: [
+              ActionChip(
+                avatar: const Icon(Icons.category_outlined, size: 18),
+                label: Text(categoria?.nombre ?? 'Sin categoría'),
+                tooltip: 'Cambiar categoría',
+                onPressed: () async {
+                  final choice = await pickCategory(
+                    context,
+                    ref,
+                    actual: food.categoriaId,
+                  );
+                  if (choice == null) return;
+                  await ref.read(categoryRepositoryProvider).assignCategory([
+                    food.id!,
+                  ], choice.categoriaId);
+                },
+              ),
               Chip(label: Text(food.tipo.etiqueta)),
               if (food.pendiente) const PendingChip(dense: false),
               if (food.archivado)
@@ -332,59 +352,66 @@ class _PortionsCard extends ConsumerWidget {
     WidgetRef ref, [
     FoodPortion? p,
   ]) async {
-    final nameCtrl = TextEditingController(text: p?.nombre ?? '');
-    final gramsCtrl = TextEditingController(
-      text: p == null ? '' : AppUtils.formatNumero(p.gramos),
-    );
-    final res = await showDialog<bool>(
+    final res = await showDialog<List<String>>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(p == null ? 'Nueva porción' : 'Editar porción'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Nombre',
-                hintText: 'unidad, rebanada, diente, taza...',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: gramsCtrl,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                labelText: 'Equivale a',
-                suffixText: food.u,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          if (p != null)
-            TextButton(
-              onPressed: () async {
-                await ref.read(foodRepositoryProvider).deletePortion(p.id!);
-                if (ctx.mounted) Navigator.pop(ctx, false);
-              },
-              child: const Text('Eliminar'),
-            ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Guardar'),
-          ),
+      builder: (_) => DialogControllers(
+        iniciales: [
+          p?.nombre ?? '',
+          p == null ? '' : AppUtils.formatNumero(p.gramos),
         ],
+        builder: (ctx, c) {
+          final nameCtrl = c[0];
+          final gramsCtrl = c[1];
+          return AlertDialog(
+            title: Text(p == null ? 'Nueva porción' : 'Editar porción'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameCtrl,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre',
+                    hintText: 'unidad, rebanada, diente, taza...',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: gramsCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Equivale a',
+                    suffixText: food.u,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              if (p != null)
+                TextButton(
+                  onPressed: () async {
+                    await ref.read(foodRepositoryProvider).deletePortion(p.id!);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  child: const Text('Eliminar'),
+                ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () =>
+                    Navigator.pop(ctx, [nameCtrl.text, gramsCtrl.text]),
+                child: const Text('Guardar'),
+              ),
+            ],
+          );
+        },
       ),
     );
-    if (res == true) {
+    if (res != null) {
       try {
         await ref
             .read(foodRepositoryProvider)
@@ -392,8 +419,8 @@ class _PortionsCard extends ConsumerWidget {
               FoodPortion(
                 id: p?.id,
                 alimentoId: food.id,
-                nombre: nameCtrl.text,
-                gramos: parseDecimal(gramsCtrl.text) ?? 0,
+                nombre: res[0],
+                gramos: parseDecimal(res[1]) ?? 0,
               ),
             );
       } on ValidationException catch (e) {
@@ -404,8 +431,6 @@ class _PortionsCard extends ConsumerWidget {
         }
       }
     }
-    nameCtrl.dispose();
-    gramsCtrl.dispose();
   }
 
   @override
@@ -486,77 +511,90 @@ class _PackagesCard extends ConsumerWidget {
   }
 
   Future<void> _edit(BuildContext context, WidgetRef ref, FoodPackage p) async {
-    final codeCtrl = TextEditingController(text: p.codigoBarras ?? '');
-    final descCtrl = TextEditingController(text: p.descripcion);
-    final contCtrl = TextEditingController(
-      text: p.contenido == null ? '' : AppUtils.formatNumero(p.contenido!),
-    );
-    final res = await showDialog<String>(
+    final res = await showDialog<(String, List<String>)>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(p.id == null ? 'Nueva presentación' : 'Presentación'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: descCtrl,
-              autofocus: p.id == null,
-              decoration: const InputDecoration(
-                labelText: 'Descripción',
-                hintText: 'Brick 1 L, pack 6 × 125 g, granel...',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: contCtrl,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                labelText: 'Contenido neto total',
-                suffixText: food.u,
-                helperText: 'Para comparar el precio por kg o litro',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: codeCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Código de barras (opcional)',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          if (p.id != null)
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, 'delete'),
-              child: const Text('Eliminar'),
-            ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, 'save'),
-            child: const Text('Guardar'),
-          ),
+      builder: (_) => DialogControllers(
+        iniciales: [
+          p.codigoBarras ?? '',
+          p.descripcion,
+          p.contenido == null ? '' : AppUtils.formatNumero(p.contenido!),
         ],
+        builder: (ctx, c) {
+          final codeCtrl = c[0];
+          final descCtrl = c[1];
+          final contCtrl = c[2];
+          return AlertDialog(
+            title: Text(p.id == null ? 'Nueva presentación' : 'Presentación'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: descCtrl,
+                  autofocus: p.id == null,
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción',
+                    hintText: 'Brick 1 L, pack 6 × 125 g, granel...',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: contCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Contenido neto total',
+                    suffixText: food.u,
+                    helperText: 'Para comparar el precio por kg o litro',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: codeCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Código de barras (opcional)',
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              if (p.id != null)
+                TextButton(
+                  onPressed: () =>
+                      Navigator.pop(ctx, ('delete', const <String>[])),
+                  child: const Text('Eliminar'),
+                ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, (
+                  'save',
+                  [codeCtrl.text, descCtrl.text, contCtrl.text],
+                )),
+                child: const Text('Guardar'),
+              ),
+            ],
+          );
+        },
       ),
     );
+    if (res == null) return;
     final repo = ref.read(foodRepositoryProvider);
+    final v = res.$2;
     try {
-      if (res == 'delete') {
+      if (res.$1 == 'delete') {
         await repo.deletePackage(p.id!);
-      } else if (res == 'save') {
+      } else if (res.$1 == 'save') {
         await repo.savePackage(
           p.copyWith(
-            codigoBarras: codeCtrl.text,
-            clearCodigo: normalizeBarcode(codeCtrl.text) == null,
-            descripcion: descCtrl.text,
-            contenido: parseDecimal(contCtrl.text),
-            clearContenido: parseDecimal(contCtrl.text) == null,
+            codigoBarras: v[0],
+            clearCodigo: normalizeBarcode(v[0]) == null,
+            descripcion: v[1],
+            contenido: parseDecimal(v[2]),
+            clearContenido: parseDecimal(v[2]) == null,
           ),
         );
       }
@@ -567,9 +605,6 @@ class _PackagesCard extends ConsumerWidget {
         ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
-    codeCtrl.dispose();
-    descCtrl.dispose();
-    contCtrl.dispose();
   }
 
   @override

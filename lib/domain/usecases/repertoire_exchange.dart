@@ -1,8 +1,10 @@
+import '../entities/category.dart';
 import '../entities/food.dart';
 import '../entities/nutrition_facts.dart';
 import '../entities/recipe.dart';
 import '../entities/repertoire.dart';
 import '../errors/domain_errors.dart';
+import '../repositories/category_repository.dart';
 import '../repositories/food_repository.dart';
 import '../repositories/recipe_repository.dart';
 import '../repositories/transaction_runner.dart';
@@ -15,11 +17,16 @@ import '../services/quantity_parser.dart';
 class ExportRepertoire {
   final FoodRepository foods;
   final RecipeRepository recipes;
+  final CategoryRepository? categories;
 
-  ExportRepertoire(this.foods, this.recipes);
+  ExportRepertoire(this.foods, this.recipes, [this.categories]);
 
   Future<Repertoire> call({bool incluirRecetas = false}) async {
     final all = await foods.getAllFoods();
+    final nombreCategoria = {
+      for (final c in await categories?.getCategories() ?? const <Category>[])
+        c.id: c.nombre,
+    };
     final ids = [for (final f in all) f.id!];
     final porciones = await foods.getPortionsFor(ids);
     final presentaciones = await foods.getPackagesFor(ids);
@@ -45,6 +52,7 @@ class ExportRepertoire {
         for (final f in all)
           RepertoireFood(
             alimento: f,
+            categoria: nombreCategoria[f.categoriaId],
             porciones: porciones[f.id] ?? const [],
             presentaciones: [
               for (final p in presentaciones[f.id] ?? const <FoodPackage>[])
@@ -72,7 +80,10 @@ class ImportRepertoire {
   final RecipeRepository recipes;
   final TransactionRunner tx;
 
-  ImportRepertoire(this.foods, this.recipes, this.tx);
+  /// Para asignar la categoría por nombre (se crea si no existe).
+  final CategoryRepository? categories;
+
+  ImportRepertoire(this.foods, this.recipes, this.tx, [this.categories]);
 
   Future<ImportReport> call(
     Repertoire rep, {
@@ -114,6 +125,21 @@ class ImportRepertoire {
     final report = ImportReport();
     final idPorUuid = <String, int>{};
     final codigosUsados = <String>{};
+    final categoriaPorNombre = {
+      for (final c in await categories?.getCategories() ?? const <Category>[])
+        normalizeText(c.nombre): c.id!,
+    };
+    Future<int?> categoriaDe(String? nombre) async {
+      final key = normalizeText(nombre ?? '');
+      if (key.isEmpty || categories == null) return null;
+      final id = categoriaPorNombre[key];
+      if (id != null || !escribir) return id;
+      final nueva = await categories!.saveCategory(
+        Category(nombre: nombre!.trim()),
+      );
+      categoriaPorNombre[key] = nueva;
+      return nueva;
+    }
 
     for (final rf in rep.alimentos) {
       final imp = rf.alimento;
@@ -132,6 +158,7 @@ class ImportRepertoire {
                 marca: imp.marca,
                 tipo: imp.tipo,
                 unidad: imp.unidad,
+                categoriaId: await categoriaDe(rf.categoria),
                 nutricion: imp.nutricion,
                 origenNutricion: imp.nutricion.estaVacia
                     ? null
@@ -158,9 +185,17 @@ class ImportRepertoire {
           report.sinCambios++;
         }
         final notas = (local.notas ?? '').isEmpty ? imp.notas : local.notas;
-        if (escribir && (cambia || notas != local.notas || local.archivado)) {
+        final categoria =
+            local.categoriaId ??
+            (escribir ? await categoriaDe(rf.categoria) : null);
+        if (escribir &&
+            (cambia ||
+                notas != local.notas ||
+                local.archivado ||
+                categoria != local.categoriaId)) {
           await foods.saveFood(
             local.copyWith(
+              categoriaId: categoria,
               nutricion: merged,
               origenNutricion: cambia
                   ? (local.origenNutricion ?? NutritionSource.importado)

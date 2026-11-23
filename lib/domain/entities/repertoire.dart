@@ -8,10 +8,14 @@ class RepertoireFood {
   final List<FoodPortion> porciones;
   final List<FoodPackage> presentaciones;
 
+  /// Nombre de la categoría (los ids no viajan entre móviles).
+  final String? categoria;
+
   const RepertoireFood({
     required this.alimento,
     this.porciones = const [],
     this.presentaciones = const [],
+    this.categoria,
   });
 }
 

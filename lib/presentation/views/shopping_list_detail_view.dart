@@ -6,10 +6,14 @@ import '../../core/styles.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/shopping_list.dart';
+import '../../domain/services/aisle_grouping.dart';
 import '../../domain/services/ingredient_matcher.dart';
+import '../providers/foods_provider.dart';
 import '../providers/shopping_provider.dart';
 import '../widgets/cart_price_sheet.dart';
+import '../widgets/dialog_controllers.dart';
 import 'cart_mode_view.dart';
+import 'categories_view.dart';
 import 'food_detail_view.dart';
 import 'food_picker_view.dart';
 import 'shopping_lists_view.dart';
@@ -31,6 +35,12 @@ class _ShoppingListDetailViewState
     extends ConsumerState<ShoppingListDetailView> {
   final _addCtrl = TextEditingController();
   final _addFocus = FocusNode();
+
+  /// Agrupar los pendientes por pasillos (categorías).
+  bool _porPasillos = true;
+
+  /// Tienda cuyo orden de pasillos se usa (null = orden general).
+  String? _tienda;
 
   ShoppingItemsNotifier get _notifier =>
       ref.read(shoppingItemsProvider(widget.listaId).notifier);
@@ -165,85 +175,91 @@ class _ShoppingListDetailViewState
   }
 
   Future<void> _edit(ShoppingItem item) async {
-    final textCtrl = TextEditingController(text: item.texto);
-    final qtyCtrl = TextEditingController(text: item.cantidad ?? '');
     Food? food = await _foodOf(item, pedir: false);
     if (!mounted) return;
 
-    final save = await showDialog<bool>(
+    final valores = await showDialog<List<String>>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          title: const Text('Editar artículo'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: textCtrl,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Artículo'),
+      builder: (_) => DialogControllers(
+        iniciales: [item.texto, item.cantidad ?? ''],
+        builder: (ctx, c) {
+          final textCtrl = c[0];
+          final qtyCtrl = c[1];
+          return StatefulBuilder(
+            builder: (ctx, setLocal) => AlertDialog(
+              title: const Text('Editar artículo'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: textCtrl,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: const InputDecoration(labelText: 'Artículo'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: qtyCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Cantidad (opcional)',
+                      hintText: 'Ej: 2 L, 1 kg, 3 unidades',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.kitchen_outlined),
+                    title: Text(
+                      food?.nombreCompleto ?? 'Sin alimento vinculado',
+                    ),
+                    subtitle: const Text('Para el precio de referencia'),
+                    trailing: food == null
+                        ? TextButton(
+                            onPressed: () async {
+                              final f = await FoodPickerView.pick(
+                                ctx,
+                                initialQuery: textCtrl.text,
+                              );
+                              if (f != null) setLocal(() => food = f);
+                            },
+                            child: const Text('Vincular'),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.link_off),
+                            onPressed: () => setLocal(() => food = null),
+                          ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: qtyCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Cantidad (opcional)',
-                  hintText: 'Ej: 2 L, 1 kg, 3 unidades',
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
                 ),
-              ),
-              const SizedBox(height: 8),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.kitchen_outlined),
-                title: Text(food?.nombreCompleto ?? 'Sin alimento vinculado'),
-                subtitle: const Text('Para el precio de referencia'),
-                trailing: food == null
-                    ? TextButton(
-                        onPressed: () async {
-                          final f = await FoodPickerView.pick(
-                            ctx,
-                            initialQuery: textCtrl.text,
-                          );
-                          if (f != null) setLocal(() => food = f);
-                        },
-                        child: const Text('Vincular'),
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.link_off),
-                        onPressed: () => setLocal(() => food = null),
-                      ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.pop(ctx, [textCtrl.text, qtyCtrl.text]),
+                  child: const Text('Guardar'),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Guardar'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
-    if (save == true && textCtrl.text.trim().isNotEmpty) {
+    if (valores != null && valores[0].trim().isNotEmpty) {
       final mismoAlimento = food?.id == item.alimentoId;
       // Cambiar de alimento saca el artículo del carrito (la compra queda en
       // el historial del alimento anterior).
       await _notifier.update(
         item.copyWith(
-          texto: textCtrl.text.trim(),
-          cantidad: qtyCtrl.text.trim(),
+          texto: valores[0].trim(),
+          cantidad: valores[1].trim(),
           alimentoId: food?.id,
           clearAlimento: food == null,
           clearCompra: !mismoAlimento,
         ),
       );
     }
-    textCtrl.dispose();
-    qtyCtrl.dispose();
   }
 
   Future<void> _copyAsText(String nombre, List<ShoppingItem> items) async {
@@ -262,10 +278,84 @@ class _ShoppingListDetailViewState
     }
   }
 
+  /// Elige el orden de pasillos: general o el de una tienda.
+  Future<void> _chooseAisleStore() async {
+    final stores = await ref.read(purchaseRepositoryProvider).getStoreNames();
+    if (!mounted) return;
+    final res = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            const ListTile(
+              title: Text(
+                'Ordenar por los pasillos de…',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.public),
+              title: const Text('Orden general'),
+              onTap: () => Navigator.pop(ctx, ''),
+            ),
+            for (final s in stores)
+              ListTile(
+                leading: const Icon(Icons.storefront_outlined),
+                title: Text(s),
+                onTap: () => Navigator.pop(ctx, s),
+              ),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text('Editar el orden de los pasillos'),
+              onTap: () => Navigator.pop(ctx, '\u0000editar'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (res == null || !mounted) return;
+    if (res == '\u0000editar') {
+      await CategoriesView.open(context, tienda: _tienda);
+      return;
+    }
+    setState(() {
+      _tienda = res.isEmpty ? null : res;
+      _porPasillos = true;
+    });
+  }
+
+  /// Pendientes con cabeceras de pasillo.
+  List<Widget> _pendientesAgrupados(List<ShoppingItem> pendientes) {
+    if (!_porPasillos) return [...pendientes.map(_itemTile)];
+    final cats = ref.watch(categoriesProvider(_tienda)).valueOrNull;
+    if (cats == null) return [...pendientes.map(_itemTile)];
+    return [
+      for (final g in groupByAisle(pendientes, cats)) ...[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: Text(
+            '${g.titulo} (${g.items.length})',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: AppStyles.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ...g.items.map(_itemTile),
+      ],
+    ];
+  }
+
   Future<void> _onMenu(String value, ShoppingList? list) async {
     final items = ref.read(shoppingItemsProvider(widget.listaId)).items;
     final actions = ref.read(shoppingListsActionsProvider);
     switch (value) {
+      case 'pasillos':
+        setState(() => _porPasillos = !_porPasillos);
+      case 'orden':
+        await _chooseAisleStore();
       case 'copy':
         await _copyAsText(list?.nombre ?? 'Lista de compra', items);
       case 'uncheck':
@@ -387,12 +477,41 @@ class _ShoppingListDetailViewState
           ),
           PopupMenuButton<String>(
             onSelected: (v) => _onMenu(v, list),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'copy', child: Text('Copiar como texto')),
-              PopupMenuItem(value: 'uncheck', child: Text('Desmarcar todo')),
-              PopupMenuItem(value: 'clear', child: Text('Quitar comprados')),
-              PopupMenuItem(value: 'rename', child: Text('Renombrar lista')),
-              PopupMenuItem(value: 'delete', child: Text('Eliminar lista')),
+            itemBuilder: (_) => [
+              CheckedPopupMenuItem(
+                value: 'pasillos',
+                checked: _porPasillos,
+                child: const Text('Agrupar por pasillos'),
+              ),
+              PopupMenuItem(
+                value: 'orden',
+                child: Text(
+                  _tienda == null
+                      ? 'Orden de pasillos: general'
+                      : 'Orden de pasillos: $_tienda',
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: 'copy',
+                child: Text('Copiar como texto'),
+              ),
+              const PopupMenuItem(
+                value: 'uncheck',
+                child: Text('Desmarcar todo'),
+              ),
+              const PopupMenuItem(
+                value: 'clear',
+                child: Text('Quitar comprados'),
+              ),
+              const PopupMenuItem(
+                value: 'rename',
+                child: Text('Renombrar lista'),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Text('Eliminar lista'),
+              ),
             ],
           ),
         ],
@@ -446,7 +565,7 @@ class _ShoppingListDetailViewState
                   )
                 : ListView(
                     children: [
-                      ...pendientes.map(_itemTile),
+                      ..._pendientesAgrupados(pendientes),
                       if (comprados.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),

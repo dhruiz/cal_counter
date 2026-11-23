@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/entities/category.dart';
 import '../../domain/entities/purchase.dart';
 import '../../domain/usecases/export_price_history_csv.dart';
 import 'core_providers.dart';
@@ -26,3 +27,12 @@ final exportPriceHistoryCsvProvider = Provider<ExportPriceHistoryCsv>(
 final purgeOnStartupProvider = FutureProvider<int>(
   (ref) => ref.watch(purgeOldPurchasesProvider)(),
 );
+
+/// Gasto por categoría en los últimos [dias] días. Se recalcula cuando
+/// cambian las compras.
+final spendingByCategoryProvider = FutureProvider.autoDispose
+    .family<List<CategorySpending>, int>((ref, dias) {
+      ref.watch(lastPurchasePerFoodProvider); // dependencia: cambios en compras
+      final desde = DateTime.now().subtract(Duration(days: dias));
+      return ref.watch(purchaseRepositoryProvider).spendingByCategory(desde);
+    });

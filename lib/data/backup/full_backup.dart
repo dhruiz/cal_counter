@@ -27,10 +27,13 @@ class FullBackupService {
 
   /// Orden de inserción (padres antes que hijos por las claves foráneas).
   static const List<String> tablas = [
+    'categorias',
     'alimentos',
     'porciones',
     'presentaciones',
     'establecimientos',
+    'orden_pasillos',
+    'codigos_bascula',
     'compras',
     'listas_compra',
     'items_lista',
@@ -49,7 +52,9 @@ class FullBackupService {
   Future<String> export() async {
     final data = <String, Object?>{};
     for (final t in tablas) {
-      final rows = await db.customSelect('SELECT * FROM $t ORDER BY id').get();
+      final rows = await db
+          .customSelect('SELECT * FROM $t ORDER BY rowid')
+          .get();
       data[t] = [for (final r in rows) r.data];
     }
     final prefs = await SharedPreferences.getInstance();
@@ -137,6 +142,9 @@ class FullBackupService {
           );
         }
       }
+      // Respaldos anteriores a la v2 no traen categorías.
+      await db.sembrarCategorias();
+      await db.clasificarAlimentos();
       await db.reconstruirBusqueda();
     });
     db.notifyUpdates({for (final t in db.allTables) TableUpdate.onTable(t)});

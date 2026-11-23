@@ -52,6 +52,9 @@ class Food extends Equatable {
   final FoodType tipo;
   final FoodUnit unidad;
 
+  /// Sección del súper (null = sin categoría).
+  final int? categoriaId;
+
   /// Por 100 g/ml. Los valores desconocidos son null.
   final NutritionFacts nutricion;
   final NutritionSource? origenNutricion;
@@ -69,6 +72,7 @@ class Food extends Equatable {
     this.marca = '',
     this.tipo = FoodType.generico,
     this.unidad = FoodUnit.g,
+    this.categoriaId,
     this.nutricion = NutritionFacts.vacia,
     this.origenNutricion,
     this.notas,
@@ -97,6 +101,8 @@ class Food extends Equatable {
     String? marca,
     FoodType? tipo,
     FoodUnit? unidad,
+    int? categoriaId,
+    bool clearCategoria = false,
     NutritionFacts? nutricion,
     NutritionSource? origenNutricion,
     bool clearOrigen = false,
@@ -112,6 +118,7 @@ class Food extends Equatable {
       marca: marca ?? this.marca,
       tipo: tipo ?? this.tipo,
       unidad: unidad ?? this.unidad,
+      categoriaId: clearCategoria ? null : (categoriaId ?? this.categoriaId),
       nutricion: nutricion ?? this.nutricion,
       origenNutricion: clearOrigen
           ? null
@@ -133,6 +140,7 @@ class Food extends Equatable {
     marca,
     tipo,
     unidad,
+    categoriaId,
     nutricion,
     origenNutricion,
     notas,

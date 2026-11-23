@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/entities/category.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/price_stats.dart';
 import '../../domain/entities/purchase.dart';
@@ -15,10 +16,17 @@ class FoodQuery extends Equatable {
   final String texto;
   final FoodFilter filtro;
 
-  const FoodQuery(this.texto, [this.filtro = FoodFilter.todos]);
+  /// Null = todas; [kSinCategoria] = sin categoría.
+  final int? categoriaId;
+
+  const FoodQuery(
+    this.texto, [
+    this.filtro = FoodFilter.todos,
+    this.categoriaId,
+  ]);
 
   @override
-  List<Object?> get props => [texto, filtro];
+  List<Object?> get props => [texto, filtro, categoriaId];
 }
 
 /// Resultados de búsqueda (texto o código) que se actualizan solos.
@@ -26,7 +34,7 @@ final foodSearchProvider = StreamProvider.autoDispose
     .family<List<Food>, FoodQuery>(
       (ref, q) => ref
           .watch(foodRepositoryProvider)
-          .watchSearch(q.texto, filter: q.filtro),
+          .watchSearch(q.texto, filter: q.filtro, categoriaId: q.categoriaId),
     );
 
 final foodProvider = StreamProvider.autoDispose.family<Food?, int>(
@@ -78,3 +86,16 @@ final recipesUsingFoodProvider = StreamProvider.autoDispose
     .family<List<Recipe>, int>(
       (ref, id) => ref.watch(recipeRepositoryProvider).watchUsingFood(id),
     );
+
+/// Categorías en el orden general de los pasillos, o en el de una tienda.
+final categoriesProvider = StreamProvider.autoDispose
+    .family<List<Category>, String?>(
+      (ref, tienda) =>
+          ref.watch(categoryRepositoryProvider).watchCategories(tienda: tienda),
+    );
+
+/// ¿La tienda tiene orden de pasillos propio?
+final hasStoreOrderProvider = StreamProvider.autoDispose.family<bool, String>(
+  (ref, tienda) =>
+      ref.watch(categoryRepositoryProvider).watchHasStoreOrder(tienda),
+);

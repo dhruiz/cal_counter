@@ -43,6 +43,12 @@ class ShoppingItem extends Equatable {
   final int unidades;
   final int? precioCent;
 
+  /// Peso de la compra (frescos al peso).
+  final double? pesoG;
+
+  /// Categoría del alimento vinculado (solo lectura).
+  final int? categoriaId;
+
   // Referencia: última compra conocida del alimento (solo lectura).
   final int? precioReferenciaCent;
   final String? establecimientoReferencia;
@@ -59,6 +65,8 @@ class ShoppingItem extends Equatable {
     this.presentacionId,
     this.unidades = 1,
     this.precioCent,
+    this.pesoG,
+    this.categoriaId,
     this.precioReferenciaCent,
     this.establecimientoReferencia,
   });
@@ -92,6 +100,8 @@ class ShoppingItem extends Equatable {
       presentacionId: clearCompra ? null : presentacionId,
       unidades: clearCompra ? 1 : unidades,
       precioCent: clearCompra ? null : precioCent,
+      pesoG: clearCompra ? null : pesoG,
+      categoriaId: categoriaId,
       precioReferenciaCent: precioReferenciaCent,
       establecimientoReferencia: establecimientoReferencia,
     );
@@ -110,6 +120,8 @@ class ShoppingItem extends Equatable {
     presentacionId,
     unidades,
     precioCent,
+    pesoG,
+    categoriaId,
     precioReferenciaCent,
     establecimientoReferencia,
   ];

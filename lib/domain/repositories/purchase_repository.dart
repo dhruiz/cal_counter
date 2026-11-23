@@ -1,3 +1,4 @@
+import '../entities/category.dart';
 import '../entities/food.dart';
 import '../entities/purchase.dart';
 
@@ -33,6 +34,9 @@ abstract class PurchaseRepository {
 
   /// Compras desde [fecha] (incluida), por alimento y fecha.
   Future<List<PurchaseRecord>> historySince(DateTime fecha);
+
+  /// Gasto por categoría desde [desde] (incluida), de mayor a menor.
+  Future<List<CategorySpending>> spendingByCategory(DateTime desde);
 }
 
 /// Atajo para mostrar presentaciones con su última compra.

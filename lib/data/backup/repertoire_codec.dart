@@ -10,7 +10,7 @@ import '../../domain/errors/domain_errors.dart';
 ///
 /// ```json
 /// {"formato": "cal_counter/repertorio", "version": 1, "exportado": "...",
-///  "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad",
+///  "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "categoria",
 ///    "nutricion": {"kcal", ..., "origen"}, "notas",
 ///    "porciones": [{"nombre", "gramos"}],
 ///    "presentaciones": [{"uuid", "codigo_barras", "descripcion",
@@ -61,6 +61,7 @@ class RepertoireCodec {
       if (f.marca.isNotEmpty) 'marca': f.marca,
       'tipo': f.tipo.clave,
       'unidad': f.unidad.clave,
+      if ((rf.categoria ?? '').isNotEmpty) 'categoria': rf.categoria,
       if (!n.estaVacia)
         'nutricion': {
           for (final e in _claves.entries)
@@ -180,7 +181,9 @@ class RepertoireCodec {
       origen = NutritionSource.fromClave(n['origen'] as String?);
     }
     final uuid = _str(a['uuid']);
+    final categoria = _str(a['categoria']);
     return RepertoireFood(
+      categoria: categoria.isEmpty ? null : categoria,
       alimento: Food(
         uuid: uuid.isEmpty ? null : uuid,
         nombre: nombre,

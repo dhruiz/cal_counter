@@ -53,8 +53,16 @@ class _SearchViewState extends ConsumerState<SearchView> {
       title: 'Escanear envase',
     );
     if (code == null || !mounted) return;
-    final food = await FoodFlows.foodForBarcode(context, ref, code);
-    if (food != null && mounted) await _register(food);
+    final res = await FoodFlows.scanAtHome(context, ref, code);
+    if (res == null || !mounted) return;
+    final navigator = Navigator.of(context);
+    final added = await FoodFlows.registerIntake(
+      context,
+      ref,
+      res.food,
+      initialQuantity: res.gramos,
+    );
+    if (added && mounted) navigator.pop();
   }
 
   Future<void> _create(String nombre) async {

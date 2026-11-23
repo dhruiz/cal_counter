@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/styles.dart';
+import '../../domain/entities/category.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../providers/foods_provider.dart';
@@ -28,6 +29,9 @@ class _FoodsViewState extends ConsumerState<FoodsView> {
   final _ctrl = TextEditingController();
   String _query = '';
   FoodFilter _filter = FoodFilter.todos;
+
+  /// Null = todas; [kSinCategoria] = sin categoría.
+  int? _categoria;
   Timer? _debounce;
 
   @override
@@ -61,13 +65,46 @@ class _FoodsViewState extends ConsumerState<FoodsView> {
 
   List<Food> _results() {
     // Pendientes sin texto: por prioridad (recetas, compras recientes).
-    if (_filter == FoodFilter.pendientes && _query.trim().isEmpty) {
+    if (_filter == FoodFilter.pendientes &&
+        _query.trim().isEmpty &&
+        _categoria == null) {
       return ref.watch(pendingFoodsProvider).valueOrNull ?? const [];
     }
     return ref
-            .watch(foodSearchProvider(FoodQuery(_query, _filter)))
+            .watch(foodSearchProvider(FoodQuery(_query, _filter, _categoria)))
             .valueOrNull ??
         const [];
+  }
+
+  Widget _categoryChip(List<Category> cats) {
+    final actual = _categoria == null
+        ? null
+        : (_categoria == kSinCategoria
+              ? 'Sin categoría'
+              : cats.where((c) => c.id == _categoria).firstOrNull?.nombre);
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: PopupMenuButton<int>(
+        tooltip: 'Filtrar por categoría',
+        onSelected: (v) => setState(() => _categoria = v < 0 ? null : v),
+        itemBuilder: (_) => [
+          const PopupMenuItem(value: -1, child: Text('Todas las categorías')),
+          for (final c in cats)
+            PopupMenuItem(value: c.id!, child: Text(c.nombre)),
+          const PopupMenuItem(
+            value: kSinCategoria,
+            child: Text('Sin categoría'),
+          ),
+        ],
+        child: Chip(
+          avatar: const Icon(Icons.category_outlined, size: 18),
+          label: Text(actual ?? 'Categoría'),
+          backgroundColor: actual == null
+              ? null
+              : Theme.of(context).colorScheme.secondaryContainer,
+        ),
+      ),
+    );
   }
 
   @override
@@ -126,6 +163,9 @@ class _FoodsViewState extends ConsumerState<FoodsView> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               children: [
+                _categoryChip(
+                  ref.watch(categoriesProvider(null)).valueOrNull ?? const [],
+                ),
                 for (final f in FoodFilter.values)
                   Padding(
                     padding: const EdgeInsets.only(right: 6),

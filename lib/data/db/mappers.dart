@@ -1,12 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../domain/entities/category.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/meal_item.dart';
 import '../../domain/entities/nutrition_facts.dart';
 import '../../domain/entities/purchase.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/services/dates.dart';
+import '../../domain/services/scale_barcode.dart';
 import 'app_database.dart';
 
 const Uuid _uuid = Uuid();
@@ -37,6 +39,7 @@ Food foodFromRow(AlimentoRow r) => Food(
   marca: r.marca,
   tipo: FoodType.fromClave(r.tipo),
   unidad: FoodUnit.fromClave(r.unidad),
+  categoriaId: r.categoriaId,
   nutricion: NutritionFacts(
     kcal: r.kcal,
     proteinas: r.proteinas,
@@ -65,6 +68,7 @@ AlimentosCompanion foodToCompanion(Food f) {
     marca: Value(f.marca.trim()),
     tipo: Value(f.tipo.clave),
     unidad: Value(f.unidad.clave),
+    categoriaId: Value(f.categoriaId),
     kcal: Value(n.kcal),
     proteinas: Value(n.proteinas),
     grasas: Value(n.grasas),
@@ -104,8 +108,19 @@ Purchase purchaseFromRows(CompraRow c, EstablecimientoRow e) => Purchase(
   fecha: parseDay(c.fecha),
   precioCent: c.precioCent,
   unidades: c.unidades,
+  pesoG: c.pesoG,
   establecimiento: e.nombre,
 );
+
+Store storeFromRow(EstablecimientoRow e) => Store(
+  id: e.id,
+  nombre: e.nombre,
+  formatoBascula: ScaleFormat.fromClave(e.formatoBascula),
+  longitudClave: e.longitudClave,
+);
+
+Category categoryFromRow(CategoriaRow c) =>
+    Category(id: c.id, nombre: c.nombre, orden: c.orden);
 
 // Recetas --------------------------------------------------------------------
 

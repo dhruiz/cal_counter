@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import '../../domain/services/category_guesser.dart';
+import '../../domain/services/ingredient_matcher.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -12,10 +14,13 @@ const String kDatabaseName = 'cal_counter';
 /// app: FTS5, claves foráneas y la misma versión en todos los dispositivos).
 @DriftDatabase(
   tables: [
+    Categorias,
     Alimentos,
     Porciones,
     Presentaciones,
     Establecimientos,
+    OrdenPasillos,
+    CodigosBascula,
     Compras,
     ListasCompra,
     ItemsLista,
@@ -32,25 +37,84 @@ class AppDatabase extends _$AppDatabase {
   factory AppDatabase.dispositivo() =>
       AppDatabase(driftDatabase(name: kDatabaseName));
 
+  /// v1: esquema inicial. v2: categorías y orden de pasillos, etiquetas de
+  /// báscula por tienda y peso real de las compras.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
       await m.createAll();
-      await _crearIndices();
+      await _crearIndices(_indices);
+      await _crearIndices(_indicesV2);
       await _crearBusqueda();
+      await sembrarCategorias();
+    },
+    onUpgrade: (m, from, to) async {
+      // Las claves foráneas se desactivan durante la migración (se vuelven
+      // a activar en beforeOpen).
+      await customStatement('PRAGMA foreign_keys = OFF');
+      if (from < 2) {
+        await m.createTable(categorias);
+        await m.createTable(ordenPasillos);
+        await m.createTable(codigosBascula);
+        await m.addColumn(alimentos, alimentos.categoriaId);
+        await m.addColumn(establecimientos, establecimientos.formatoBascula);
+        await m.addColumn(establecimientos, establecimientos.longitudClave);
+        await m.addColumn(compras, compras.pesoG);
+        await _crearIndices(_indicesV2);
+        await sembrarCategorias();
+        await clasificarAlimentos();
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
 
-  Future<void> _crearIndices() async {
-    for (final sql in _indices) {
+  Future<void> _crearIndices(List<String> sentencias) async {
+    for (final sql in sentencias) {
       await customStatement(sql);
     }
+  }
+
+  /// Crea las categorías por defecto si no hay ninguna.
+  Future<void> sembrarCategorias() async {
+    final hay = await customSelect(
+      'SELECT COUNT(*) AS n FROM categorias',
+    ).getSingle();
+    if (hay.read<int>('n') > 0) return;
+    for (var i = 0; i < defaultCategories.length; i++) {
+      await into(categorias).insert(
+        CategoriasCompanion.insert(
+          nombre: defaultCategories[i].nombre,
+          orden: Value(i),
+        ),
+      );
+    }
+  }
+
+  /// Asigna categoría (por su nombre) a los alimentos que no tienen.
+  Future<int> clasificarAlimentos() async {
+    final cats = await select(categorias).get();
+    final porNombre = {for (final c in cats) normalizeText(c.nombre): c.id};
+    final sin = await customSelect(
+      'SELECT id, nombre FROM alimentos WHERE categoria_id IS NULL',
+    ).get();
+    var n = 0;
+    for (final r in sin) {
+      final guess = guessCategoryName(r.read<String>('nombre'));
+      final id = guess == null ? null : porNombre[normalizeText(guess)];
+      if (id == null) continue;
+      await customUpdate(
+        'UPDATE alimentos SET categoria_id = ? WHERE id = ?',
+        variables: [Variable.withInt(id), Variable.withInt(r.read<int>('id'))],
+        updates: {alimentos},
+      );
+      n++;
+    }
+    return n;
   }
 
   /// Índice de búsqueda FTS5 sobre nombre y marca, sin tildes, sincronizado
@@ -81,6 +145,12 @@ const List<String> _indices = [
   'CREATE INDEX ix_comidas_fecha ON comidas(fecha)',
   'CREATE INDEX ix_items_comida ON items_comida(comida_id)',
   'CREATE INDEX ix_items_comida_alimento ON items_comida(alimento_id)',
+];
+
+const List<String> _indicesV2 = [
+  'CREATE INDEX ix_alimentos_categoria ON alimentos(categoria_id)',
+  'CREATE INDEX ix_codigos_bascula_presentacion '
+      'ON codigos_bascula(presentacion_id)',
 ];
 
 const List<String> _fts = [

@@ -133,6 +133,8 @@ class ShoppingItemsNotifier extends StateNotifier<ShoppingItemsState> {
     required int precioCent,
     required String establecimiento,
     int unidades = 1,
+    bool alPeso = false,
+    double? pesoG,
   }) => _ref.read(addToCartProvider)(
     listaId: listaId,
     alimento: alimento,
@@ -141,6 +143,8 @@ class ShoppingItemsNotifier extends StateNotifier<ShoppingItemsState> {
     precioCent: precioCent,
     establecimiento: establecimiento,
     unidades: unidades,
+    alPeso: alPeso,
+    pesoG: pesoG,
   );
 
   /// Corrige precio/unidades. Ver [UpdateCartItem].

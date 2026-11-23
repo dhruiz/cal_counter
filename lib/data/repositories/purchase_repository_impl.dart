@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/entities/category.dart';
 import '../../domain/entities/purchase.dart';
 import '../../domain/errors/domain_errors.dart';
 import '../../domain/repositories/purchase_repository.dart';
@@ -88,6 +89,7 @@ class PurchaseRepositoryImpl implements PurchaseRepository {
               fecha: dayKey(compra.fecha),
               precioCent: compra.precioCent,
               unidades: Value(compra.unidades),
+              pesoG: Value(compra.pesoG),
             ),
           );
     });
@@ -107,6 +109,7 @@ class PurchaseRepositoryImpl implements PurchaseRepository {
           fecha: Value(dayKey(compra.fecha)),
           precioCent: Value(compra.precioCent),
           unidades: Value(compra.unidades),
+          pesoG: Value(compra.pesoG),
         ),
       );
     });
@@ -216,6 +219,46 @@ class PurchaseRepositoryImpl implements PurchaseRepository {
       updates: {db.compras, db.itemsLista},
       updateKind: UpdateKind.delete,
     );
+  }
+
+  @override
+  Future<List<CategorySpending>> spendingByCategory(DateTime desde) async {
+    final rows = await db
+        .customSelect(
+          'SELECT c.categoria_id AS cid, cat.nombre AS cnombre, '
+          'cat.orden AS corden, SUM(co.precio_cent * co.unidades) AS total, '
+          'COUNT(*) AS n '
+          'FROM compras co '
+          'JOIN presentaciones p ON p.id = co.presentacion_id '
+          'JOIN alimentos c ON c.id = p.alimento_id '
+          'LEFT JOIN categorias cat ON cat.id = c.categoria_id '
+          'WHERE co.fecha >= ? '
+          'GROUP BY c.categoria_id ORDER BY total DESC',
+          variables: [Variable.withString(dayKey(desde))],
+          readsFrom: {
+            db.compras,
+            db.presentaciones,
+            db.alimentos,
+            db.categorias,
+          },
+        )
+        .get();
+    return [
+      for (final r in rows)
+        CategorySpending(
+          categoria:
+              r.readNullable<int>('cid') == null ||
+                  r.readNullable<String>('cnombre') == null
+              ? null
+              : Category(
+                  id: r.read<int>('cid'),
+                  nombre: r.read<String>('cnombre'),
+                  orden: r.read<int>('corden'),
+                ),
+          totalCent: r.read<int>('total'),
+          compras: r.read<int>('n'),
+        ),
+    ];
   }
 
   @override

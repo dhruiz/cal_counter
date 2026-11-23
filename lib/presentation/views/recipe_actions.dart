@@ -11,6 +11,7 @@ import '../../domain/services/nutrition_calculator.dart';
 import '../../domain/services/quantity_parser.dart';
 import '../providers/foods_provider.dart';
 import '../providers/recipes_provider.dart';
+import '../widgets/dialog_controllers.dart';
 import 'food_form_view.dart';
 import 'food_picker_view.dart';
 
@@ -126,33 +127,13 @@ class RecipeActions {
     Food food,
     String nombre,
   ) async {
-    final ctrl = TextEditingController();
     final gramos = await showDialog<double>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('¿Cuánto pesa 1 $nombre?'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText: '1 $nombre de ${food.nombre}',
-            suffixText: food.u,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, parseDecimal(ctrl.text)),
-            child: const Text('Guardar'),
-          ),
-        ],
+      builder: (_) => DialogControllers(
+        iniciales: const [''],
+        builder: (ctx, c) => _portionDialog(ctx, c.first, food, nombre),
       ),
     );
-    ctrl.dispose();
     if (gramos == null || gramos <= 0) return;
     try {
       await ref
@@ -168,6 +149,34 @@ class RecipeActions {
       }
     }
   }
+
+  static Widget _portionDialog(
+    BuildContext ctx,
+    TextEditingController ctrl,
+    Food food,
+    String nombre,
+  ) => AlertDialog(
+    title: Text('¿Cuánto pesa 1 $nombre?'),
+    content: TextField(
+      controller: ctrl,
+      autofocus: true,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: '1 $nombre de ${food.nombre}',
+        suffixText: food.u,
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(ctx),
+        child: const Text('Cancelar'),
+      ),
+      ElevatedButton(
+        onPressed: () => Navigator.pop(ctx, parseDecimal(ctrl.text)),
+        child: const Text('Guardar'),
+      ),
+    ],
+  );
 }
 
 class _IngredientEditor extends ConsumerStatefulWidget {

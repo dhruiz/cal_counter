@@ -50,6 +50,10 @@ class CartPriceSheet extends StatefulWidget {
   final List<String>? tiendas;
   final String? tiendaInicial;
 
+  /// Producto al peso (etiqueta de báscula): se pide el importe del paquete
+  /// y no hay unidades.
+  final bool alPeso;
+
   const CartPriceSheet({
     super.key,
     required this.titulo,
@@ -63,6 +67,7 @@ class CartPriceSheet extends StatefulWidget {
     this.edicion = false,
     this.tiendas,
     this.tiendaInicial,
+    this.alPeso = false,
   });
 
   static Future<CartPriceResult?> show(
@@ -179,17 +184,21 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
                 InfoBanner(
                   color: AppStyles.semaphBlue,
                   icon: Icons.shopping_cart,
-                  text:
-                      'Ya llevas ${widget.yaEnCarrito} en el carrito; '
-                      'se sumarán estas unidades.',
+                  text: widget.alPeso
+                      ? 'Ya llevas este producto en el carrito; se sumará '
+                            'este paquete.'
+                      : 'Ya llevas ${widget.yaEnCarrito} en el carrito; '
+                            'se sumarán estas unidades.',
                 ),
               if (sinPrecioGuardado && !widget.edicion)
-                const InfoBanner(
+                InfoBanner(
                   color: AppStyles.semaphBlue,
                   icon: Icons.sell_outlined,
-                  text:
-                      'No hay precio guardado: escribe el de la etiqueta y '
-                      'quedará registrado.',
+                  text: widget.alPeso
+                      ? 'Escribe el importe que marca la etiqueta: la próxima '
+                            'vez se calculará solo con el peso.'
+                      : 'No hay precio guardado: escribe el de la etiqueta y '
+                            'quedará registrado.',
                 ),
               const SizedBox(height: 12),
               Row(
@@ -202,11 +211,13 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Precio por unidad',
+                      decoration: InputDecoration(
+                        labelText: widget.alPeso
+                            ? 'Importe del paquete'
+                            : 'Precio por unidad',
                         hintText: 'Ej: 2,35',
                         suffixText: '€',
-                        prefixIcon: Icon(Icons.sell_outlined),
+                        prefixIcon: const Icon(Icons.sell_outlined),
                       ),
                       onChanged: (_) => setState(() {}),
                       validator: (v) => parsePrecioCent(v ?? '') == null
@@ -214,11 +225,13 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
                           : null,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  _UnitsStepper(
-                    value: _unidades,
-                    onChanged: (v) => setState(() => _unidades = v),
-                  ),
+                  if (!widget.alPeso) ...[
+                    const SizedBox(width: 8),
+                    _UnitsStepper(
+                      value: _unidades,
+                      onChanged: (v) => setState(() => _unidades = v),
+                    ),
+                  ],
                 ],
               ),
               if (widget.tiendas != null) ...[
@@ -252,7 +265,7 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
               ],
               const SizedBox(height: 12),
               Text(
-                precio == null
+                precio == null || widget.alPeso
                     ? ' '
                     : 'Subtotal: $_unidades × ${AppUtils.formatPrecioCent(precio)}'
                           ' = ${AppUtils.formatPrecioCent(precio * _unidades)}',

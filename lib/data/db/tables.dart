@@ -8,6 +8,16 @@ import 'package:drift/drift.dart';
 // Los días se guardan como TEXT 'YYYY-MM-DD'; las marcas de tiempo como
 // ISO 8601. El dinero, en céntimos (INTEGER).
 
+/// Secciones del súper. [orden] es el orden general de los pasillos (v2).
+@DataClassName('CategoriaRow')
+class Categorias extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get nombre => text()
+      .withLength(min: 1)
+      .customConstraint('NOT NULL UNIQUE COLLATE NOCASE')();
+  IntColumn get orden => integer().withDefault(const Constant(0))();
+}
+
 /// Repertorio central de alimentos. Nutrición por 100 g/ml; NULL = desconocido.
 @DataClassName('AlimentoRow')
 class Alimentos extends Table {
@@ -23,6 +33,12 @@ class Alimentos extends Table {
       .check(tipo.isIn(['generico', 'envasado', 'preparado']))();
   TextColumn get unidad =>
       text().withDefault(const Constant('g')).check(unidad.isIn(['g', 'ml']))();
+  // v2
+  IntColumn get categoriaId => integer().nullable().references(
+    Categorias,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   RealColumn get kcal =>
       real().nullable().check(kcal.isBiggerOrEqualValue(0))();
   RealColumn get proteinas =>
@@ -86,12 +102,57 @@ class Presentaciones extends Table {
   TextColumn get actualizado => text()();
 }
 
+/// Tiendas, con el formato aprendido de sus etiquetas de báscula (v2).
 @DataClassName('EstablecimientoRow')
 class Establecimientos extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get nombre => text()
       .withLength(min: 1)
       .customConstraint('NOT NULL UNIQUE COLLATE NOCASE')();
+  // v2: 'precio' (importe en céntimos) o 'peso' (gramos); NULL = sin aprender.
+  TextColumn get formatoBascula =>
+      text().nullable().check(formatoBascula.isIn(['precio', 'peso']))();
+  // v2: dígitos fijos que identifican el producto (6 o 7).
+  IntColumn get longitudClave => integer()
+      .withDefault(const Constant(7))
+      .check(longitudClave.isIn([6, 7]))();
+}
+
+/// Orden de los pasillos de una tienda concreta (v2). Sin filas, la tienda
+/// usa el orden general de `categorias`.
+@DataClassName('OrdenPasilloRow')
+class OrdenPasillos extends Table {
+  IntColumn get establecimientoId => integer().references(
+    Establecimientos,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+  IntColumn get categoriaId =>
+      integer().references(Categorias, #id, onDelete: KeyAction.cascade)();
+  IntColumn get orden => integer()();
+
+  @override
+  Set<Column> get primaryKey => {establecimientoId, categoriaId};
+}
+
+/// Etiquetas de báscula aprendidas (v2): en cada tienda, la parte fija del
+/// código identifica una presentación "al peso" de un alimento.
+@DataClassName('CodigoBasculaRow')
+class CodigosBascula extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get establecimientoId => integer().references(
+    Establecimientos,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+  TextColumn get clave => text()();
+  IntColumn get presentacionId =>
+      integer().references(Presentaciones, #id, onDelete: KeyAction.cascade)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {establecimientoId, clave},
+  ];
 }
 
 /// Historial de precios. RESTRICT: una presentación con compras no se borra
@@ -112,6 +173,8 @@ class Compras extends Table {
   IntColumn get unidades => integer()
       .withDefault(const Constant(1))
       .check(unidades.isBiggerOrEqualValue(1))();
+  // v2: peso neto real de la compra (frescos al peso), para el €/kg.
+  RealColumn get pesoG => real().nullable().check(pesoG.isBiggerThanValue(0))();
 }
 
 @DataClassName('ListaCompraRow')

@@ -24,6 +24,7 @@ final exportRepertoireProvider = Provider<ExportRepertoire>(
   (ref) => ExportRepertoire(
     ref.watch(foodRepositoryProvider),
     ref.watch(recipeRepositoryProvider),
+    ref.watch(categoryRepositoryProvider),
   ),
 );
 
@@ -32,6 +33,7 @@ final importRepertoireProvider = Provider<ImportRepertoire>(
     ref.watch(foodRepositoryProvider),
     ref.watch(recipeRepositoryProvider),
     ref.watch(transactionRunnerProvider),
+    ref.watch(categoryRepositoryProvider),
   ),
 );
 

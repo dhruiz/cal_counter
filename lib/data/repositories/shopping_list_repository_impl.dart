@@ -69,9 +69,11 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
       .customSelect(
         'SELECT i.*, c.presentacion_id AS c_presentacion, '
         'c.unidades AS c_unidades, c.precio_cent AS c_precio, '
+        'c.peso_g AS c_peso, a.categoria_id AS a_categoria, '
         '(SELECT c2.precio_cent $_refSub) AS ref_precio, '
         '(SELECT e2.nombre $_refSub) AS ref_tienda '
         'FROM items_lista i LEFT JOIN compras c ON c.id = i.compra_id '
+        'LEFT JOIN alimentos a ON a.id = i.alimento_id '
         'WHERE i.lista_id = ? '
         'ORDER BY i.comprado ASC, i.orden ASC, i.id ASC',
         variables: [Variable.withInt(listaId)],
@@ -80,6 +82,7 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
           db.compras,
           db.presentaciones,
           db.establecimientos,
+          db.alimentos,
         },
       )
       .map((r) {
@@ -96,6 +99,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
           presentacionId: r.readNullable<int>('c_presentacion'),
           unidades: r.readNullable<int>('c_unidades') ?? 1,
           precioCent: r.readNullable<int>('c_precio'),
+          pesoG: r.readNullable<double>('c_peso'),
+          categoriaId: r.readNullable<int>('a_categoria'),
           precioReferenciaCent: r.readNullable<int>('ref_precio'),
           establecimientoReferencia: r.readNullable<String>('ref_tienda'),
         );

@@ -20,6 +20,10 @@ import 'register_purchase.dart';
 ///   vinculándolo al alimento; si no estaba en la lista, lo añade ya
 ///   comprado. La UI pregunta antes de ese último caso.
 ///
+/// Productos al peso ([alPeso]): [precioCent] es el importe del paquete y
+/// [pesoG] su peso (si se conoce). Varios paquetes del mismo producto se
+/// acumulan en la misma compra (importe y peso sumados, 1 unidad).
+///
 /// Devuelve el id del artículo.
 class AddToCart {
   final ShoppingListRepository shopping;
@@ -36,10 +40,13 @@ class AddToCart {
     int? itemId,
     required int precioCent,
     int unidades = 1,
+    bool alPeso = false,
+    double? pesoG,
     required String establecimiento,
     DateTime? fecha,
   }) {
     RegisterPurchase.validarPrecioCent(precioCent);
+    if (alPeso) unidades = 1;
     if (unidades < 1) {
       throw const ValidationException('Las unidades deben ser al menos 1.');
     }
@@ -55,6 +62,7 @@ class AddToCart {
           fecha: dia,
           precioCent: precioCent,
           unidades: unidades,
+          pesoG: pesoG,
           establecimiento: tienda,
         ),
       );
@@ -73,11 +81,23 @@ class AddToCart {
         final compra = await purchases.getPurchase(target.compraId!);
         if (compra != null) {
           await purchases.updatePurchase(
-            compra.copyWith(
-              unidades: compra.unidades + unidades,
-              precioCent: precioCent,
-              presentacionId: pid,
-            ),
+            alPeso
+                ? Purchase(
+                    id: compra.id,
+                    presentacionId: pid,
+                    fecha: compra.fecha,
+                    precioCent: compra.totalCent + precioCent,
+                    unidades: 1,
+                    pesoG: (compra.pesoG == null && pesoG == null)
+                        ? null
+                        : (compra.pesoG ?? 0) + (pesoG ?? 0),
+                    establecimiento: compra.establecimiento,
+                  )
+                : compra.copyWith(
+                    unidades: compra.unidades + unidades,
+                    precioCent: precioCent,
+                    presentacionId: pid,
+                  ),
           );
           return target.id!;
         }

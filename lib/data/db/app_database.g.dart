@@ -3,6 +3,252 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class $CategoriasTable extends Categorias
+    with TableInfo<$CategoriasTable, CategoriaRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CategoriasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nombreMeta = const VerificationMeta('nombre');
+  @override
+  late final GeneratedColumn<String> nombre = GeneratedColumn<String>(
+    'nombre',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE COLLATE NOCASE',
+  );
+  static const VerificationMeta _ordenMeta = const VerificationMeta('orden');
+  @override
+  late final GeneratedColumn<int> orden = GeneratedColumn<int>(
+    'orden',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, nombre, orden];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'categorias';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CategoriaRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nombre')) {
+      context.handle(
+        _nombreMeta,
+        nombre.isAcceptableOrUnknown(data['nombre']!, _nombreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nombreMeta);
+    }
+    if (data.containsKey('orden')) {
+      context.handle(
+        _ordenMeta,
+        orden.isAcceptableOrUnknown(data['orden']!, _ordenMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CategoriaRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CategoriaRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nombre: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nombre'],
+      )!,
+      orden: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}orden'],
+      )!,
+    );
+  }
+
+  @override
+  $CategoriasTable createAlias(String alias) {
+    return $CategoriasTable(attachedDatabase, alias);
+  }
+}
+
+class CategoriaRow extends DataClass implements Insertable<CategoriaRow> {
+  final int id;
+  final String nombre;
+  final int orden;
+  const CategoriaRow({
+    required this.id,
+    required this.nombre,
+    required this.orden,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nombre'] = Variable<String>(nombre);
+    map['orden'] = Variable<int>(orden);
+    return map;
+  }
+
+  CategoriasCompanion toCompanion(bool nullToAbsent) {
+    return CategoriasCompanion(
+      id: Value(id),
+      nombre: Value(nombre),
+      orden: Value(orden),
+    );
+  }
+
+  factory CategoriaRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CategoriaRow(
+      id: serializer.fromJson<int>(json['id']),
+      nombre: serializer.fromJson<String>(json['nombre']),
+      orden: serializer.fromJson<int>(json['orden']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nombre': serializer.toJson<String>(nombre),
+      'orden': serializer.toJson<int>(orden),
+    };
+  }
+
+  CategoriaRow copyWith({int? id, String? nombre, int? orden}) => CategoriaRow(
+    id: id ?? this.id,
+    nombre: nombre ?? this.nombre,
+    orden: orden ?? this.orden,
+  );
+  CategoriaRow copyWithCompanion(CategoriasCompanion data) {
+    return CategoriaRow(
+      id: data.id.present ? data.id.value : this.id,
+      nombre: data.nombre.present ? data.nombre.value : this.nombre,
+      orden: data.orden.present ? data.orden.value : this.orden,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CategoriaRow(')
+          ..write('id: $id, ')
+          ..write('nombre: $nombre, ')
+          ..write('orden: $orden')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, nombre, orden);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CategoriaRow &&
+          other.id == this.id &&
+          other.nombre == this.nombre &&
+          other.orden == this.orden);
+}
+
+class CategoriasCompanion extends UpdateCompanion<CategoriaRow> {
+  final Value<int> id;
+  final Value<String> nombre;
+  final Value<int> orden;
+  const CategoriasCompanion({
+    this.id = const Value.absent(),
+    this.nombre = const Value.absent(),
+    this.orden = const Value.absent(),
+  });
+  CategoriasCompanion.insert({
+    this.id = const Value.absent(),
+    required String nombre,
+    this.orden = const Value.absent(),
+  }) : nombre = Value(nombre);
+  static Insertable<CategoriaRow> custom({
+    Expression<int>? id,
+    Expression<String>? nombre,
+    Expression<int>? orden,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nombre != null) 'nombre': nombre,
+      if (orden != null) 'orden': orden,
+    });
+  }
+
+  CategoriasCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nombre,
+    Value<int>? orden,
+  }) {
+    return CategoriasCompanion(
+      id: id ?? this.id,
+      nombre: nombre ?? this.nombre,
+      orden: orden ?? this.orden,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nombre.present) {
+      map['nombre'] = Variable<String>(nombre.value);
+    }
+    if (orden.present) {
+      map['orden'] = Variable<int>(orden.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CategoriasCompanion(')
+          ..write('id: $id, ')
+          ..write('nombre: $nombre, ')
+          ..write('orden: $orden')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $AlimentosTable extends Alimentos
     with TableInfo<$AlimentosTable, AlimentoRow> {
   @override
@@ -76,6 +322,20 @@ class $AlimentosTable extends Alimentos
     type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultValue: const Constant('g'),
+  );
+  static const VerificationMeta _categoriaIdMeta = const VerificationMeta(
+    'categoriaId',
+  );
+  @override
+  late final GeneratedColumn<int> categoriaId = GeneratedColumn<int>(
+    'categoria_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES categorias (id) ON DELETE SET NULL',
+    ),
   );
   static const VerificationMeta _kcalMeta = const VerificationMeta('kcal');
   @override
@@ -257,6 +517,7 @@ class $AlimentosTable extends Alimentos
     marca,
     tipo,
     unidad,
+    categoriaId,
     kcal,
     proteinas,
     grasas,
@@ -320,6 +581,15 @@ class $AlimentosTable extends Alimentos
       context.handle(
         _unidadMeta,
         unidad.isAcceptableOrUnknown(data['unidad']!, _unidadMeta),
+      );
+    }
+    if (data.containsKey('categoria_id')) {
+      context.handle(
+        _categoriaIdMeta,
+        categoriaId.isAcceptableOrUnknown(
+          data['categoria_id']!,
+          _categoriaIdMeta,
+        ),
       );
     }
     if (data.containsKey('kcal')) {
@@ -465,6 +735,10 @@ class $AlimentosTable extends Alimentos
         DriftSqlType.string,
         data['${effectivePrefix}unidad'],
       )!,
+      categoriaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}categoria_id'],
+      ),
       kcal: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}kcal'],
@@ -541,6 +815,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
   final String marca;
   final String tipo;
   final String unidad;
+  final int? categoriaId;
   final double? kcal;
   final double? proteinas;
   final double? grasas;
@@ -563,6 +838,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     required this.marca,
     required this.tipo,
     required this.unidad,
+    this.categoriaId,
     this.kcal,
     this.proteinas,
     this.grasas,
@@ -588,6 +864,9 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     map['marca'] = Variable<String>(marca);
     map['tipo'] = Variable<String>(tipo);
     map['unidad'] = Variable<String>(unidad);
+    if (!nullToAbsent || categoriaId != null) {
+      map['categoria_id'] = Variable<int>(categoriaId);
+    }
     if (!nullToAbsent || kcal != null) {
       map['kcal'] = Variable<double>(kcal);
     }
@@ -636,6 +915,9 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       marca: Value(marca),
       tipo: Value(tipo),
       unidad: Value(unidad),
+      categoriaId: categoriaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categoriaId),
       kcal: kcal == null && nullToAbsent ? const Value.absent() : Value(kcal),
       proteinas: proteinas == null && nullToAbsent
           ? const Value.absent()
@@ -684,6 +966,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       marca: serializer.fromJson<String>(json['marca']),
       tipo: serializer.fromJson<String>(json['tipo']),
       unidad: serializer.fromJson<String>(json['unidad']),
+      categoriaId: serializer.fromJson<int?>(json['categoriaId']),
       kcal: serializer.fromJson<double?>(json['kcal']),
       proteinas: serializer.fromJson<double?>(json['proteinas']),
       grasas: serializer.fromJson<double?>(json['grasas']),
@@ -711,6 +994,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       'marca': serializer.toJson<String>(marca),
       'tipo': serializer.toJson<String>(tipo),
       'unidad': serializer.toJson<String>(unidad),
+      'categoriaId': serializer.toJson<int?>(categoriaId),
       'kcal': serializer.toJson<double?>(kcal),
       'proteinas': serializer.toJson<double?>(proteinas),
       'grasas': serializer.toJson<double?>(grasas),
@@ -736,6 +1020,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     String? marca,
     String? tipo,
     String? unidad,
+    Value<int?> categoriaId = const Value.absent(),
     Value<double?> kcal = const Value.absent(),
     Value<double?> proteinas = const Value.absent(),
     Value<double?> grasas = const Value.absent(),
@@ -758,6 +1043,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     marca: marca ?? this.marca,
     tipo: tipo ?? this.tipo,
     unidad: unidad ?? this.unidad,
+    categoriaId: categoriaId.present ? categoriaId.value : this.categoriaId,
     kcal: kcal.present ? kcal.value : this.kcal,
     proteinas: proteinas.present ? proteinas.value : this.proteinas,
     grasas: grasas.present ? grasas.value : this.grasas,
@@ -788,6 +1074,9 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       marca: data.marca.present ? data.marca.value : this.marca,
       tipo: data.tipo.present ? data.tipo.value : this.tipo,
       unidad: data.unidad.present ? data.unidad.value : this.unidad,
+      categoriaId: data.categoriaId.present
+          ? data.categoriaId.value
+          : this.categoriaId,
       kcal: data.kcal.present ? data.kcal.value : this.kcal,
       proteinas: data.proteinas.present ? data.proteinas.value : this.proteinas,
       grasas: data.grasas.present ? data.grasas.value : this.grasas,
@@ -823,6 +1112,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
           ..write('marca: $marca, ')
           ..write('tipo: $tipo, ')
           ..write('unidad: $unidad, ')
+          ..write('categoriaId: $categoriaId, ')
           ..write('kcal: $kcal, ')
           ..write('proteinas: $proteinas, ')
           ..write('grasas: $grasas, ')
@@ -850,6 +1140,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     marca,
     tipo,
     unidad,
+    categoriaId,
     kcal,
     proteinas,
     grasas,
@@ -876,6 +1167,7 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
           other.marca == this.marca &&
           other.tipo == this.tipo &&
           other.unidad == this.unidad &&
+          other.categoriaId == this.categoriaId &&
           other.kcal == this.kcal &&
           other.proteinas == this.proteinas &&
           other.grasas == this.grasas &&
@@ -900,6 +1192,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
   final Value<String> marca;
   final Value<String> tipo;
   final Value<String> unidad;
+  final Value<int?> categoriaId;
   final Value<double?> kcal;
   final Value<double?> proteinas;
   final Value<double?> grasas;
@@ -922,6 +1215,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     this.marca = const Value.absent(),
     this.tipo = const Value.absent(),
     this.unidad = const Value.absent(),
+    this.categoriaId = const Value.absent(),
     this.kcal = const Value.absent(),
     this.proteinas = const Value.absent(),
     this.grasas = const Value.absent(),
@@ -945,6 +1239,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     this.marca = const Value.absent(),
     this.tipo = const Value.absent(),
     this.unidad = const Value.absent(),
+    this.categoriaId = const Value.absent(),
     this.kcal = const Value.absent(),
     this.proteinas = const Value.absent(),
     this.grasas = const Value.absent(),
@@ -971,6 +1266,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     Expression<String>? marca,
     Expression<String>? tipo,
     Expression<String>? unidad,
+    Expression<int>? categoriaId,
     Expression<double>? kcal,
     Expression<double>? proteinas,
     Expression<double>? grasas,
@@ -994,6 +1290,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
       if (marca != null) 'marca': marca,
       if (tipo != null) 'tipo': tipo,
       if (unidad != null) 'unidad': unidad,
+      if (categoriaId != null) 'categoria_id': categoriaId,
       if (kcal != null) 'kcal': kcal,
       if (proteinas != null) 'proteinas': proteinas,
       if (grasas != null) 'grasas': grasas,
@@ -1019,6 +1316,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     Value<String>? marca,
     Value<String>? tipo,
     Value<String>? unidad,
+    Value<int?>? categoriaId,
     Value<double?>? kcal,
     Value<double?>? proteinas,
     Value<double?>? grasas,
@@ -1042,6 +1340,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
       marca: marca ?? this.marca,
       tipo: tipo ?? this.tipo,
       unidad: unidad ?? this.unidad,
+      categoriaId: categoriaId ?? this.categoriaId,
       kcal: kcal ?? this.kcal,
       proteinas: proteinas ?? this.proteinas,
       grasas: grasas ?? this.grasas,
@@ -1080,6 +1379,9 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     }
     if (unidad.present) {
       map['unidad'] = Variable<String>(unidad.value);
+    }
+    if (categoriaId.present) {
+      map['categoria_id'] = Variable<int>(categoriaId.value);
     }
     if (kcal.present) {
       map['kcal'] = Variable<double>(kcal.value);
@@ -1138,6 +1440,7 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
           ..write('marca: $marca, ')
           ..write('tipo: $tipo, ')
           ..write('unidad: $unidad, ')
+          ..write('categoriaId: $categoriaId, ')
           ..write('kcal: $kcal, ')
           ..write('proteinas: $proteinas, ')
           ..write('grasas: $grasas, ')
@@ -2066,8 +2369,38 @@ class $EstablecimientosTable extends Establecimientos
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL UNIQUE COLLATE NOCASE',
   );
+  static const VerificationMeta _formatoBasculaMeta = const VerificationMeta(
+    'formatoBascula',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, nombre];
+  late final GeneratedColumn<String> formatoBascula = GeneratedColumn<String>(
+    'formato_bascula',
+    aliasedName,
+    true,
+    check: () => formatoBascula.isIn(['precio', 'peso']),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _longitudClaveMeta = const VerificationMeta(
+    'longitudClave',
+  );
+  @override
+  late final GeneratedColumn<int> longitudClave = GeneratedColumn<int>(
+    'longitud_clave',
+    aliasedName,
+    false,
+    check: () => longitudClave.isIn([6, 7]),
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(7),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nombre,
+    formatoBascula,
+    longitudClave,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2091,6 +2424,24 @@ class $EstablecimientosTable extends Establecimientos
     } else if (isInserting) {
       context.missing(_nombreMeta);
     }
+    if (data.containsKey('formato_bascula')) {
+      context.handle(
+        _formatoBasculaMeta,
+        formatoBascula.isAcceptableOrUnknown(
+          data['formato_bascula']!,
+          _formatoBasculaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('longitud_clave')) {
+      context.handle(
+        _longitudClaveMeta,
+        longitudClave.isAcceptableOrUnknown(
+          data['longitud_clave']!,
+          _longitudClaveMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2108,6 +2459,14 @@ class $EstablecimientosTable extends Establecimientos
         DriftSqlType.string,
         data['${effectivePrefix}nombre'],
       )!,
+      formatoBascula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formato_bascula'],
+      ),
+      longitudClave: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}longitud_clave'],
+      )!,
     );
   }
 
@@ -2121,17 +2480,35 @@ class EstablecimientoRow extends DataClass
     implements Insertable<EstablecimientoRow> {
   final int id;
   final String nombre;
-  const EstablecimientoRow({required this.id, required this.nombre});
+  final String? formatoBascula;
+  final int longitudClave;
+  const EstablecimientoRow({
+    required this.id,
+    required this.nombre,
+    this.formatoBascula,
+    required this.longitudClave,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['nombre'] = Variable<String>(nombre);
+    if (!nullToAbsent || formatoBascula != null) {
+      map['formato_bascula'] = Variable<String>(formatoBascula);
+    }
+    map['longitud_clave'] = Variable<int>(longitudClave);
     return map;
   }
 
   EstablecimientosCompanion toCompanion(bool nullToAbsent) {
-    return EstablecimientosCompanion(id: Value(id), nombre: Value(nombre));
+    return EstablecimientosCompanion(
+      id: Value(id),
+      nombre: Value(nombre),
+      formatoBascula: formatoBascula == null && nullToAbsent
+          ? const Value.absent()
+          : Value(formatoBascula),
+      longitudClave: Value(longitudClave),
+    );
   }
 
   factory EstablecimientoRow.fromJson(
@@ -2142,6 +2519,8 @@ class EstablecimientoRow extends DataClass
     return EstablecimientoRow(
       id: serializer.fromJson<int>(json['id']),
       nombre: serializer.fromJson<String>(json['nombre']),
+      formatoBascula: serializer.fromJson<String?>(json['formatoBascula']),
+      longitudClave: serializer.fromJson<int>(json['longitudClave']),
     );
   }
   @override
@@ -2150,15 +2529,34 @@ class EstablecimientoRow extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'nombre': serializer.toJson<String>(nombre),
+      'formatoBascula': serializer.toJson<String?>(formatoBascula),
+      'longitudClave': serializer.toJson<int>(longitudClave),
     };
   }
 
-  EstablecimientoRow copyWith({int? id, String? nombre}) =>
-      EstablecimientoRow(id: id ?? this.id, nombre: nombre ?? this.nombre);
+  EstablecimientoRow copyWith({
+    int? id,
+    String? nombre,
+    Value<String?> formatoBascula = const Value.absent(),
+    int? longitudClave,
+  }) => EstablecimientoRow(
+    id: id ?? this.id,
+    nombre: nombre ?? this.nombre,
+    formatoBascula: formatoBascula.present
+        ? formatoBascula.value
+        : this.formatoBascula,
+    longitudClave: longitudClave ?? this.longitudClave,
+  );
   EstablecimientoRow copyWithCompanion(EstablecimientosCompanion data) {
     return EstablecimientoRow(
       id: data.id.present ? data.id.value : this.id,
       nombre: data.nombre.present ? data.nombre.value : this.nombre,
+      formatoBascula: data.formatoBascula.present
+          ? data.formatoBascula.value
+          : this.formatoBascula,
+      longitudClave: data.longitudClave.present
+          ? data.longitudClave.value
+          : this.longitudClave,
     );
   }
 
@@ -2166,46 +2564,67 @@ class EstablecimientoRow extends DataClass
   String toString() {
     return (StringBuffer('EstablecimientoRow(')
           ..write('id: $id, ')
-          ..write('nombre: $nombre')
+          ..write('nombre: $nombre, ')
+          ..write('formatoBascula: $formatoBascula, ')
+          ..write('longitudClave: $longitudClave')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, nombre);
+  int get hashCode => Object.hash(id, nombre, formatoBascula, longitudClave);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is EstablecimientoRow &&
           other.id == this.id &&
-          other.nombre == this.nombre);
+          other.nombre == this.nombre &&
+          other.formatoBascula == this.formatoBascula &&
+          other.longitudClave == this.longitudClave);
 }
 
 class EstablecimientosCompanion extends UpdateCompanion<EstablecimientoRow> {
   final Value<int> id;
   final Value<String> nombre;
+  final Value<String?> formatoBascula;
+  final Value<int> longitudClave;
   const EstablecimientosCompanion({
     this.id = const Value.absent(),
     this.nombre = const Value.absent(),
+    this.formatoBascula = const Value.absent(),
+    this.longitudClave = const Value.absent(),
   });
   EstablecimientosCompanion.insert({
     this.id = const Value.absent(),
     required String nombre,
+    this.formatoBascula = const Value.absent(),
+    this.longitudClave = const Value.absent(),
   }) : nombre = Value(nombre);
   static Insertable<EstablecimientoRow> custom({
     Expression<int>? id,
     Expression<String>? nombre,
+    Expression<String>? formatoBascula,
+    Expression<int>? longitudClave,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nombre != null) 'nombre': nombre,
+      if (formatoBascula != null) 'formato_bascula': formatoBascula,
+      if (longitudClave != null) 'longitud_clave': longitudClave,
     });
   }
 
-  EstablecimientosCompanion copyWith({Value<int>? id, Value<String>? nombre}) {
+  EstablecimientosCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nombre,
+    Value<String?>? formatoBascula,
+    Value<int>? longitudClave,
+  }) {
     return EstablecimientosCompanion(
       id: id ?? this.id,
       nombre: nombre ?? this.nombre,
+      formatoBascula: formatoBascula ?? this.formatoBascula,
+      longitudClave: longitudClave ?? this.longitudClave,
     );
   }
 
@@ -2218,6 +2637,12 @@ class EstablecimientosCompanion extends UpdateCompanion<EstablecimientoRow> {
     if (nombre.present) {
       map['nombre'] = Variable<String>(nombre.value);
     }
+    if (formatoBascula.present) {
+      map['formato_bascula'] = Variable<String>(formatoBascula.value);
+    }
+    if (longitudClave.present) {
+      map['longitud_clave'] = Variable<int>(longitudClave.value);
+    }
     return map;
   }
 
@@ -2225,7 +2650,616 @@ class EstablecimientosCompanion extends UpdateCompanion<EstablecimientoRow> {
   String toString() {
     return (StringBuffer('EstablecimientosCompanion(')
           ..write('id: $id, ')
-          ..write('nombre: $nombre')
+          ..write('nombre: $nombre, ')
+          ..write('formatoBascula: $formatoBascula, ')
+          ..write('longitudClave: $longitudClave')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OrdenPasillosTable extends OrdenPasillos
+    with TableInfo<$OrdenPasillosTable, OrdenPasilloRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OrdenPasillosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _establecimientoIdMeta = const VerificationMeta(
+    'establecimientoId',
+  );
+  @override
+  late final GeneratedColumn<int> establecimientoId = GeneratedColumn<int>(
+    'establecimiento_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES establecimientos (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _categoriaIdMeta = const VerificationMeta(
+    'categoriaId',
+  );
+  @override
+  late final GeneratedColumn<int> categoriaId = GeneratedColumn<int>(
+    'categoria_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES categorias (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _ordenMeta = const VerificationMeta('orden');
+  @override
+  late final GeneratedColumn<int> orden = GeneratedColumn<int>(
+    'orden',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [establecimientoId, categoriaId, orden];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'orden_pasillos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OrdenPasilloRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('establecimiento_id')) {
+      context.handle(
+        _establecimientoIdMeta,
+        establecimientoId.isAcceptableOrUnknown(
+          data['establecimiento_id']!,
+          _establecimientoIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_establecimientoIdMeta);
+    }
+    if (data.containsKey('categoria_id')) {
+      context.handle(
+        _categoriaIdMeta,
+        categoriaId.isAcceptableOrUnknown(
+          data['categoria_id']!,
+          _categoriaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_categoriaIdMeta);
+    }
+    if (data.containsKey('orden')) {
+      context.handle(
+        _ordenMeta,
+        orden.isAcceptableOrUnknown(data['orden']!, _ordenMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ordenMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {establecimientoId, categoriaId};
+  @override
+  OrdenPasilloRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OrdenPasilloRow(
+      establecimientoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}establecimiento_id'],
+      )!,
+      categoriaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}categoria_id'],
+      )!,
+      orden: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}orden'],
+      )!,
+    );
+  }
+
+  @override
+  $OrdenPasillosTable createAlias(String alias) {
+    return $OrdenPasillosTable(attachedDatabase, alias);
+  }
+}
+
+class OrdenPasilloRow extends DataClass implements Insertable<OrdenPasilloRow> {
+  final int establecimientoId;
+  final int categoriaId;
+  final int orden;
+  const OrdenPasilloRow({
+    required this.establecimientoId,
+    required this.categoriaId,
+    required this.orden,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['establecimiento_id'] = Variable<int>(establecimientoId);
+    map['categoria_id'] = Variable<int>(categoriaId);
+    map['orden'] = Variable<int>(orden);
+    return map;
+  }
+
+  OrdenPasillosCompanion toCompanion(bool nullToAbsent) {
+    return OrdenPasillosCompanion(
+      establecimientoId: Value(establecimientoId),
+      categoriaId: Value(categoriaId),
+      orden: Value(orden),
+    );
+  }
+
+  factory OrdenPasilloRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OrdenPasilloRow(
+      establecimientoId: serializer.fromJson<int>(json['establecimientoId']),
+      categoriaId: serializer.fromJson<int>(json['categoriaId']),
+      orden: serializer.fromJson<int>(json['orden']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'establecimientoId': serializer.toJson<int>(establecimientoId),
+      'categoriaId': serializer.toJson<int>(categoriaId),
+      'orden': serializer.toJson<int>(orden),
+    };
+  }
+
+  OrdenPasilloRow copyWith({
+    int? establecimientoId,
+    int? categoriaId,
+    int? orden,
+  }) => OrdenPasilloRow(
+    establecimientoId: establecimientoId ?? this.establecimientoId,
+    categoriaId: categoriaId ?? this.categoriaId,
+    orden: orden ?? this.orden,
+  );
+  OrdenPasilloRow copyWithCompanion(OrdenPasillosCompanion data) {
+    return OrdenPasilloRow(
+      establecimientoId: data.establecimientoId.present
+          ? data.establecimientoId.value
+          : this.establecimientoId,
+      categoriaId: data.categoriaId.present
+          ? data.categoriaId.value
+          : this.categoriaId,
+      orden: data.orden.present ? data.orden.value : this.orden,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OrdenPasilloRow(')
+          ..write('establecimientoId: $establecimientoId, ')
+          ..write('categoriaId: $categoriaId, ')
+          ..write('orden: $orden')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(establecimientoId, categoriaId, orden);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OrdenPasilloRow &&
+          other.establecimientoId == this.establecimientoId &&
+          other.categoriaId == this.categoriaId &&
+          other.orden == this.orden);
+}
+
+class OrdenPasillosCompanion extends UpdateCompanion<OrdenPasilloRow> {
+  final Value<int> establecimientoId;
+  final Value<int> categoriaId;
+  final Value<int> orden;
+  final Value<int> rowid;
+  const OrdenPasillosCompanion({
+    this.establecimientoId = const Value.absent(),
+    this.categoriaId = const Value.absent(),
+    this.orden = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OrdenPasillosCompanion.insert({
+    required int establecimientoId,
+    required int categoriaId,
+    required int orden,
+    this.rowid = const Value.absent(),
+  }) : establecimientoId = Value(establecimientoId),
+       categoriaId = Value(categoriaId),
+       orden = Value(orden);
+  static Insertable<OrdenPasilloRow> custom({
+    Expression<int>? establecimientoId,
+    Expression<int>? categoriaId,
+    Expression<int>? orden,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (establecimientoId != null) 'establecimiento_id': establecimientoId,
+      if (categoriaId != null) 'categoria_id': categoriaId,
+      if (orden != null) 'orden': orden,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OrdenPasillosCompanion copyWith({
+    Value<int>? establecimientoId,
+    Value<int>? categoriaId,
+    Value<int>? orden,
+    Value<int>? rowid,
+  }) {
+    return OrdenPasillosCompanion(
+      establecimientoId: establecimientoId ?? this.establecimientoId,
+      categoriaId: categoriaId ?? this.categoriaId,
+      orden: orden ?? this.orden,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (establecimientoId.present) {
+      map['establecimiento_id'] = Variable<int>(establecimientoId.value);
+    }
+    if (categoriaId.present) {
+      map['categoria_id'] = Variable<int>(categoriaId.value);
+    }
+    if (orden.present) {
+      map['orden'] = Variable<int>(orden.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OrdenPasillosCompanion(')
+          ..write('establecimientoId: $establecimientoId, ')
+          ..write('categoriaId: $categoriaId, ')
+          ..write('orden: $orden, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CodigosBasculaTable extends CodigosBascula
+    with TableInfo<$CodigosBasculaTable, CodigoBasculaRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CodigosBasculaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _establecimientoIdMeta = const VerificationMeta(
+    'establecimientoId',
+  );
+  @override
+  late final GeneratedColumn<int> establecimientoId = GeneratedColumn<int>(
+    'establecimiento_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES establecimientos (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _claveMeta = const VerificationMeta('clave');
+  @override
+  late final GeneratedColumn<String> clave = GeneratedColumn<String>(
+    'clave',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _presentacionIdMeta = const VerificationMeta(
+    'presentacionId',
+  );
+  @override
+  late final GeneratedColumn<int> presentacionId = GeneratedColumn<int>(
+    'presentacion_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES presentaciones (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    establecimientoId,
+    clave,
+    presentacionId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'codigos_bascula';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CodigoBasculaRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('establecimiento_id')) {
+      context.handle(
+        _establecimientoIdMeta,
+        establecimientoId.isAcceptableOrUnknown(
+          data['establecimiento_id']!,
+          _establecimientoIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_establecimientoIdMeta);
+    }
+    if (data.containsKey('clave')) {
+      context.handle(
+        _claveMeta,
+        clave.isAcceptableOrUnknown(data['clave']!, _claveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_claveMeta);
+    }
+    if (data.containsKey('presentacion_id')) {
+      context.handle(
+        _presentacionIdMeta,
+        presentacionId.isAcceptableOrUnknown(
+          data['presentacion_id']!,
+          _presentacionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_presentacionIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {establecimientoId, clave},
+  ];
+  @override
+  CodigoBasculaRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CodigoBasculaRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      establecimientoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}establecimiento_id'],
+      )!,
+      clave: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}clave'],
+      )!,
+      presentacionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}presentacion_id'],
+      )!,
+    );
+  }
+
+  @override
+  $CodigosBasculaTable createAlias(String alias) {
+    return $CodigosBasculaTable(attachedDatabase, alias);
+  }
+}
+
+class CodigoBasculaRow extends DataClass
+    implements Insertable<CodigoBasculaRow> {
+  final int id;
+  final int establecimientoId;
+  final String clave;
+  final int presentacionId;
+  const CodigoBasculaRow({
+    required this.id,
+    required this.establecimientoId,
+    required this.clave,
+    required this.presentacionId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['establecimiento_id'] = Variable<int>(establecimientoId);
+    map['clave'] = Variable<String>(clave);
+    map['presentacion_id'] = Variable<int>(presentacionId);
+    return map;
+  }
+
+  CodigosBasculaCompanion toCompanion(bool nullToAbsent) {
+    return CodigosBasculaCompanion(
+      id: Value(id),
+      establecimientoId: Value(establecimientoId),
+      clave: Value(clave),
+      presentacionId: Value(presentacionId),
+    );
+  }
+
+  factory CodigoBasculaRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CodigoBasculaRow(
+      id: serializer.fromJson<int>(json['id']),
+      establecimientoId: serializer.fromJson<int>(json['establecimientoId']),
+      clave: serializer.fromJson<String>(json['clave']),
+      presentacionId: serializer.fromJson<int>(json['presentacionId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'establecimientoId': serializer.toJson<int>(establecimientoId),
+      'clave': serializer.toJson<String>(clave),
+      'presentacionId': serializer.toJson<int>(presentacionId),
+    };
+  }
+
+  CodigoBasculaRow copyWith({
+    int? id,
+    int? establecimientoId,
+    String? clave,
+    int? presentacionId,
+  }) => CodigoBasculaRow(
+    id: id ?? this.id,
+    establecimientoId: establecimientoId ?? this.establecimientoId,
+    clave: clave ?? this.clave,
+    presentacionId: presentacionId ?? this.presentacionId,
+  );
+  CodigoBasculaRow copyWithCompanion(CodigosBasculaCompanion data) {
+    return CodigoBasculaRow(
+      id: data.id.present ? data.id.value : this.id,
+      establecimientoId: data.establecimientoId.present
+          ? data.establecimientoId.value
+          : this.establecimientoId,
+      clave: data.clave.present ? data.clave.value : this.clave,
+      presentacionId: data.presentacionId.present
+          ? data.presentacionId.value
+          : this.presentacionId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CodigoBasculaRow(')
+          ..write('id: $id, ')
+          ..write('establecimientoId: $establecimientoId, ')
+          ..write('clave: $clave, ')
+          ..write('presentacionId: $presentacionId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, establecimientoId, clave, presentacionId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CodigoBasculaRow &&
+          other.id == this.id &&
+          other.establecimientoId == this.establecimientoId &&
+          other.clave == this.clave &&
+          other.presentacionId == this.presentacionId);
+}
+
+class CodigosBasculaCompanion extends UpdateCompanion<CodigoBasculaRow> {
+  final Value<int> id;
+  final Value<int> establecimientoId;
+  final Value<String> clave;
+  final Value<int> presentacionId;
+  const CodigosBasculaCompanion({
+    this.id = const Value.absent(),
+    this.establecimientoId = const Value.absent(),
+    this.clave = const Value.absent(),
+    this.presentacionId = const Value.absent(),
+  });
+  CodigosBasculaCompanion.insert({
+    this.id = const Value.absent(),
+    required int establecimientoId,
+    required String clave,
+    required int presentacionId,
+  }) : establecimientoId = Value(establecimientoId),
+       clave = Value(clave),
+       presentacionId = Value(presentacionId);
+  static Insertable<CodigoBasculaRow> custom({
+    Expression<int>? id,
+    Expression<int>? establecimientoId,
+    Expression<String>? clave,
+    Expression<int>? presentacionId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (establecimientoId != null) 'establecimiento_id': establecimientoId,
+      if (clave != null) 'clave': clave,
+      if (presentacionId != null) 'presentacion_id': presentacionId,
+    });
+  }
+
+  CodigosBasculaCompanion copyWith({
+    Value<int>? id,
+    Value<int>? establecimientoId,
+    Value<String>? clave,
+    Value<int>? presentacionId,
+  }) {
+    return CodigosBasculaCompanion(
+      id: id ?? this.id,
+      establecimientoId: establecimientoId ?? this.establecimientoId,
+      clave: clave ?? this.clave,
+      presentacionId: presentacionId ?? this.presentacionId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (establecimientoId.present) {
+      map['establecimiento_id'] = Variable<int>(establecimientoId.value);
+    }
+    if (clave.present) {
+      map['clave'] = Variable<String>(clave.value);
+    }
+    if (presentacionId.present) {
+      map['presentacion_id'] = Variable<int>(presentacionId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CodigosBasculaCompanion(')
+          ..write('id: $id, ')
+          ..write('establecimientoId: $establecimientoId, ')
+          ..write('clave: $clave, ')
+          ..write('presentacionId: $presentacionId')
           ..write(')'))
         .toString();
   }
@@ -2311,6 +3345,16 @@ class $ComprasTable extends Compras with TableInfo<$ComprasTable, CompraRow> {
     requiredDuringInsert: false,
     defaultValue: const Constant(1),
   );
+  static const VerificationMeta _pesoGMeta = const VerificationMeta('pesoG');
+  @override
+  late final GeneratedColumn<double> pesoG = GeneratedColumn<double>(
+    'peso_g',
+    aliasedName,
+    true,
+    check: () => ComparableExpr(pesoG).isBiggerThanValue(0),
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2319,6 +3363,7 @@ class $ComprasTable extends Compras with TableInfo<$ComprasTable, CompraRow> {
     fecha,
     precioCent,
     unidades,
+    pesoG,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2379,6 +3424,12 @@ class $ComprasTable extends Compras with TableInfo<$ComprasTable, CompraRow> {
         unidades.isAcceptableOrUnknown(data['unidades']!, _unidadesMeta),
       );
     }
+    if (data.containsKey('peso_g')) {
+      context.handle(
+        _pesoGMeta,
+        pesoG.isAcceptableOrUnknown(data['peso_g']!, _pesoGMeta),
+      );
+    }
     return context;
   }
 
@@ -2412,6 +3463,10 @@ class $ComprasTable extends Compras with TableInfo<$ComprasTable, CompraRow> {
         DriftSqlType.int,
         data['${effectivePrefix}unidades'],
       )!,
+      pesoG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}peso_g'],
+      ),
     );
   }
 
@@ -2428,6 +3483,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
   final String fecha;
   final int precioCent;
   final int unidades;
+  final double? pesoG;
   const CompraRow({
     required this.id,
     required this.presentacionId,
@@ -2435,6 +3491,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
     required this.fecha,
     required this.precioCent,
     required this.unidades,
+    this.pesoG,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2445,6 +3502,9 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
     map['fecha'] = Variable<String>(fecha);
     map['precio_cent'] = Variable<int>(precioCent);
     map['unidades'] = Variable<int>(unidades);
+    if (!nullToAbsent || pesoG != null) {
+      map['peso_g'] = Variable<double>(pesoG);
+    }
     return map;
   }
 
@@ -2456,6 +3516,9 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
       fecha: Value(fecha),
       precioCent: Value(precioCent),
       unidades: Value(unidades),
+      pesoG: pesoG == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pesoG),
     );
   }
 
@@ -2471,6 +3534,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
       fecha: serializer.fromJson<String>(json['fecha']),
       precioCent: serializer.fromJson<int>(json['precioCent']),
       unidades: serializer.fromJson<int>(json['unidades']),
+      pesoG: serializer.fromJson<double?>(json['pesoG']),
     );
   }
   @override
@@ -2483,6 +3547,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
       'fecha': serializer.toJson<String>(fecha),
       'precioCent': serializer.toJson<int>(precioCent),
       'unidades': serializer.toJson<int>(unidades),
+      'pesoG': serializer.toJson<double?>(pesoG),
     };
   }
 
@@ -2493,6 +3558,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
     String? fecha,
     int? precioCent,
     int? unidades,
+    Value<double?> pesoG = const Value.absent(),
   }) => CompraRow(
     id: id ?? this.id,
     presentacionId: presentacionId ?? this.presentacionId,
@@ -2500,6 +3566,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
     fecha: fecha ?? this.fecha,
     precioCent: precioCent ?? this.precioCent,
     unidades: unidades ?? this.unidades,
+    pesoG: pesoG.present ? pesoG.value : this.pesoG,
   );
   CompraRow copyWithCompanion(ComprasCompanion data) {
     return CompraRow(
@@ -2515,6 +3582,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
           ? data.precioCent.value
           : this.precioCent,
       unidades: data.unidades.present ? data.unidades.value : this.unidades,
+      pesoG: data.pesoG.present ? data.pesoG.value : this.pesoG,
     );
   }
 
@@ -2526,7 +3594,8 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
           ..write('establecimientoId: $establecimientoId, ')
           ..write('fecha: $fecha, ')
           ..write('precioCent: $precioCent, ')
-          ..write('unidades: $unidades')
+          ..write('unidades: $unidades, ')
+          ..write('pesoG: $pesoG')
           ..write(')'))
         .toString();
   }
@@ -2539,6 +3608,7 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
     fecha,
     precioCent,
     unidades,
+    pesoG,
   );
   @override
   bool operator ==(Object other) =>
@@ -2549,7 +3619,8 @@ class CompraRow extends DataClass implements Insertable<CompraRow> {
           other.establecimientoId == this.establecimientoId &&
           other.fecha == this.fecha &&
           other.precioCent == this.precioCent &&
-          other.unidades == this.unidades);
+          other.unidades == this.unidades &&
+          other.pesoG == this.pesoG);
 }
 
 class ComprasCompanion extends UpdateCompanion<CompraRow> {
@@ -2559,6 +3630,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
   final Value<String> fecha;
   final Value<int> precioCent;
   final Value<int> unidades;
+  final Value<double?> pesoG;
   const ComprasCompanion({
     this.id = const Value.absent(),
     this.presentacionId = const Value.absent(),
@@ -2566,6 +3638,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
     this.fecha = const Value.absent(),
     this.precioCent = const Value.absent(),
     this.unidades = const Value.absent(),
+    this.pesoG = const Value.absent(),
   });
   ComprasCompanion.insert({
     this.id = const Value.absent(),
@@ -2574,6 +3647,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
     required String fecha,
     required int precioCent,
     this.unidades = const Value.absent(),
+    this.pesoG = const Value.absent(),
   }) : presentacionId = Value(presentacionId),
        establecimientoId = Value(establecimientoId),
        fecha = Value(fecha),
@@ -2585,6 +3659,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
     Expression<String>? fecha,
     Expression<int>? precioCent,
     Expression<int>? unidades,
+    Expression<double>? pesoG,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2593,6 +3668,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
       if (fecha != null) 'fecha': fecha,
       if (precioCent != null) 'precio_cent': precioCent,
       if (unidades != null) 'unidades': unidades,
+      if (pesoG != null) 'peso_g': pesoG,
     });
   }
 
@@ -2603,6 +3679,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
     Value<String>? fecha,
     Value<int>? precioCent,
     Value<int>? unidades,
+    Value<double?>? pesoG,
   }) {
     return ComprasCompanion(
       id: id ?? this.id,
@@ -2611,6 +3688,7 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
       fecha: fecha ?? this.fecha,
       precioCent: precioCent ?? this.precioCent,
       unidades: unidades ?? this.unidades,
+      pesoG: pesoG ?? this.pesoG,
     );
   }
 
@@ -2635,6 +3713,9 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
     if (unidades.present) {
       map['unidades'] = Variable<int>(unidades.value);
     }
+    if (pesoG.present) {
+      map['peso_g'] = Variable<double>(pesoG.value);
+    }
     return map;
   }
 
@@ -2646,7 +3727,8 @@ class ComprasCompanion extends UpdateCompanion<CompraRow> {
           ..write('establecimientoId: $establecimientoId, ')
           ..write('fecha: $fecha, ')
           ..write('precioCent: $precioCent, ')
-          ..write('unidades: $unidades')
+          ..write('unidades: $unidades, ')
+          ..write('pesoG: $pesoG')
           ..write(')'))
         .toString();
   }
@@ -5491,12 +6573,15 @@ class ItemsComidaCompanion extends UpdateCompanion<ItemComidaRow> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $CategoriasTable categorias = $CategoriasTable(this);
   late final $AlimentosTable alimentos = $AlimentosTable(this);
   late final $PorcionesTable porciones = $PorcionesTable(this);
   late final $PresentacionesTable presentaciones = $PresentacionesTable(this);
   late final $EstablecimientosTable establecimientos = $EstablecimientosTable(
     this,
   );
+  late final $OrdenPasillosTable ordenPasillos = $OrdenPasillosTable(this);
+  late final $CodigosBasculaTable codigosBascula = $CodigosBasculaTable(this);
   late final $ComprasTable compras = $ComprasTable(this);
   late final $ListasCompraTable listasCompra = $ListasCompraTable(this);
   late final $ItemsListaTable itemsLista = $ItemsListaTable(this);
@@ -5510,10 +6595,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    categorias,
     alimentos,
     porciones,
     presentaciones,
     establecimientos,
+    ordenPasillos,
+    codigosBascula,
     compras,
     listasCompra,
     itemsLista,
@@ -5524,6 +6612,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'categorias',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('alimentos', kind: UpdateKind.update)],
+    ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'alimentos',
@@ -5537,6 +6632,34 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('presentaciones', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'establecimientos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('orden_pasillos', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'categorias',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('orden_pasillos', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'establecimientos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('codigos_bascula', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'presentaciones',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('codigos_bascula', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -5597,6 +6720,352 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ]);
 }
 
+typedef $$CategoriasTableCreateCompanionBuilder =
+    CategoriasCompanion Function({
+      Value<int> id,
+      required String nombre,
+      Value<int> orden,
+    });
+typedef $$CategoriasTableUpdateCompanionBuilder =
+    CategoriasCompanion Function({
+      Value<int> id,
+      Value<String> nombre,
+      Value<int> orden,
+    });
+
+final class $$CategoriasTableReferences
+    extends BaseReferences<_$AppDatabase, $CategoriasTable, CategoriaRow> {
+  $$CategoriasTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$AlimentosTable, List<AlimentoRow>>
+  _alimentosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.alimentos,
+    aliasName: 'categorias__id__alimentos__categoria_id',
+  );
+
+  $$AlimentosTableProcessedTableManager get alimentosRefs {
+    final manager = $$AlimentosTableTableManager(
+      $_db,
+      $_db.alimentos,
+    ).filter((f) => f.categoriaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_alimentosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$OrdenPasillosTable, List<OrdenPasilloRow>>
+  _ordenPasillosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ordenPasillos,
+    aliasName: 'categorias__id__orden_pasillos__categoria_id',
+  );
+
+  $$OrdenPasillosTableProcessedTableManager get ordenPasillosRefs {
+    final manager = $$OrdenPasillosTableTableManager(
+      $_db,
+      $_db.ordenPasillos,
+    ).filter((f) => f.categoriaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_ordenPasillosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CategoriasTableFilterComposer
+    extends Composer<_$AppDatabase, $CategoriasTable> {
+  $$CategoriasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nombre => $composableBuilder(
+    column: $table.nombre,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get orden => $composableBuilder(
+    column: $table.orden,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> alimentosRefs(
+    Expression<bool> Function($$AlimentosTableFilterComposer f) f,
+  ) {
+    final $$AlimentosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.alimentos,
+      getReferencedColumn: (t) => t.categoriaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AlimentosTableFilterComposer(
+            $db: $db,
+            $table: $db.alimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ordenPasillosRefs(
+    Expression<bool> Function($$OrdenPasillosTableFilterComposer f) f,
+  ) {
+    final $$OrdenPasillosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ordenPasillos,
+      getReferencedColumn: (t) => t.categoriaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdenPasillosTableFilterComposer(
+            $db: $db,
+            $table: $db.ordenPasillos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CategoriasTableOrderingComposer
+    extends Composer<_$AppDatabase, $CategoriasTable> {
+  $$CategoriasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nombre => $composableBuilder(
+    column: $table.nombre,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get orden => $composableBuilder(
+    column: $table.orden,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CategoriasTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CategoriasTable> {
+  $$CategoriasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nombre =>
+      $composableBuilder(column: $table.nombre, builder: (column) => column);
+
+  GeneratedColumn<int> get orden =>
+      $composableBuilder(column: $table.orden, builder: (column) => column);
+
+  Expression<T> alimentosRefs<T extends Object>(
+    Expression<T> Function($$AlimentosTableAnnotationComposer a) f,
+  ) {
+    final $$AlimentosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.alimentos,
+      getReferencedColumn: (t) => t.categoriaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AlimentosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.alimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> ordenPasillosRefs<T extends Object>(
+    Expression<T> Function($$OrdenPasillosTableAnnotationComposer a) f,
+  ) {
+    final $$OrdenPasillosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ordenPasillos,
+      getReferencedColumn: (t) => t.categoriaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdenPasillosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ordenPasillos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CategoriasTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CategoriasTable,
+          CategoriaRow,
+          $$CategoriasTableFilterComposer,
+          $$CategoriasTableOrderingComposer,
+          $$CategoriasTableAnnotationComposer,
+          $$CategoriasTableCreateCompanionBuilder,
+          $$CategoriasTableUpdateCompanionBuilder,
+          (CategoriaRow, $$CategoriasTableReferences),
+          CategoriaRow,
+          PrefetchHooks Function({bool alimentosRefs, bool ordenPasillosRefs})
+        > {
+  $$CategoriasTableTableManager(_$AppDatabase db, $CategoriasTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CategoriasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CategoriasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CategoriasTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> nombre = const Value.absent(),
+                Value<int> orden = const Value.absent(),
+              }) => CategoriasCompanion(id: id, nombre: nombre, orden: orden),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String nombre,
+                Value<int> orden = const Value.absent(),
+              }) => CategoriasCompanion.insert(
+                id: id,
+                nombre: nombre,
+                orden: orden,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CategoriasTable, CategoriaRow>(table),
+                  $$CategoriasTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({alimentosRefs = false, ordenPasillosRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (alimentosRefs) db.alimentos,
+                    if (ordenPasillosRefs) db.ordenPasillos,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (alimentosRefs)
+                        await $_getPrefetchedDataByColumns<
+                          CategoriaRow,
+                          $CategoriasTable,
+                          AlimentoRow,
+                          $AlimentosTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CategoriasTableReferences
+                              ._alimentosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CategoriasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).alimentosRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'categoria_id',
+                          typedResults: items,
+                        ),
+                      if (ordenPasillosRefs)
+                        await $_getPrefetchedDataByColumns<
+                          CategoriaRow,
+                          $CategoriasTable,
+                          OrdenPasilloRow,
+                          $OrdenPasillosTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CategoriasTableReferences
+                              ._ordenPasillosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CategoriasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ordenPasillosRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'categoria_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CategoriasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CategoriasTable,
+      CategoriaRow,
+      $$CategoriasTableFilterComposer,
+      $$CategoriasTableOrderingComposer,
+      $$CategoriasTableAnnotationComposer,
+      $$CategoriasTableCreateCompanionBuilder,
+      $$CategoriasTableUpdateCompanionBuilder,
+      (CategoriaRow, $$CategoriasTableReferences),
+      CategoriaRow,
+      PrefetchHooks Function({bool alimentosRefs, bool ordenPasillosRefs})
+    >;
 typedef $$AlimentosTableCreateCompanionBuilder =
     AlimentosCompanion Function({
       Value<int> id,
@@ -5605,6 +7074,7 @@ typedef $$AlimentosTableCreateCompanionBuilder =
       Value<String> marca,
       Value<String> tipo,
       Value<String> unidad,
+      Value<int?> categoriaId,
       Value<double?> kcal,
       Value<double?> proteinas,
       Value<double?> grasas,
@@ -5629,6 +7099,7 @@ typedef $$AlimentosTableUpdateCompanionBuilder =
       Value<String> marca,
       Value<String> tipo,
       Value<String> unidad,
+      Value<int?> categoriaId,
       Value<double?> kcal,
       Value<double?> proteinas,
       Value<double?> grasas,
@@ -5649,6 +7120,23 @@ typedef $$AlimentosTableUpdateCompanionBuilder =
 final class $$AlimentosTableReferences
     extends BaseReferences<_$AppDatabase, $AlimentosTable, AlimentoRow> {
   $$AlimentosTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $CategoriasTable _categoriaIdTable(_$AppDatabase db) =>
+      db.categorias.createAlias('alimentos__categoria_id__categorias__id');
+
+  $$CategoriasTableProcessedTableManager? get categoriaId {
+    final $_column = $_itemColumn<int>('categoria_id');
+    if ($_column == null) return null;
+    final manager = $$CategoriasTableTableManager(
+      $_db,
+      $_db.categorias,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoriaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<$PorcionesTable, List<PorcionRow>>
   _porcionesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
@@ -5879,6 +7367,29 @@ class $$AlimentosTableFilterComposer
     column: $table.actualizado,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$CategoriasTableFilterComposer get categoriaId {
+    final $$CategoriasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorias,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriasTableFilterComposer(
+            $db: $db,
+            $table: $db.categorias,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<bool> porcionesRefs(
     Expression<bool> Function($$PorcionesTableFilterComposer f) f,
@@ -6144,6 +7655,29 @@ class $$AlimentosTableOrderingComposer
     column: $table.actualizado,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$CategoriasTableOrderingComposer get categoriaId {
+    final $$CategoriasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorias,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriasTableOrderingComposer(
+            $db: $db,
+            $table: $db.categorias,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$AlimentosTableAnnotationComposer
@@ -6225,6 +7759,29 @@ class $$AlimentosTableAnnotationComposer
     column: $table.actualizado,
     builder: (column) => column,
   );
+
+  $$CategoriasTableAnnotationComposer get categoriaId {
+    final $$CategoriasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorias,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.categorias,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<T> porcionesRefs<T extends Object>(
     Expression<T> Function($$PorcionesTableAnnotationComposer a) f,
@@ -6392,6 +7949,7 @@ class $$AlimentosTableTableManager
           (AlimentoRow, $$AlimentosTableReferences),
           AlimentoRow,
           PrefetchHooks Function({
+            bool categoriaId,
             bool porcionesRefs,
             bool presentacionesRefs,
             bool itemsListaRefs,
@@ -6419,6 +7977,7 @@ class $$AlimentosTableTableManager
                 Value<String> marca = const Value.absent(),
                 Value<String> tipo = const Value.absent(),
                 Value<String> unidad = const Value.absent(),
+                Value<int?> categoriaId = const Value.absent(),
                 Value<double?> kcal = const Value.absent(),
                 Value<double?> proteinas = const Value.absent(),
                 Value<double?> grasas = const Value.absent(),
@@ -6441,6 +8000,7 @@ class $$AlimentosTableTableManager
                 marca: marca,
                 tipo: tipo,
                 unidad: unidad,
+                categoriaId: categoriaId,
                 kcal: kcal,
                 proteinas: proteinas,
                 grasas: grasas,
@@ -6465,6 +8025,7 @@ class $$AlimentosTableTableManager
                 Value<String> marca = const Value.absent(),
                 Value<String> tipo = const Value.absent(),
                 Value<String> unidad = const Value.absent(),
+                Value<int?> categoriaId = const Value.absent(),
                 Value<double?> kcal = const Value.absent(),
                 Value<double?> proteinas = const Value.absent(),
                 Value<double?> grasas = const Value.absent(),
@@ -6487,6 +8048,7 @@ class $$AlimentosTableTableManager
                 marca: marca,
                 tipo: tipo,
                 unidad: unidad,
+                categoriaId: categoriaId,
                 kcal: kcal,
                 proteinas: proteinas,
                 grasas: grasas,
@@ -6513,6 +8075,7 @@ class $$AlimentosTableTableManager
               .toList(),
           prefetchHooksCallback:
               ({
+                categoriaId = false,
                 porcionesRefs = false,
                 presentacionesRefs = false,
                 itemsListaRefs = false,
@@ -6530,7 +8093,38 @@ class $$AlimentosTableTableManager
                     if (ingredientesRecetaRefs) db.ingredientesReceta,
                     if (itemsComidaRefs) db.itemsComida,
                   ],
-                  addJoins: null,
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (categoriaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.categoriaId,
+                                    referencedTable: $$AlimentosTableReferences
+                                        ._categoriaIdTable(db),
+                                    referencedColumn: $$AlimentosTableReferences
+                                        ._categoriaIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (porcionesRefs)
@@ -6674,6 +8268,7 @@ typedef $$AlimentosTableProcessedTableManager =
       (AlimentoRow, $$AlimentosTableReferences),
       AlimentoRow,
       PrefetchHooks Function({
+        bool categoriaId,
         bool porcionesRefs,
         bool presentacionesRefs,
         bool itemsListaRefs,
@@ -7025,6 +8620,24 @@ final class $$PresentacionesTableReferences
     );
   }
 
+  static MultiTypedResultKey<$CodigosBasculaTable, List<CodigoBasculaRow>>
+  _codigosBasculaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.codigosBascula,
+    aliasName: 'presentaciones__id__codigos_bascula__presentacion_id',
+  );
+
+  $$CodigosBasculaTableProcessedTableManager get codigosBasculaRefs {
+    final manager = $$CodigosBasculaTableTableManager(
+      $_db,
+      $_db.codigosBascula,
+    ).filter((f) => f.presentacionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_codigosBasculaRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$ComprasTable, List<CompraRow>> _comprasRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
@@ -7115,6 +8728,31 @@ class $$PresentacionesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> codigosBasculaRefs(
+    Expression<bool> Function($$CodigosBasculaTableFilterComposer f) f,
+  ) {
+    final $$CodigosBasculaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.codigosBascula,
+      getReferencedColumn: (t) => t.presentacionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CodigosBasculaTableFilterComposer(
+            $db: $db,
+            $table: $db.codigosBascula,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 
   Expression<bool> comprasRefs(
@@ -7278,6 +8916,31 @@ class $$PresentacionesTableAnnotationComposer
     return composer;
   }
 
+  Expression<T> codigosBasculaRefs<T extends Object>(
+    Expression<T> Function($$CodigosBasculaTableAnnotationComposer a) f,
+  ) {
+    final $$CodigosBasculaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.codigosBascula,
+      getReferencedColumn: (t) => t.presentacionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CodigosBasculaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.codigosBascula,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> comprasRefs<T extends Object>(
     Expression<T> Function($$ComprasTableAnnotationComposer a) f,
   ) {
@@ -7317,7 +8980,11 @@ class $$PresentacionesTableTableManager
           $$PresentacionesTableUpdateCompanionBuilder,
           (PresentacionRow, $$PresentacionesTableReferences),
           PresentacionRow,
-          PrefetchHooks Function({bool alimentoId, bool comprasRefs})
+          PrefetchHooks Function({
+            bool alimentoId,
+            bool codigosBasculaRefs,
+            bool comprasRefs,
+          })
         > {
   $$PresentacionesTableTableManager(
     _$AppDatabase db,
@@ -7384,69 +9051,98 @@ class $$PresentacionesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({alimentoId = false, comprasRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (comprasRefs) db.compras],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (alimentoId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.alimentoId,
-                                referencedTable: $$PresentacionesTableReferences
-                                    ._alimentoIdTable(db),
-                                referencedColumn:
-                                    $$PresentacionesTableReferences
-                                        ._alimentoIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                alimentoId = false,
+                codigosBasculaRefs = false,
+                comprasRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (codigosBasculaRefs) db.codigosBascula,
+                    if (comprasRefs) db.compras,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (alimentoId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.alimentoId,
+                                    referencedTable:
+                                        $$PresentacionesTableReferences
+                                            ._alimentoIdTable(db),
+                                    referencedColumn:
+                                        $$PresentacionesTableReferences
+                                            ._alimentoIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (codigosBasculaRefs)
+                        await $_getPrefetchedDataByColumns<
+                          PresentacionRow,
+                          $PresentacionesTable,
+                          CodigoBasculaRow,
+                          $CodigosBasculaTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PresentacionesTableReferences
+                              ._codigosBasculaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PresentacionesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).codigosBasculaRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'presentacion_id',
+                          typedResults: items,
+                        ),
+                      if (comprasRefs)
+                        await $_getPrefetchedDataByColumns<
+                          PresentacionRow,
+                          $PresentacionesTable,
+                          CompraRow,
+                          $ComprasTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PresentacionesTableReferences
+                              ._comprasRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PresentacionesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).comprasRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'presentacion_id',
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (comprasRefs)
-                    await $_getPrefetchedDataByColumns<
-                      PresentacionRow,
-                      $PresentacionesTable,
-                      CompraRow,
-                      $ComprasTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$PresentacionesTableReferences
-                          ._comprasRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$PresentacionesTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).comprasRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'presentacion_id',
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -7463,12 +9159,26 @@ typedef $$PresentacionesTableProcessedTableManager =
       $$PresentacionesTableUpdateCompanionBuilder,
       (PresentacionRow, $$PresentacionesTableReferences),
       PresentacionRow,
-      PrefetchHooks Function({bool alimentoId, bool comprasRefs})
+      PrefetchHooks Function({
+        bool alimentoId,
+        bool codigosBasculaRefs,
+        bool comprasRefs,
+      })
     >;
 typedef $$EstablecimientosTableCreateCompanionBuilder =
-    EstablecimientosCompanion Function({Value<int> id, required String nombre});
+    EstablecimientosCompanion Function({
+      Value<int> id,
+      required String nombre,
+      Value<String?> formatoBascula,
+      Value<int> longitudClave,
+    });
 typedef $$EstablecimientosTableUpdateCompanionBuilder =
-    EstablecimientosCompanion Function({Value<int> id, Value<String> nombre});
+    EstablecimientosCompanion Function({
+      Value<int> id,
+      Value<String> nombre,
+      Value<String?> formatoBascula,
+      Value<int> longitudClave,
+    });
 
 final class $$EstablecimientosTableReferences
     extends
@@ -7482,6 +9192,42 @@ final class $$EstablecimientosTableReferences
     super.$_table,
     super.$_typedResult,
   );
+
+  static MultiTypedResultKey<$OrdenPasillosTable, List<OrdenPasilloRow>>
+  _ordenPasillosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.ordenPasillos,
+    aliasName: 'establecimientos__id__orden_pasillos__establecimiento_id',
+  );
+
+  $$OrdenPasillosTableProcessedTableManager get ordenPasillosRefs {
+    final manager = $$OrdenPasillosTableTableManager(
+      $_db,
+      $_db.ordenPasillos,
+    ).filter((f) => f.establecimientoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_ordenPasillosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CodigosBasculaTable, List<CodigoBasculaRow>>
+  _codigosBasculaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.codigosBascula,
+    aliasName: 'establecimientos__id__codigos_bascula__establecimiento_id',
+  );
+
+  $$CodigosBasculaTableProcessedTableManager get codigosBasculaRefs {
+    final manager = $$CodigosBasculaTableTableManager(
+      $_db,
+      $_db.codigosBascula,
+    ).filter((f) => f.establecimientoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_codigosBasculaRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 
   static MultiTypedResultKey<$ComprasTable, List<CompraRow>> _comprasRefsTable(
     _$AppDatabase db,
@@ -7521,6 +9267,66 @@ class $$EstablecimientosTableFilterComposer
     column: $table.nombre,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<String> get formatoBascula => $composableBuilder(
+    column: $table.formatoBascula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get longitudClave => $composableBuilder(
+    column: $table.longitudClave,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> ordenPasillosRefs(
+    Expression<bool> Function($$OrdenPasillosTableFilterComposer f) f,
+  ) {
+    final $$OrdenPasillosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ordenPasillos,
+      getReferencedColumn: (t) => t.establecimientoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdenPasillosTableFilterComposer(
+            $db: $db,
+            $table: $db.ordenPasillos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> codigosBasculaRefs(
+    Expression<bool> Function($$CodigosBasculaTableFilterComposer f) f,
+  ) {
+    final $$CodigosBasculaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.codigosBascula,
+      getReferencedColumn: (t) => t.establecimientoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CodigosBasculaTableFilterComposer(
+            $db: $db,
+            $table: $db.codigosBascula,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 
   Expression<bool> comprasRefs(
     Expression<bool> Function($$ComprasTableFilterComposer f) f,
@@ -7566,6 +9372,16 @@ class $$EstablecimientosTableOrderingComposer
     column: $table.nombre,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get formatoBascula => $composableBuilder(
+    column: $table.formatoBascula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get longitudClave => $composableBuilder(
+    column: $table.longitudClave,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$EstablecimientosTableAnnotationComposer
@@ -7582,6 +9398,66 @@ class $$EstablecimientosTableAnnotationComposer
 
   GeneratedColumn<String> get nombre =>
       $composableBuilder(column: $table.nombre, builder: (column) => column);
+
+  GeneratedColumn<String> get formatoBascula => $composableBuilder(
+    column: $table.formatoBascula,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get longitudClave => $composableBuilder(
+    column: $table.longitudClave,
+    builder: (column) => column,
+  );
+
+  Expression<T> ordenPasillosRefs<T extends Object>(
+    Expression<T> Function($$OrdenPasillosTableAnnotationComposer a) f,
+  ) {
+    final $$OrdenPasillosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ordenPasillos,
+      getReferencedColumn: (t) => t.establecimientoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdenPasillosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ordenPasillos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> codigosBasculaRefs<T extends Object>(
+    Expression<T> Function($$CodigosBasculaTableAnnotationComposer a) f,
+  ) {
+    final $$CodigosBasculaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.codigosBascula,
+      getReferencedColumn: (t) => t.establecimientoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CodigosBasculaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.codigosBascula,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 
   Expression<T> comprasRefs<T extends Object>(
     Expression<T> Function($$ComprasTableAnnotationComposer a) f,
@@ -7622,7 +9498,11 @@ class $$EstablecimientosTableTableManager
           $$EstablecimientosTableUpdateCompanionBuilder,
           (EstablecimientoRow, $$EstablecimientosTableReferences),
           EstablecimientoRow,
-          PrefetchHooks Function({bool comprasRefs})
+          PrefetchHooks Function({
+            bool ordenPasillosRefs,
+            bool codigosBasculaRefs,
+            bool comprasRefs,
+          })
         > {
   $$EstablecimientosTableTableManager(
     _$AppDatabase db,
@@ -7641,12 +9521,26 @@ class $$EstablecimientosTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> nombre = const Value.absent(),
-              }) => EstablecimientosCompanion(id: id, nombre: nombre),
+                Value<String?> formatoBascula = const Value.absent(),
+                Value<int> longitudClave = const Value.absent(),
+              }) => EstablecimientosCompanion(
+                id: id,
+                nombre: nombre,
+                formatoBascula: formatoBascula,
+                longitudClave: longitudClave,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String nombre,
-              }) => EstablecimientosCompanion.insert(id: id, nombre: nombre),
+                Value<String?> formatoBascula = const Value.absent(),
+                Value<int> longitudClave = const Value.absent(),
+              }) => EstablecimientosCompanion.insert(
+                id: id,
+                nombre: nombre,
+                formatoBascula: formatoBascula,
+                longitudClave: longitudClave,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
@@ -7657,37 +9551,86 @@ class $$EstablecimientosTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({comprasRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (comprasRefs) db.compras],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (comprasRefs)
-                    await $_getPrefetchedDataByColumns<
-                      EstablecimientoRow,
-                      $EstablecimientosTable,
-                      CompraRow,
-                      $ComprasTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$EstablecimientosTableReferences
-                          ._comprasRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$EstablecimientosTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).comprasRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'establecimiento_id',
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                ordenPasillosRefs = false,
+                codigosBasculaRefs = false,
+                comprasRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (ordenPasillosRefs) db.ordenPasillos,
+                    if (codigosBasculaRefs) db.codigosBascula,
+                    if (comprasRefs) db.compras,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (ordenPasillosRefs)
+                        await $_getPrefetchedDataByColumns<
+                          EstablecimientoRow,
+                          $EstablecimientosTable,
+                          OrdenPasilloRow,
+                          $OrdenPasillosTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EstablecimientosTableReferences
+                              ._ordenPasillosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EstablecimientosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ordenPasillosRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'establecimiento_id',
+                          typedResults: items,
+                        ),
+                      if (codigosBasculaRefs)
+                        await $_getPrefetchedDataByColumns<
+                          EstablecimientoRow,
+                          $EstablecimientosTable,
+                          CodigoBasculaRow,
+                          $CodigosBasculaTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EstablecimientosTableReferences
+                              ._codigosBasculaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EstablecimientosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).codigosBasculaRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'establecimiento_id',
+                          typedResults: items,
+                        ),
+                      if (comprasRefs)
+                        await $_getPrefetchedDataByColumns<
+                          EstablecimientoRow,
+                          $EstablecimientosTable,
+                          CompraRow,
+                          $ComprasTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EstablecimientosTableReferences
+                              ._comprasRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EstablecimientosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).comprasRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'establecimiento_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -7704,7 +9647,779 @@ typedef $$EstablecimientosTableProcessedTableManager =
       $$EstablecimientosTableUpdateCompanionBuilder,
       (EstablecimientoRow, $$EstablecimientosTableReferences),
       EstablecimientoRow,
-      PrefetchHooks Function({bool comprasRefs})
+      PrefetchHooks Function({
+        bool ordenPasillosRefs,
+        bool codigosBasculaRefs,
+        bool comprasRefs,
+      })
+    >;
+typedef $$OrdenPasillosTableCreateCompanionBuilder =
+    OrdenPasillosCompanion Function({
+      required int establecimientoId,
+      required int categoriaId,
+      required int orden,
+      Value<int> rowid,
+    });
+typedef $$OrdenPasillosTableUpdateCompanionBuilder =
+    OrdenPasillosCompanion Function({
+      Value<int> establecimientoId,
+      Value<int> categoriaId,
+      Value<int> orden,
+      Value<int> rowid,
+    });
+
+final class $$OrdenPasillosTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $OrdenPasillosTable, OrdenPasilloRow> {
+  $$OrdenPasillosTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EstablecimientosTable _establecimientoIdTable(_$AppDatabase db) => db
+      .establecimientos
+      .createAlias('orden_pasillos__establecimiento_id__establecimientos__id');
+
+  $$EstablecimientosTableProcessedTableManager get establecimientoId {
+    final $_column = $_itemColumn<int>('establecimiento_id')!;
+
+    final manager = $$EstablecimientosTableTableManager(
+      $_db,
+      $_db.establecimientos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_establecimientoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CategoriasTable _categoriaIdTable(_$AppDatabase db) =>
+      db.categorias.createAlias('orden_pasillos__categoria_id__categorias__id');
+
+  $$CategoriasTableProcessedTableManager get categoriaId {
+    final $_column = $_itemColumn<int>('categoria_id')!;
+
+    final manager = $$CategoriasTableTableManager(
+      $_db,
+      $_db.categorias,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoriaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$OrdenPasillosTableFilterComposer
+    extends Composer<_$AppDatabase, $OrdenPasillosTable> {
+  $$OrdenPasillosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get orden => $composableBuilder(
+    column: $table.orden,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EstablecimientosTableFilterComposer get establecimientoId {
+    final $$EstablecimientosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.establecimientoId,
+      referencedTable: $db.establecimientos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EstablecimientosTableFilterComposer(
+            $db: $db,
+            $table: $db.establecimientos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategoriasTableFilterComposer get categoriaId {
+    final $$CategoriasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorias,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriasTableFilterComposer(
+            $db: $db,
+            $table: $db.categorias,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OrdenPasillosTableOrderingComposer
+    extends Composer<_$AppDatabase, $OrdenPasillosTable> {
+  $$OrdenPasillosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get orden => $composableBuilder(
+    column: $table.orden,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EstablecimientosTableOrderingComposer get establecimientoId {
+    final $$EstablecimientosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.establecimientoId,
+      referencedTable: $db.establecimientos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EstablecimientosTableOrderingComposer(
+            $db: $db,
+            $table: $db.establecimientos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategoriasTableOrderingComposer get categoriaId {
+    final $$CategoriasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorias,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriasTableOrderingComposer(
+            $db: $db,
+            $table: $db.categorias,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OrdenPasillosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OrdenPasillosTable> {
+  $$OrdenPasillosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get orden =>
+      $composableBuilder(column: $table.orden, builder: (column) => column);
+
+  $$EstablecimientosTableAnnotationComposer get establecimientoId {
+    final $$EstablecimientosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.establecimientoId,
+      referencedTable: $db.establecimientos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EstablecimientosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.establecimientos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategoriasTableAnnotationComposer get categoriaId {
+    final $$CategoriasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorias,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategoriasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.categorias,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OrdenPasillosTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OrdenPasillosTable,
+          OrdenPasilloRow,
+          $$OrdenPasillosTableFilterComposer,
+          $$OrdenPasillosTableOrderingComposer,
+          $$OrdenPasillosTableAnnotationComposer,
+          $$OrdenPasillosTableCreateCompanionBuilder,
+          $$OrdenPasillosTableUpdateCompanionBuilder,
+          (OrdenPasilloRow, $$OrdenPasillosTableReferences),
+          OrdenPasilloRow,
+          PrefetchHooks Function({bool establecimientoId, bool categoriaId})
+        > {
+  $$OrdenPasillosTableTableManager(_$AppDatabase db, $OrdenPasillosTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OrdenPasillosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OrdenPasillosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OrdenPasillosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> establecimientoId = const Value.absent(),
+                Value<int> categoriaId = const Value.absent(),
+                Value<int> orden = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OrdenPasillosCompanion(
+                establecimientoId: establecimientoId,
+                categoriaId: categoriaId,
+                orden: orden,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int establecimientoId,
+                required int categoriaId,
+                required int orden,
+                Value<int> rowid = const Value.absent(),
+              }) => OrdenPasillosCompanion.insert(
+                establecimientoId: establecimientoId,
+                categoriaId: categoriaId,
+                orden: orden,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OrdenPasillosTable, OrdenPasilloRow>(table),
+                  $$OrdenPasillosTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({establecimientoId = false, categoriaId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (establecimientoId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.establecimientoId,
+                                    referencedTable:
+                                        $$OrdenPasillosTableReferences
+                                            ._establecimientoIdTable(db),
+                                    referencedColumn:
+                                        $$OrdenPasillosTableReferences
+                                            ._establecimientoIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (categoriaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.categoriaId,
+                                    referencedTable:
+                                        $$OrdenPasillosTableReferences
+                                            ._categoriaIdTable(db),
+                                    referencedColumn:
+                                        $$OrdenPasillosTableReferences
+                                            ._categoriaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$OrdenPasillosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OrdenPasillosTable,
+      OrdenPasilloRow,
+      $$OrdenPasillosTableFilterComposer,
+      $$OrdenPasillosTableOrderingComposer,
+      $$OrdenPasillosTableAnnotationComposer,
+      $$OrdenPasillosTableCreateCompanionBuilder,
+      $$OrdenPasillosTableUpdateCompanionBuilder,
+      (OrdenPasilloRow, $$OrdenPasillosTableReferences),
+      OrdenPasilloRow,
+      PrefetchHooks Function({bool establecimientoId, bool categoriaId})
+    >;
+typedef $$CodigosBasculaTableCreateCompanionBuilder =
+    CodigosBasculaCompanion Function({
+      Value<int> id,
+      required int establecimientoId,
+      required String clave,
+      required int presentacionId,
+    });
+typedef $$CodigosBasculaTableUpdateCompanionBuilder =
+    CodigosBasculaCompanion Function({
+      Value<int> id,
+      Value<int> establecimientoId,
+      Value<String> clave,
+      Value<int> presentacionId,
+    });
+
+final class $$CodigosBasculaTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $CodigosBasculaTable, CodigoBasculaRow> {
+  $$CodigosBasculaTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EstablecimientosTable _establecimientoIdTable(_$AppDatabase db) => db
+      .establecimientos
+      .createAlias('codigos_bascula__establecimiento_id__establecimientos__id');
+
+  $$EstablecimientosTableProcessedTableManager get establecimientoId {
+    final $_column = $_itemColumn<int>('establecimiento_id')!;
+
+    final manager = $$EstablecimientosTableTableManager(
+      $_db,
+      $_db.establecimientos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_establecimientoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PresentacionesTable _presentacionIdTable(_$AppDatabase db) => db
+      .presentaciones
+      .createAlias('codigos_bascula__presentacion_id__presentaciones__id');
+
+  $$PresentacionesTableProcessedTableManager get presentacionId {
+    final $_column = $_itemColumn<int>('presentacion_id')!;
+
+    final manager = $$PresentacionesTableTableManager(
+      $_db,
+      $_db.presentaciones,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_presentacionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CodigosBasculaTableFilterComposer
+    extends Composer<_$AppDatabase, $CodigosBasculaTable> {
+  $$CodigosBasculaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clave => $composableBuilder(
+    column: $table.clave,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EstablecimientosTableFilterComposer get establecimientoId {
+    final $$EstablecimientosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.establecimientoId,
+      referencedTable: $db.establecimientos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EstablecimientosTableFilterComposer(
+            $db: $db,
+            $table: $db.establecimientos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PresentacionesTableFilterComposer get presentacionId {
+    final $$PresentacionesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.presentacionId,
+      referencedTable: $db.presentaciones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PresentacionesTableFilterComposer(
+            $db: $db,
+            $table: $db.presentaciones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CodigosBasculaTableOrderingComposer
+    extends Composer<_$AppDatabase, $CodigosBasculaTable> {
+  $$CodigosBasculaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clave => $composableBuilder(
+    column: $table.clave,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EstablecimientosTableOrderingComposer get establecimientoId {
+    final $$EstablecimientosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.establecimientoId,
+      referencedTable: $db.establecimientos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EstablecimientosTableOrderingComposer(
+            $db: $db,
+            $table: $db.establecimientos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PresentacionesTableOrderingComposer get presentacionId {
+    final $$PresentacionesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.presentacionId,
+      referencedTable: $db.presentaciones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PresentacionesTableOrderingComposer(
+            $db: $db,
+            $table: $db.presentaciones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CodigosBasculaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CodigosBasculaTable> {
+  $$CodigosBasculaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get clave =>
+      $composableBuilder(column: $table.clave, builder: (column) => column);
+
+  $$EstablecimientosTableAnnotationComposer get establecimientoId {
+    final $$EstablecimientosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.establecimientoId,
+      referencedTable: $db.establecimientos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EstablecimientosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.establecimientos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PresentacionesTableAnnotationComposer get presentacionId {
+    final $$PresentacionesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.presentacionId,
+      referencedTable: $db.presentaciones,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PresentacionesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.presentaciones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CodigosBasculaTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CodigosBasculaTable,
+          CodigoBasculaRow,
+          $$CodigosBasculaTableFilterComposer,
+          $$CodigosBasculaTableOrderingComposer,
+          $$CodigosBasculaTableAnnotationComposer,
+          $$CodigosBasculaTableCreateCompanionBuilder,
+          $$CodigosBasculaTableUpdateCompanionBuilder,
+          (CodigoBasculaRow, $$CodigosBasculaTableReferences),
+          CodigoBasculaRow,
+          PrefetchHooks Function({bool establecimientoId, bool presentacionId})
+        > {
+  $$CodigosBasculaTableTableManager(
+    _$AppDatabase db,
+    $CodigosBasculaTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CodigosBasculaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CodigosBasculaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CodigosBasculaTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> establecimientoId = const Value.absent(),
+                Value<String> clave = const Value.absent(),
+                Value<int> presentacionId = const Value.absent(),
+              }) => CodigosBasculaCompanion(
+                id: id,
+                establecimientoId: establecimientoId,
+                clave: clave,
+                presentacionId: presentacionId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int establecimientoId,
+                required String clave,
+                required int presentacionId,
+              }) => CodigosBasculaCompanion.insert(
+                id: id,
+                establecimientoId: establecimientoId,
+                clave: clave,
+                presentacionId: presentacionId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CodigosBasculaTable, CodigoBasculaRow>(table),
+                  $$CodigosBasculaTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({establecimientoId = false, presentacionId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (establecimientoId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.establecimientoId,
+                                    referencedTable:
+                                        $$CodigosBasculaTableReferences
+                                            ._establecimientoIdTable(db),
+                                    referencedColumn:
+                                        $$CodigosBasculaTableReferences
+                                            ._establecimientoIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (presentacionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.presentacionId,
+                                    referencedTable:
+                                        $$CodigosBasculaTableReferences
+                                            ._presentacionIdTable(db),
+                                    referencedColumn:
+                                        $$CodigosBasculaTableReferences
+                                            ._presentacionIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CodigosBasculaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CodigosBasculaTable,
+      CodigoBasculaRow,
+      $$CodigosBasculaTableFilterComposer,
+      $$CodigosBasculaTableOrderingComposer,
+      $$CodigosBasculaTableAnnotationComposer,
+      $$CodigosBasculaTableCreateCompanionBuilder,
+      $$CodigosBasculaTableUpdateCompanionBuilder,
+      (CodigoBasculaRow, $$CodigosBasculaTableReferences),
+      CodigoBasculaRow,
+      PrefetchHooks Function({bool establecimientoId, bool presentacionId})
     >;
 typedef $$ComprasTableCreateCompanionBuilder =
     ComprasCompanion Function({
@@ -7714,6 +10429,7 @@ typedef $$ComprasTableCreateCompanionBuilder =
       required String fecha,
       required int precioCent,
       Value<int> unidades,
+      Value<double?> pesoG,
     });
 typedef $$ComprasTableUpdateCompanionBuilder =
     ComprasCompanion Function({
@@ -7723,6 +10439,7 @@ typedef $$ComprasTableUpdateCompanionBuilder =
       Value<String> fecha,
       Value<int> precioCent,
       Value<int> unidades,
+      Value<double?> pesoG,
     });
 
 final class $$ComprasTableReferences
@@ -7810,6 +10527,11 @@ class $$ComprasTableFilterComposer
 
   ColumnFilters<int> get unidades => $composableBuilder(
     column: $table.unidades,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get pesoG => $composableBuilder(
+    column: $table.pesoG,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7914,6 +10636,11 @@ class $$ComprasTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get pesoG => $composableBuilder(
+    column: $table.pesoG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PresentacionesTableOrderingComposer get presentacionId {
     final $$PresentacionesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -7983,6 +10710,9 @@ class $$ComprasTableAnnotationComposer
 
   GeneratedColumn<int> get unidades =>
       $composableBuilder(column: $table.unidades, builder: (column) => column);
+
+  GeneratedColumn<double> get pesoG =>
+      $composableBuilder(column: $table.pesoG, builder: (column) => column);
 
   $$PresentacionesTableAnnotationComposer get presentacionId {
     final $$PresentacionesTableAnnotationComposer composer = $composerBuilder(
@@ -8094,6 +10824,7 @@ class $$ComprasTableTableManager
                 Value<String> fecha = const Value.absent(),
                 Value<int> precioCent = const Value.absent(),
                 Value<int> unidades = const Value.absent(),
+                Value<double?> pesoG = const Value.absent(),
               }) => ComprasCompanion(
                 id: id,
                 presentacionId: presentacionId,
@@ -8101,6 +10832,7 @@ class $$ComprasTableTableManager
                 fecha: fecha,
                 precioCent: precioCent,
                 unidades: unidades,
+                pesoG: pesoG,
               ),
           createCompanionCallback:
               ({
@@ -8110,6 +10842,7 @@ class $$ComprasTableTableManager
                 required String fecha,
                 required int precioCent,
                 Value<int> unidades = const Value.absent(),
+                Value<double?> pesoG = const Value.absent(),
               }) => ComprasCompanion.insert(
                 id: id,
                 presentacionId: presentacionId,
@@ -8117,6 +10850,7 @@ class $$ComprasTableTableManager
                 fecha: fecha,
                 precioCent: precioCent,
                 unidades: unidades,
+                pesoG: pesoG,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -10798,6 +13532,8 @@ typedef $$ItemsComidaTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$CategoriasTableTableManager get categorias =>
+      $$CategoriasTableTableManager(_db, _db.categorias);
   $$AlimentosTableTableManager get alimentos =>
       $$AlimentosTableTableManager(_db, _db.alimentos);
   $$PorcionesTableTableManager get porciones =>
@@ -10806,6 +13542,10 @@ class $AppDatabaseManager {
       $$PresentacionesTableTableManager(_db, _db.presentaciones);
   $$EstablecimientosTableTableManager get establecimientos =>
       $$EstablecimientosTableTableManager(_db, _db.establecimientos);
+  $$OrdenPasillosTableTableManager get ordenPasillos =>
+      $$OrdenPasillosTableTableManager(_db, _db.ordenPasillos);
+  $$CodigosBasculaTableTableManager get codigosBascula =>
+      $$CodigosBasculaTableTableManager(_db, _db.codigosBascula);
   $$ComprasTableTableManager get compras =>
       $$ComprasTableTableManager(_db, _db.compras);
   $$ListasCompraTableTableManager get listasCompra =>

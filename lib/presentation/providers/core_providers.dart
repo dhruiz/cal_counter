@@ -2,16 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/app_database.dart';
 import '../../data/ocr/mlkit_text_recognizer.dart';
+import '../../data/repositories/category_repository_impl.dart';
 import '../../data/repositories/drift_transaction_runner.dart';
 import '../../data/repositories/food_repository_impl.dart';
 import '../../data/repositories/meal_repository_impl.dart';
 import '../../data/repositories/purchase_repository_impl.dart';
 import '../../data/repositories/recipe_repository_impl.dart';
+import '../../data/repositories/scale_repository_impl.dart';
 import '../../data/repositories/shopping_list_repository_impl.dart';
+import '../../domain/repositories/category_repository.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../../domain/repositories/meal_repository.dart';
 import '../../domain/repositories/purchase_repository.dart';
 import '../../domain/repositories/recipe_repository.dart';
+import '../../domain/repositories/scale_repository.dart';
 import '../../domain/repositories/shopping_list_repository.dart';
 import '../../domain/repositories/transaction_runner.dart';
 import '../../domain/services/label_text_recognizer.dart';
@@ -24,6 +28,7 @@ import '../../domain/usecases/get_price_stats.dart';
 import '../../domain/usecases/purge_old_purchases.dart';
 import '../../domain/usecases/register_purchase.dart';
 import '../../domain/usecases/save_meal_as_food.dart';
+import '../../domain/usecases/scale_labels.dart';
 
 /// Único punto de creación de la base de datos. En tests se sustituye por una
 /// en memoria con `ProviderScope(overrides: [appDatabaseProvider...])`.
@@ -57,6 +62,14 @@ final recipeRepositoryProvider = Provider<RecipeRepository>(
 
 final mealRepositoryProvider = Provider<MealRepository>(
   (ref) => MealRepositoryImpl(ref.watch(appDatabaseProvider)),
+);
+
+final categoryRepositoryProvider = Provider<CategoryRepository>(
+  (ref) => CategoryRepositoryImpl(ref.watch(appDatabaseProvider)),
+);
+
+final scaleRepositoryProvider = Provider<ScaleRepository>(
+  (ref) => ScaleRepositoryImpl(ref.watch(appDatabaseProvider)),
 );
 
 // Casos de uso -----------------------------------------------------------------
@@ -121,6 +134,14 @@ final removeFromCartProvider = Provider<RemoveFromCart>(
   (ref) => RemoveFromCart(
     ref.watch(shoppingListRepositoryProvider),
     ref.watch(purchaseRepositoryProvider),
+    ref.watch(transactionRunnerProvider),
+  ),
+);
+
+final linkScaleCodeProvider = Provider<LinkScaleCode>(
+  (ref) => LinkScaleCode(
+    ref.watch(foodRepositoryProvider),
+    ref.watch(scaleRepositoryProvider),
     ref.watch(transactionRunnerProvider),
   ),
 );

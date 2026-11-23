@@ -4,6 +4,7 @@ import '../../domain/entities/food.dart';
 import '../../domain/errors/domain_errors.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../../domain/services/barcode.dart';
+import '../../domain/services/category_guesser.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../db/app_database.dart';
 import '../db/mappers.dart';
@@ -48,8 +49,18 @@ class FoodRepositoryImpl implements FoodRepository {
     return parts.isEmpty ? null : parts.join(' AND ');
   }
 
-  Selectable<Food> _searchQuery(String query, FoodFilter filter, int limit) {
-    final where = _filterSql(filter);
+  Selectable<Food> _searchQuery(
+    String query,
+    FoodFilter filter,
+    int limit, {
+    int? categoriaId,
+  }) {
+    var where = _filterSql(filter);
+    if (categoriaId == kSinCategoria) {
+      where += ' AND a.categoria_id IS NULL';
+    } else if (categoriaId != null) {
+      where += ' AND a.categoria_id = ${categoriaId.toInt()}';
+    }
     final q = query.trim();
 
     if (q.isEmpty) {
@@ -104,15 +115,17 @@ class FoodRepositoryImpl implements FoodRepository {
   Stream<List<Food>> watchSearch(
     String query, {
     FoodFilter filter = FoodFilter.todos,
+    int? categoriaId,
     int limit = 200,
-  }) => _searchQuery(query, filter, limit).watch();
+  }) => _searchQuery(query, filter, limit, categoriaId: categoriaId).watch();
 
   @override
   Future<List<Food>> search(
     String query, {
     FoodFilter filter = FoodFilter.todos,
+    int? categoriaId,
     int limit = 200,
-  }) => _searchQuery(query, filter, limit).get();
+  }) => _searchQuery(query, filter, limit, categoriaId: categoriaId).get();
 
   // Lectura -------------------------------------------------------------------
 
@@ -246,8 +259,18 @@ class FoodRepositoryImpl implements FoodRepository {
     return (f == null || f.id == food.id) ? null : f;
   }
 
+  /// Id de la categoría que sugiere el nombre, si existe esa categoría.
+  Future<int?> _categoriaSugerida(String nombre) async {
+    final guess = guessCategoryName(nombre);
+    if (guess == null) return null;
+    final row = await (db.select(
+      db.categorias,
+    )..where((c) => c.nombre.equals(guess))).getSingleOrNull();
+    return row?.id;
+  }
+
   @override
-  Future<int> saveFood(Food food) async {
+  Future<int> saveFood(Food food, {bool adivinarCategoria = true}) async {
     if (food.nombre.trim().isEmpty) {
       throw const ValidationException('El nombre no puede estar vacío.');
     }
@@ -257,10 +280,14 @@ class FoodRepositoryImpl implements FoodRepository {
       final values = foodToCompanion(food);
       final now = nowIso();
       if (food.id == null) {
+        final categoria =
+            food.categoriaId ??
+            (adivinarCategoria ? await _categoriaSugerida(food.nombre) : null);
         return db
             .into(db.alimentos)
             .insert(
               values.copyWith(
+                categoriaId: Value(categoria),
                 uuid: Value(food.uuid ?? newUuid()),
                 usoCount: Value(food.usoCount),
                 ultimoUso: Value(food.ultimoUso?.toIso8601String()),

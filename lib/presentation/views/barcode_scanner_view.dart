@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../core/styles.dart';
+import '../widgets/dialog_controllers.dart';
 
 /// Lector de códigos de barras a pantalla completa. Devuelve el código leído
 /// (`Navigator.pop(context, codigo)`) o null si se cancela. Permite escribir
@@ -51,10 +52,18 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
 
 /// Pide el código escrito a mano. Devuelve null si se cancela.
 Future<String?> askBarcodeManually(BuildContext context) async {
-  final ctrl = TextEditingController();
   final code = await showDialog<String>(
     context: context,
-    builder: (ctx) => AlertDialog(
+    builder: (_) => DialogControllers(
+      iniciales: const [''],
+      builder: (ctx, c) => _manualCodeDialog(ctx, c.first),
+    ),
+  );
+  return (code == null || code.isEmpty) ? null : code;
+}
+
+Widget _manualCodeDialog(BuildContext ctx, TextEditingController ctrl) =>
+    AlertDialog(
       title: const Text('Escribir código'),
       content: TextField(
         controller: ctrl,
@@ -76,11 +85,7 @@ Future<String?> askBarcodeManually(BuildContext context) async {
           child: const Text('Aceptar'),
         ),
       ],
-    ),
-  );
-  ctrl.dispose();
-  return (code == null || code.isEmpty) ? null : code;
-}
+    );
 
 /// Cámara con marco, linterna, mensajes de error y entrada manual del código.
 ///

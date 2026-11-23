@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/food.dart';
 import '../../domain/errors/domain_errors.dart';
+import '../../domain/services/barcode.dart';
+import '../../domain/services/scale_barcode.dart';
 import '../providers/foods_provider.dart';
 import '../widgets/add_food_popup.dart';
 import 'food_form_view.dart';
@@ -84,6 +86,51 @@ class FoodFlows {
   /// ofrece darlo de alta completo (con tabla nutricional) o añadirlo como
   /// otra presentación de un alimento existente.
   static Future<Food?> foodForBarcode(
+    BuildContext context,
+    WidgetRef ref,
+    String code,
+  ) async => (await scanAtHome(context, ref, code))?.food;
+
+  /// Como [foodForBarcode], y si es una etiqueta de báscula con el peso
+  /// incrustado devuelve también los gramos del paquete.
+  static Future<({Food food, double? gramos})?> scanAtHome(
+    BuildContext context,
+    WidgetRef ref,
+    String code,
+  ) async {
+    if (isVariableMeasure(code)) {
+      final matches = await ref
+          .read(scaleRepositoryProvider)
+          .findAnyStore(code);
+      if (!context.mounted) return null;
+      if (matches.isNotEmpty) {
+        final m = matches.first;
+        final label = ScaleLabel.parse(
+          code,
+          longitudClave: m.tienda.longitudClave,
+        );
+        final gramos =
+            (label != null && m.tienda.formatoBascula == ScaleFormat.peso)
+            ? label.comoPesoG
+            : null;
+        return (food: m.alimento, gramos: gramos);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Etiqueta de báscula aún sin aprender: escanéala una vez en el '
+            'modo carrito. Ahora elige el alimento.',
+          ),
+        ),
+      );
+      final food = await FoodPickerView.pick(context);
+      return food == null ? null : (food: food, gramos: null);
+    }
+    final food = await _foodForBarcode(context, ref, code);
+    return food == null ? null : (food: food, gramos: null);
+  }
+
+  static Future<Food?> _foodForBarcode(
     BuildContext context,
     WidgetRef ref,
     String code,

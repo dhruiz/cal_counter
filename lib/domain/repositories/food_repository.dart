@@ -1,5 +1,8 @@
 import '../entities/food.dart';
 
+/// Valor de `categoriaId` para filtrar los alimentos sin categoría.
+const int kSinCategoria = 0;
+
 /// Filtros del repertorio.
 enum FoodFilter {
   todos('Todos'),
@@ -28,15 +31,19 @@ abstract class FoodRepository {
   /// Búsqueda por texto (sin tildes, por prefijo de palabra) o por código de
   /// barras si lo escrito lo parece. Con [query] vacío lista todo según
   /// [filter]. Los archivados solo aparecen con [FoodFilter.archivados].
+  ///
+  /// Con [categoriaId] filtra por sección ([kSinCategoria] = sin categoría).
   Stream<List<Food>> watchSearch(
     String query, {
     FoodFilter filter = FoodFilter.todos,
+    int? categoriaId,
     int limit = 200,
   });
 
   Future<List<Food>> search(
     String query, {
     FoodFilter filter = FoodFilter.todos,
+    int? categoriaId,
     int limit = 200,
   });
 
@@ -65,7 +72,10 @@ abstract class FoodRepository {
 
   /// Inserta (id null) o actualiza. Lanza [DuplicateFoodException] si ya
   /// existe otro con el mismo nombre y marca. Devuelve el id.
-  Future<int> saveFood(Food food);
+  ///
+  /// Al insertar sin categoría, se le asigna la que sugiere su nombre
+  /// (`guessCategoryName`) salvo que [adivinarCategoria] sea false.
+  Future<int> saveFood(Food food, {bool adivinarCategoria = true});
 
   /// Borra si no tiene compras; si las tiene, lo archiva.
   Future<FoodDeletion> deleteFood(int id);

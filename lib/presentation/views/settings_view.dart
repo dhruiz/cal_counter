@@ -5,6 +5,7 @@ import '../../core/styles.dart';
 import '../../domain/entities/user_settings.dart';
 import '../providers/settings_provider.dart';
 import '../providers/theme_provider.dart';
+import 'categories_view.dart';
 import 'data_view.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
@@ -197,6 +198,17 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     context,
                     MaterialPageRoute(builder: (_) => const DataView()),
                   ),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.category_outlined),
+                  title: const Text('Categorías y pasillos'),
+                  subtitle: const Text(
+                    'Secciones del súper y orden de recorrido por tienda',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => CategoriesView.open(context),
                 ),
               ),
               _buildSectionTitle('Datos Personales'),

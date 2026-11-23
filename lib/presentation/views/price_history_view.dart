@@ -71,10 +71,11 @@ class PriceHistoryView extends ConsumerWidget {
                   'cada presentación.',
             )
           : ListView.separated(
-              itemCount: records.length,
+              itemCount: records.length + 1,
               separatorBuilder: (_, _) => const Divider(height: 0),
-              itemBuilder: (ctx, i) {
-                final r = records[i];
+              itemBuilder: (ctx, index) {
+                if (index == 0) return const _SpendingCard();
+                final r = records[index - 1];
                 final kilo = r.precioPorKiloCent;
                 return ListTile(
                   title: Row(
@@ -120,6 +121,98 @@ class PriceHistoryView extends ConsumerWidget {
                 );
               },
             ),
+    );
+  }
+}
+
+/// Gasto por categoría en los últimos 30 días o 3 meses.
+class _SpendingCard extends ConsumerStatefulWidget {
+  const _SpendingCard();
+
+  @override
+  ConsumerState<_SpendingCard> createState() => _SpendingCardState();
+}
+
+class _SpendingCardState extends ConsumerState<_SpendingCard> {
+  int _dias = 30;
+
+  @override
+  Widget build(BuildContext context) {
+    final gasto =
+        ref.watch(spendingByCategoryProvider(_dias)).valueOrNull ?? const [];
+    final total = gasto.fold<int>(0, (s, g) => s + g.totalCent);
+    final maximo = gasto.isEmpty ? 1 : gasto.first.totalCent;
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.all(AppStyles.paddingMedium),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Gasto por categoría',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                SegmentedButton<int>(
+                  showSelectedIcon: false,
+                  segments: const [
+                    ButtonSegment(value: 30, label: Text('30 días')),
+                    ButtonSegment(value: 90, label: Text('3 meses')),
+                  ],
+                  selected: {_dias},
+                  onSelectionChanged: (s) => setState(() => _dias = s.first),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (gasto.isEmpty)
+              const Text(
+                'Sin compras en este periodo.',
+                style: AppStyles.labelText,
+              )
+            else ...[
+              Text(
+                'Total: ${AppUtils.formatPrecioCent(total)}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              for (final g in gasto)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(g.categoria?.nombre ?? 'Sin categoría'),
+                          ),
+                          Text(
+                            '${AppUtils.formatPrecioCent(g.totalCent)} · '
+                            '${(g.totalCent * 100 / (total == 0 ? 1 : total)).round()} %',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: g.totalCent / maximo,
+                          minHeight: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

@@ -3,13 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/styles.dart';
 import '../../core/utils.dart';
+import '../../domain/entities/category.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/nutrition_facts.dart';
 import '../../domain/errors/domain_errors.dart';
 import '../../domain/services/barcode.dart';
+import '../../domain/services/category_guesser.dart';
+import '../../domain/services/ingredient_matcher.dart';
 import '../../domain/services/money.dart';
 import '../../domain/usecases/food_registration.dart';
 import '../providers/foods_provider.dart';
+import '../widgets/category_widgets.dart';
 import '../widgets/food_widgets.dart';
 import '../widgets/label_reader.dart';
 import 'barcode_scanner_view.dart';
@@ -70,6 +74,11 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   late final Map<Nutrient, TextEditingController> _nutrientCtrls;
   late FoodType _tipo;
   late FoodUnit _unidad;
+  int? _categoriaId;
+
+  /// El usuario eligió la categoría a mano (si no, al crear se propone la
+  /// que sugiere el nombre).
+  bool _categoriaElegida = false;
   NutritionSource? _origen;
   bool _saving = false;
 
@@ -95,7 +104,20 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
         f?.tipo ??
         (widget.codigoBarras != null ? FoodType.envasado : FoodType.generico);
     _unidad = f?.unidad ?? FoodUnit.g;
+    _categoriaId = f?.categoriaId;
+    _categoriaElegida = f != null;
     _origen = f?.origenNutricion;
+  }
+
+  /// Categoría efectiva: la elegida, o la que sugiere el nombre al crear.
+  int? _categoria(List<Category> cats) {
+    if (_categoriaElegida) return _categoriaId;
+    final guess = guessCategoryName(_nameCtrl.text);
+    if (guess == null) return null;
+    return cats
+        .where((c) => normalizeText(c.nombre) == normalizeText(guess))
+        .firstOrNull
+        ?.id;
   }
 
   static String _fmt(double? v) =>
@@ -190,11 +212,16 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
 
     final base = widget.food ?? const Food(nombre: '');
     final cambioTabla = nutricion != (widget.food?.nutricion);
+    final categoria = _categoria(
+      ref.read(categoriesProvider(null)).valueOrNull ?? const [],
+    );
     final food = base.copyWith(
       nombre: _nameCtrl.text.trim(),
       marca: _brandCtrl.text.trim(),
       tipo: _tipo,
       unidad: _unidad,
+      categoriaId: categoria,
+      clearCategoria: categoria == null,
       nutricion: nutricion,
       origenNutricion: cambioTabla && _origen != NutritionSource.etiquetaOcr
           ? NutritionSource.manual
@@ -208,6 +235,7 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
       if (_isNew) {
         id = await ref.read(saveFoodWithPackageProvider)(
           food,
+          adivinarCategoria: false,
           presentacion: PackageDraft(
             codigoBarras: _codeCtrl.text,
             descripcion: _packCtrl.text,
@@ -321,6 +349,9 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
               autofocus: _isNew && _nameCtrl.text.isEmpty,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(labelText: 'Nombre *'),
+              onChanged: (_) {
+                if (!_categoriaElegida) setState(() {});
+              },
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Escribe un nombre' : null,
             ),
@@ -340,6 +371,17 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
               ],
               selected: {_tipo},
               onSelectionChanged: (s) => setState(() => _tipo = s.first),
+            ),
+            const SizedBox(height: 12),
+            CategoryDropdown(
+              value: _categoria(
+                ref.watch(categoriesProvider(null)).valueOrNull ?? const [],
+              ),
+              helperText: _categoriaElegida ? null : 'Sugerida por el nombre',
+              onChanged: (v) => setState(() {
+                _categoriaId = v;
+                _categoriaElegida = true;
+              }),
             ),
             const SizedBox(height: 20),
             Row(
