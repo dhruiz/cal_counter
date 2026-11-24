@@ -67,3 +67,43 @@ String ingredientLine({
   if (opcional) b.write(' (opcional)');
   return b.toString();
 }
+
+final RegExp _cantidadInicial = RegExp(r'^(\d+(?:[.,]\d+)?|½|¼|¾)(\s*)');
+
+const Map<String, double> _fraccionesInicio = {'½': 0.5, '¼': 0.25, '¾': 0.75};
+
+/// Texto de una línea con las cantidades multiplicadas por [factor]. Una
+/// línea vinculada con cantidad se rehace con [nombreAlimento]; una de texto
+/// libre cambia el número del principio ("4 huevos" × 1,5 → "6 huevos") o, si
+/// no lo tiene, indica la escala ("Sal (×1,5)").
+String scaledIngredientText({
+  required String texto,
+  required double factor,
+  String? nombreAlimento,
+  double? cantidad,
+  String? unidad,
+  String? nota,
+  bool opcional = false,
+}) {
+  if (factor == 1) return texto;
+  if (nombreAlimento != null && cantidad != null && cantidad > 0) {
+    return ingredientLine(
+      nombreAlimento: nombreAlimento,
+      cantidad: cantidad * factor,
+      unidad: unidad,
+      nota: nota,
+      opcional: opcional || texto.toLowerCase().contains('(opcional)'),
+    );
+  }
+  final m = _cantidadInicial.firstMatch(texto);
+  if (m != null) {
+    final raw = m.group(1)!;
+    final v =
+        _fraccionesInicio[raw] ?? double.tryParse(raw.replaceAll(',', '.'));
+    if (v != null) {
+      return '${formatQuantity(v * factor)}${m.group(2)}'
+          '${texto.substring(m.end)}';
+    }
+  }
+  return '$texto (×${formatQuantity(factor)})';
+}
