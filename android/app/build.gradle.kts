@@ -53,6 +53,12 @@ android {
             signingConfig = signingConfigs.getByName(
                 if (hasReleaseKeystore) "release" else "debug",
             )
+            // Reglas propias para R8 (se suman a las de Flutter): ver el
+            // comentario de proguard-rules.pro.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

@@ -104,7 +104,8 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
 
 - AGP 9.1.0 + Gradle 9.3.1 + KGP 2.4.0, con `android.builtInKotlin=false` / `android.newDsl=false` (los flags de la plantilla de Flutter 3.47: su plugin de Gradle aún no soporta `newDsl=true`). Flutter de referencia: 3.47.x.
 - **`file_picker` 13+** (la 11 no aplicaba KGP bajo AGP 9 y no compilaba). API 12+: `saveFile(fileName:, bytes:)` escribe el archivo vía SAF y devuelve `Uri?` (mostrar con `AppUtils.formatRutaGuardada`; ruta vacía = cancelado para `ExportDayToCsv`); `pickFile()` devuelve `PlatformFile?` y se lee con `readAsBytes()` (sin `withData` ni `FilePickerResult`). Todo pasa por `FileTransfer` salvo el CSV del día, recetas e historial.
-- **`google_mlkit_text_recognition` anclado a `^0.16.0`** (se probó con AGP 8; con AGP 9 podría subirse, pero no hace falta).
+- **`google_mlkit_text_recognition` anclado a `^0.16.0`**. Aplica KGP por su cuenta: Flutter 3.47 avisa de que versiones futuras no compilarán con plugins así; al actualizar Flutter, subirlo a una versión con Kotlin integrado.
+- **R8**: `android/app/proguard-rules.pro` lleva `-dontwarn` para los reconocedores de chino/devanagari/japonés/coreano que referencia ML Kit y que no se incluyen (solo `TextRecognitionScript.latin`). Sin esas reglas el build release falla en `minifyReleaseWithR8`.
 - **Manifiesto**: sin permisos de almacenamiento (todo por SAF) y sin `INTERNET` en release (`tools:node="remove"`; lo añade la telemetría de ML Kit). Debug/profile lo declaran para las herramientas de Flutter. Firma de release opcional con `android/key.properties` (no versionado).
 - `file_saver` se eliminó; no reintroducirlo.
 - SQLite la incluye `sqlite3` mediante build hooks (descarga binarios al compilar).
