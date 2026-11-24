@@ -342,7 +342,7 @@ Un alimento sin tabla completa **no se registra con ceros**. Al elegirlo se abre
   - **Parcial**: se muestra el valor como mínimo ("≥ 420 kcal") junto con la lista de lo que falta.
 - Los ingredientes "al gusto" sin cantidad (sal, pimienta) no bloquean el cálculo.
 - **"Registrar porción"** añade a Calorías una foto de los valores calculados (`items_comida` con `alimento_id` del preparado, si existe).
-- **"Añadir al repertorio"** crea o actualiza un alimento `preparado` (`nutricion_origen = 'calculado'`) vinculado con `recetas.alimento_id`. Se recalcula al editar la receta. Sustituye al "vincular receta a alimento" actual.
+- **"Añadir al repertorio"** crea o actualiza un alimento `preparado` (`nutricion_origen = 'calculado'`) vinculado con `recetas.alimento_id`. Se recalcula al editar la receta. Sustituye al "vincular receta a alimento" actual. *(v3: ya no hace falta pulsarlo: toda receta tiene su alimento y se recalcula solo; ver «Ampliación v3».)*
 - **Vinculación asistida:** al guardar o importar una receta, `parseIngredientLine` y `ingredient_matcher` proponen alimento, cantidad y unidad para cada línea. Una pantalla "Vincular ingredientes" permite confirmarlos todos de golpe. El texto original nunca se pierde.
 
 ### 5.6 Compras y carrito
@@ -573,6 +573,24 @@ Cada una tiene mi recomendación. Si no dices nada, aplico la recomendada.
 5. **Alimento pendiente en Calorías:** pedir que se complete en ese momento *(recomendado)* o permitir registrarlo marcado como incompleto.
 6. **Recetas en el repertorio compartido:** casilla opcional al exportar *(recomendado)*, siempre o nunca.
 7. **Categorías y orden de pasillo:** en la Fase 7 *(recomendado)* o desde la Fase 3.
+
+---
+
+## Ampliación v3: recetas como alimentos y artículos que no son alimentos
+
+Decisiones tomadas con el usuario tras revisar cómo funcionaban las recetas:
+
+1. **Uso de las recetas**: el gestor sirve para tener ideas de cosas ya preparadas; en el contador cada receta se apunta **por gramos del plato, como un alimento más**. «Registrar porción» desaparece como camino principal (queda «Registrar en el día» como atajo).
+2. **Toda receta es un alimento** («Nombre · Receta», tabla por 100 g) que se mantiene al día solo (`SyncRecipeFoods` + vigilante en `MainShell`). La marca «Receta» evita chocar con un genérico del mismo nombre; si aun así choca con otro alimento, **no se sobrescribe** y la receta avisa. Esto corrige el fallo del antiguo «Añadir a mis alimentos», que sobrescribía la tabla de un alimento sin marca con el mismo nombre.
+3. **Peso final después de cocinar**: la receta se guarda sin él y se introduce al terminar (pesando la olla y descontándola). Mientras falte, la tabla se calcula con los ingredientes en crudo y se marca como **aproximada**, con aviso en la receta, en la ficha del alimento y al añadirlo en el contador.
+4. **Datos incompletos**: se calcula y se registra con lo que haya (aproximado), sin bloquear.
+5. **Ingredientes desde el buscador**, como en el contador: un ingrediente es un alimento registrado o creado en ese momento. Las líneas de texto de recetas antiguas o importadas quedan «por vincular».
+6. **Escalar raciones**; la lista de compra usa esas cantidades **como mínimo**, suma las de varias recetas y sugiere el envase que las cubre.
+7. **Borrar una receta conserva su alimento**, que se sigue pudiendo registrar.
+8. **Artículos que no son alimentos** (limpieza, higiene...) en las listas y en el historial de precios, sin tabla nutricional (`alimentos.es_alimento`).
+9. **Ideas**: «Sugiéreme algo», ordenar por lo que hace tiempo que no preparas y filtrar por categoría (`recetas.ultima_preparacion`).
+
+Esquema v3 (solo `ADD COLUMN`): `alimentos.nutricion_aproximada`, `alimentos.es_alimento`, `recetas.ultima_preparacion`, `ingredientes_receta.nota`, `items_lista.cantidad_minima`. Formatos: campos añadidos y opcionales (`es_alimento`, `nutricion.aproximada`, `nota` en el repertorio; columna final `es_alimento` en el TSV).
 
 ---
 

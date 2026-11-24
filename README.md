@@ -30,9 +30,9 @@ Cuatro pestañas (`MainShell`, `NavigationBar` + `IndexedStack`):
 | Pestaña | Contenido |
 |---|---|
 | **Calorías** | Anillos de kcal, grasas, carbohidratos y proteínas frente a los objetivos; *Agregar ingesta* (buscar por texto o escanear) y *Gestionar día* (editar cantidades, renombrar, guardar una comida como alimento, exportar el día). |
-| **Alimentos** | El repertorio: búsqueda sin tildes o por código de barras, filtros (pendientes, envasados, genéricos, preparados, archivados) y **filtro por categoría**, insignia con los **pendientes de completar** y ficha de cada alimento (tabla nutricional, categoría, porciones caseras, presentaciones y códigos, precios por tienda y €/kg, recetas que lo usan). |
-| **Recetas** | Búsqueda por los ingredientes que tienes; ingredientes vinculados a alimentos con cantidad → **nutrición calculada** por porción y por 100 g, con la lista de lo que falta para calcularla y una acción directa para cada cosa; modo cocina; importar desde texto/plantilla/JSON/CSV. |
-| **Compras** | Listas de compra con precio de referencia y **agrupadas por pasillos** (orden general o el de una tienda), **modo carrito** (escanear lo que metes en el carrito con total en vivo, incluidas las **etiquetas de báscula** de los frescos al peso) e historial de precios exportable con el **gasto por categoría**. |
+| **Alimentos** | El repertorio: búsqueda sin tildes o por código de barras, filtros (pendientes, envasados, genéricos, preparados, **no alimentarios**, archivados) y **filtro por categoría**, insignia con los **pendientes de completar** y ficha de cada alimento (tabla nutricional, categoría, porciones caseras, presentaciones y códigos, precios por tienda y €/kg, recetas que lo usan). |
+| **Recetas** | Cada receta es **un alimento más** («Nombre · Receta», por 100 g) que se mantiene al día solo y se apunta en Calorías por gramos. Ingredientes elegidos **desde el buscador** (como en el contador) con su cantidad; **peso final** al terminar (descontando la olla) para una tabla exacta, o **aproximada** con aviso mientras falte; **escalar raciones** y llevarlas a la lista de compra como mínimo; **ideas** («Sugiéreme algo», ordenar por lo que hace tiempo que no preparas, filtrar por categoría); búsqueda por los ingredientes que tienes; modo cocina; importar desde texto/plantilla/JSON/CSV. |
+| **Compras** | Listas de compra con precio de referencia y **agrupadas por pasillos** (orden general o el de una tienda), cantidades **mínimas** de las recetas con el envase que las cubre, **modo carrito** (escanear lo que metes en el carrito con total en vivo, incluidas las **etiquetas de báscula** de los frescos al peso), artículos que **no son alimentos** (limpieza, higiene...) con su historial, e historial de precios exportable con el **gasto por categoría**. |
 
 **Ajustes**:
 
@@ -103,7 +103,7 @@ lib/
 
 ## Modelo de datos
 
-Esquema **v2** (`lib/data/db/tables.dart`, `schemaVersion = 2`). Las **claves foráneas están activas** (`PRAGMA foreign_keys = ON` en cada apertura). Los días se guardan como `TEXT 'YYYY-MM-DD'`, las marcas de tiempo en ISO 8601 y el dinero en **céntimos** (`INTEGER`).
+Esquema **v3** (`lib/data/db/tables.dart`, `schemaVersion = 3`). Las **claves foráneas están activas** (`PRAGMA foreign_keys = ON` en cada apertura). Los días se guardan como `TEXT 'YYYY-MM-DD'`, las marcas de tiempo en ISO 8601 y el dinero en **céntimos** (`INTEGER`).
 
 ```
 categorias ──< orden_pasillos >── establecimientos ──< codigos_bascula >── presentaciones
@@ -121,21 +121,21 @@ alimentos ──< porciones
 | Tabla | Qué guarda |
 |---|---|
 | `categorias` | Secciones del súper (v2): `nombre` único sin distinguir mayúsculas y `orden` general de los pasillos. Al instalar (y al migrar desde v1) se crean 13 por defecto: Frutas y verduras, Panadería, Carnicería, Pescadería, Charcutería y quesos, Lácteos y huevos, Despensa, Desayuno y dulces, Bebidas, Congelados, Platos preparados, Limpieza, Higiene y cuidado personal. |
-| `alimentos` | El repertorio. `uuid` único (identidad para compartir), `nombre` + `marca` (únicos juntos, sin distinguir mayúsculas; marca `''` = genérico), `tipo` (`generico`/`envasado`/`preparado`), `unidad` (`g`/`ml`), `categoria_id` (v2, opcional, `SET NULL` al borrar la categoría). Tabla nutricional **por 100 g/ml** con 8 nutrientes (`kcal`, `proteinas`, `grasas`, `grasas_saturadas`, `carbohidratos`, `azucares`, `fibra`, `sal`); **`NULL` = desconocido** (no es lo mismo que 0). `nutricion_origen` (`manual`, `etiqueta_ocr`, `importado`, `calculado`), `uso_count`/`ultimo_uso` (lista de "más usados"), `archivado`. |
+| `alimentos` | El repertorio. `uuid` único (identidad para compartir), `nombre` + `marca` (únicos juntos, sin distinguir mayúsculas; marca `''` = genérico), `tipo` (`generico`/`envasado`/`preparado`), `unidad` (`g`/`ml`), `categoria_id` (v2, opcional, `SET NULL` al borrar la categoría). Tabla nutricional **por 100 g/ml** con 8 nutrientes (`kcal`, `proteinas`, `grasas`, `grasas_saturadas`, `carbohidratos`, `azucares`, `fibra`, `sal`); **`NULL` = desconocido** (no es lo mismo que 0). `nutricion_origen` (`manual`, `etiqueta_ocr`, `importado`, `calculado`), `uso_count`/`ultimo_uso` (lista de "más usados"), `archivado`. v3: `nutricion_aproximada` (tabla de una receta sin peso final o con ingredientes sin datos) y `es_alimento` (`false` = artículo de limpieza, higiene...: sin tabla nutricional, fuera del contador y de pendientes). |
 | `porciones` | Equivalencias caseras: "1 diente = 5 g", "1 vaso = 250 ml". Sirven para registrar rápido y para calcular recetas con "2 dientes de ajo". |
 | `presentaciones` | Formato comercial de un alimento: `codigo_barras` (GTIN normalizado, único, `NULL` = granel), `descripcion` ("Brick 1 L"), `contenido` neto (para el precio por kg o litro). Un alimento puede tener varias. Los frescos de báscula usan una presentación **"Al peso"** sin código. |
 | `establecimientos` | Tiendas, sin duplicados por mayúsculas. v2: `formato_bascula` (`'precio'`, `'peso'` o `NULL` = aún sin aprender) y `longitud_clave` (6 o 7, por defecto 7) de sus etiquetas de báscula. |
 | `orden_pasillos` | Orden propio de los pasillos de una tienda (v2). PK `establecimiento_id + categoria_id`, `orden`. Sin filas, la tienda usa el orden general de `categorias`. |
 | `codigos_bascula` | Etiquetas de báscula aprendidas (v2): en cada tienda, la `clave` (parte fija del código) apunta a una `presentacion_id`. Única por tienda + clave. |
 | `compras` | Historial de precios: presentación, tienda, fecha, `precio_cent` unitario y `unidades`. v2: `peso_g` (peso real de la compra, para el €/kg de los frescos al peso). `ON DELETE RESTRICT`: una presentación con compras no se borra, se archiva. |
-| `listas_compra` / `items_lista` | Listas y artículos (`alimento_id` opcional, `texto`, `cantidad`, `comprado`). En el carrito, `compra_id` apunta a la compra: unidades y precio se leen de ella, **no se copian**. |
-| `recetas` / `ingredientes_receta` | Receta (`uuid`, porciones, `peso_final_g` cocinado, `alimento_id` del alimento "preparado" que la representa) e ingredientes: `texto` original siempre, más `alimento_id`, `cantidad` y `unidad` (`g`, `ml` o nombre de una porción) opcionales. |
+| `listas_compra` / `items_lista` | Listas y artículos (`alimento_id` opcional, `texto`, `cantidad`, `comprado`). En el carrito, `compra_id` apunta a la compra: unidades y precio se leen de ella, **no se copian**. v3: `cantidad_minima` (g/ml del alimento que piden las recetas, ya escalado y sumado entre recetas). |
+| `recetas` / `ingredientes_receta` | Receta (`uuid`, porciones, `peso_final_g` cocinado y sin olla, `alimento_id` del alimento "preparado" que la representa —se crea y actualiza solo—, v3: `ultima_preparacion`) e ingredientes: `texto` siempre (generado al elegir el alimento, o el original de recetas antiguas e importadas), más `alimento_id`, `cantidad`, `unidad` (`g`, `ml` o nombre de una porción) y, v3, `nota`. |
 | `comidas` / `items_comida` | Registro del día. Los items guardan el nombre y los macros **ya escalados** (histórico inmutable) y un `alimento_id` informativo. |
 | `alimentos_fts` | Índice FTS5 (`unicode61 remove_diacritics 2`) sobre nombre y marca, mantenido por triggers. |
 
 ### Reglas del modelo
 
-- **Completo** = tiene `kcal`, `proteinas`, `grasas` y `carbohidratos`. Si no, está **pendiente**: aparece en Alimentos → Pendientes (con insignia), ordenado por prioridad (usado en recetas → comprado recientemente → resto).
+- **Completo** = tiene `kcal`, `proteinas`, `grasas` y `carbohidratos`. Si no, está **pendiente** (salvo los artículos que no son alimentos, que nunca lo están): aparece en Alimentos → Pendientes (con insignia), ordenado por prioridad (usado en recetas → comprado recientemente → resto).
 - **Un alimento pendiente no se registra en Calorías con ceros**: al elegirlo se ofrece completarlo (formulario + lectura de etiqueta).
 - **Borrar** un alimento sin compras lo borra, y sus porciones y presentaciones caen en cascada. Con compras se **archiva**. Recetas, listas y comidas que lo usaban quedan desvinculadas (`SET NULL`) pero conservan su texto.
 - **Duplicados**: no puede haber dos alimentos con el mismo nombre y marca (sin tildes ni mayúsculas). Editar nunca borra y reinserta: se conservan el id, los vínculos y el uso.
@@ -146,6 +146,8 @@ alimentos ──< porciones
 - **Códigos de báscula**: un EAN-13 que empieza por `2` (`isVariableMeasure`) **nunca** se guarda como `codigo_barras` de una presentación; se guarda su clave en `codigos_bascula`, ligada a la tienda.
 
 ### Migraciones
+
+- **v2 → v3** (`from < 3`): solo `ADD COLUMN`: `alimentos.nutricion_aproximada`, `alimentos.es_alimento`, `recetas.ultima_preparacion`, `ingredientes_receta.nota` e `items_lista.cantidad_minima`. Al abrir la app actualizada, el vigilante de recetas crea los alimentos de las recetas que ya se pueden contar. Test: `test/unit/schema_v3_test.dart` parte de `test/fixtures/schema_v2.sql` y compara tablas, columnas, índices y triggers con una instalación nueva.
 
 - **v1 → v2** (`onUpgrade`, `from < 2`): crea `categorias`, `orden_pasillos` y `codigos_bascula`; añade `alimentos.categoria_id`, `establecimientos.formato_bascula`, `establecimientos.longitud_clave` y `compras.peso_g`; crea los índices nuevos; siembra las categorías por defecto (`sembrarCategorias`) y clasifica los alimentos existentes por su nombre (`clasificarAlimentos`). `onCreate` siembra las categorías igual. Las claves foráneas se desactivan durante la migración y se reactivan en `beforeOpen`.
 - El test de migración parte de un volcado del esquema v1 con datos (`test/fixtures/schema_v1.sql`) y compara el resultado con una instalación nueva.
@@ -203,20 +205,28 @@ El mismo código significa cosas distintas en tiendas distintas, así que format
 4. Formato peso: importe = peso × último €/kg de esa presentación en la tienda (`lastPricePerKiloCent`, `priceForWeight`). La primera vez se pide el importe.
 5. `CartPriceSheet(alPeso: true)` pide el "Importe del paquete" sin unidades, y la compra se registra con su `peso_g`.
 
-### Recetas conectadas (`nutrition_calculator.dart`, `recipe_food.dart`)
+### Recetas (`nutrition_calculator.dart`, `recipe_food.dart`, `recipe_ideas.dart`)
 
-- **Gramos de un ingrediente**: si la unidad es `g`/`ml`, la cantidad; si es una porción, `cantidad × gramos de la porción` ("dientes" ↔ "diente").
-- **Cálculos**: `total = Σ gramos/100 × valor por 100`. `peso = peso_final_g ?? Σ gramos`. **Por porción** = total / porciones.
-- **Completa** cuando todos los ingredientes no opcionales están vinculados, con cantidad convertible a gramos y con su tabla completa. Si no, se muestra el mínimo ("≥ X kcal") y una lista con el motivo de cada ingrediente:
-  - sin vincular → **Vincular**
-  - sin cantidad → **Cantidad**
-  - porción sin peso → **Añadir peso**
-  - alimento pendiente → **Completar**, con lectura de etiqueta
-- "Sal/pimienta/agua al gusto" no bloquean el cálculo.
-- **Vincular automáticamente** (`SuggestIngredientLinks`): propone para cada línea el alimento que mejor encaja y la cantidad leída ("200 g de arroz" → Arroz, 200 g). Se revisa antes de guardar.
-- **Registrar porción** añade la receta al día. **Añadir a mis alimentos** crea o actualiza un alimento `preparado` con la nutrición calculada y la porción de la receta (`SaveRecipeAsFood`).
-- **Editar la receta** conserva los vínculos de las líneas cuyo texto no cambia.
-- **Modo cocina**: ingredientes y pasos en grande. Al empezar recuerda los datos que faltan, porque el envase está en la mano para leer la etiqueta.
+El gestor de recetas sirve para tener **ideas de cosas que ya has preparado**, y cada receta se usa en el contador **como un alimento más**, apuntando los gramos de tu plato.
+
+- **Ingredientes desde el buscador** (`IngredientSheet`): «Añadir ingrediente» abre el mismo buscador del contador (buscar, escanear o «Crear "X"» con el formulario completo y la lectura de etiqueta; solo alimentos, nunca el de la propia receta). Después se indica la cantidad en `g`/`ml` o en una porción del alimento (se puede crear una: «diente = 5 g»), una nota opcional («picada») y si es opcional. El **texto de la línea se genera solo** («2 dientes de ajo, picados»), así que nunca contradice a la cantidad, y el vínculo va con la fila (cambiar la cantidad no lo pierde).
+- **Líneas por vincular**: las recetas antiguas, pegadas («Pegar lista») o importadas traen líneas de texto sin alimento. Se ven en naranja con «Buscar» y el asistente **Vincular automáticamente** (`SuggestIngredientLinks`: propone el alimento que mejor encaja y la cantidad leída; se revisa antes de guardar). No impiden guardar: la receta queda aproximada. Al importar una sola receta se pasa directamente a vincular sus ingredientes.
+- **Cálculo**: gramos de un ingrediente = la cantidad (`g`/`ml`) o `cantidad × gramos de la porción` ("dientes" ↔ "diente"). `total = Σ gramos/100 × valor por 100`. `peso = peso_final_g ?? Σ gramos`. **Por porción** = total / porciones. "Sal/pimienta/agua al gusto" no bloquean el cálculo.
+- **Exacta o aproximada**: es **exacta** con todos los ingredientes completos **y** el peso final. Si no, se calcula **con los datos que hay** y es **aproximada**: se avisa en la receta (con la lista de lo que falta y su acción: Vincular, Cantidad, Añadir peso, Completar), en la ficha del alimento y al añadirlo en el contador («no se ha introducido el peso total final de la preparación…»).
+- **Peso final** (`SetRecipeFinalWeight`, `FinalWeightDialog`): se introduce después de cocinar, desde la receta o al final del modo cocina. «En la olla»: peso total menos el de la olla, elegida de las **ollas guardadas** (`CookingPotRepository`, en SharedPreferences, clave `recipientes_cocina`; viajan en el respaldo completo). Si se cocinó escalada, el peso se guarda referido a la receta original. Marca la receta como preparada ese día.
+- **Alimento de la receta** (`SyncRecipeFoods`): «Nombre · Receta» (`preparado`, `nutricion_origen = 'calculado'`, tabla por 100 g, porción «porción» = peso de una ración y `nutricion_aproximada`). Se crea en cuanto se conocen kcal, proteínas, grasas y carbohidratos y desde entonces **se actualiza solo**: lo llama `SaveRecipe` y un **vigilante** (`recipeFoodSyncProvider`, escuchado en `MainShell`) que reacciona a cualquier cambio en recetas, ingredientes, alimentos o porciones (completar la tabla de un ingrediente, importar, restaurar...). Solo escribe lo que cambia, así que su propia escritura no vuelve a escribir.
+  - **Nunca sobrescribe otro alimento**: si «Nombre · Receta» ya es de un alimento que no es de ninguna receta, la receta avisa y se queda sin el suyo hasta que se renombra. Un «preparado» huérfano con ese nombre (receta borrada, repertorio importado) se adopta. Un vínculo antiguo a un alimento que no es «preparado» (lo dejaba el antiguo «Añadir a mis alimentos» al coincidir el nombre) se suelta sin tocar ese alimento.
+  - Las recetas que usan el alimento de otra se calculan después de ella; un bucle (A contiene B y B contiene A) se corta sin contar ese ingrediente (`IngredientIssueKind.circular`).
+  - **Borrar una receta conserva su alimento** (se puede seguir registrando). Renombrarla lo renombra. Los nombres de receta son únicos (sin tildes ni mayúsculas). Editar a mano la tabla de ese alimento muestra que se sobrescribirá; completarlo desde el contador lleva a la receta.
+- **Escalar** (`recipeScaleProvider`): raciones (o ×½, ×1, ×1½...) en el detalle; las cantidades, el modo cocina, la lista de compra y el peso final usan esa escala (`scaledIngredientText`).
+- **Lista de compra** (`AddIngredientsToShoppingList`): cada línea se lleva con su cantidad escalada; si se sabe en g/ml (cantidad, porciones o lo escrito) se guarda como **mínimo** (`items_lista.cantidad_minima`). Si el artículo ya estaba pendiente, se **suma** (dos recetas con arroz). La lista muestra «mín. 750 g → 1 × Paquete 1 kg» con el envase que la cubre con menos sobrante (`suggestPackage`, según el contenido de las presentaciones). Cambiar a mano la cantidad o el alimento quita el mínimo.
+- **Ideas** (`recipe_ideas.dart`): «Sugiéreme algo» propone una receta al azar en la que pesan las favoritas y las que hace tiempo que no preparas (las de los últimos días casi nunca), con «Otra» sin repetir. En «Por nombre» se ordena por favoritas, «hace más tiempo que no la preparas» o «preparadas hace poco» y se filtra por categoría. `ultima_preparacion` se guarda al pesar la preparación, al terminar el modo cocina o con «La he preparado hoy», y se ve en la lista («hace 3 semanas»).
+- **Modo cocina**: ingredientes (escalados) y pasos en grande. Al empezar recuerda los datos que faltan, porque el envase está en la mano para leer la etiqueta; al terminar pide el peso.
+
+### Artículos que no son alimentos
+
+- `alimentos.es_alimento = false`: limpieza, higiene, hogar... Se dan de alta con el interruptor «Es un alimento» (formulario y alta rápida en la tienda), propuesto por el nombre (`pareceNoAlimentario`: categorías Limpieza e Higiene y cuidado personal).
+- No tienen tabla nutricional, **nunca están pendientes**, no salen en el buscador del contador ni como ingredientes (`search(soloAlimentos: true)`) y no se pueden registrar en el día. Se compran, se escanean y guardan su historial de precios y €/kg como cualquier producto. Filtro «No alimentarios» en Alimentos.
 
 ---
 
@@ -228,12 +238,12 @@ Todo se guarda y se abre con el selector del sistema (SAF en Android, sin permis
 |---|---|---|
 | **Repertorio** `.json` (`RepertoireCodec`) | Alimentos con porciones, presentaciones y categoría (por nombre); recetas opcionales (con los ingredientes vinculados por `uuid`). **Sin datos personales**: ni comidas, ni compras, ni precios, ni uso, ni ajustes. | **Fusiona** (`ImportRepertoire`) |
 | **Respaldo completo** `.json` (`FullBackupService`) | Todas las tablas tal cual (incluidas `categorias`, `orden_pasillos` y `codigos_bascula`) + ajustes (SharedPreferences) | **Reemplaza** todo, en una transacción, después de guardar una copia automática del estado actual (`respaldo_automatico_*.json` en documentos). Un respaldo anterior a v2 se restaura y después se siembran las categorías y se clasifican los alimentos. Si el respaldo es anterior a la lista de frutas y verduras (no trae `catalogo_frutas_version`), esa marca se borra y la lista se vuelve a incorporar sola |
-| **TSV** (`FoodsTsvCodec`) | `uuid nombre marca tipo unidad codigos kcal grasas grasas_saturadas carbohidratos azucares fibra proteinas sal categoria` (TAB; celdas vacías = desconocido) | Fusiona. Acepta archivos sin la columna `categoria` y **también la cabecera antigua** `id alimento kCal grasas carbohidratos proteinas` |
+| **TSV** (`FoodsTsvCodec`) | `uuid nombre marca tipo unidad codigos kcal grasas grasas_saturadas carbohidratos azucares fibra proteinas sal categoria es_alimento` (TAB; celdas vacías = desconocido; `es_alimento` = `no` en los artículos que no son alimentos) | Fusiona. Las columnas se leen por nombre: acepta archivos sin `categoria` ni `es_alimento` y **también la cabecera antigua** `id alimento kCal grasas carbohidratos proteinas` |
 | **`.db` antiguo** (`LegacyData`) | `db_alimentos` de versiones anteriores | Fusiona los alimentos |
 | Recetas `.txt`/JSON/CSV (`RecipeTextCodec`) | Recetas sueltas | Omite las que ya existen por nombre |
 | CSV diario / historial de precios | Exportación (TAB, extensión `.csv`) | — |
 
-Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, "exportado", "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "categoria", "nutricion": {..., "origen"}, "porciones": [...], "presentaciones": [...]}], "recetas": [...]}`. Los campos desconocidos se ignoran y las versiones mayores más nuevas se rechazan con un mensaje claro.
+Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, "exportado", "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "categoria", "es_alimento", "nutricion": {..., "origen", "aproximada"}, "porciones": [...], "presentaciones": [...]}], "recetas": [{..., "ingredientes": [{"texto", "alimento_uuid", "cantidad", "unidad", "opcional", "nota"}]}]}`. Los campos desconocidos se ignoran y las versiones mayores más nuevas se rechazan con un mensaje claro. `es_alimento` (solo si es `false`), `aproximada` (solo si es `true`) y `nota` son campos añadidos y opcionales (v3), sin cambiar la versión del formato: un archivo anterior se lee igual y una versión anterior de la app los ignora. El alimento de una receta viaja como un alimento más («Nombre · Receta»); en el destino la receta lo adopta.
 
 **Categorías en el intercambio**: viajan siempre **por nombre**, nunca por id. `categoria` es un campo opcional (añadido sin cambiar la versión del formato); si la categoría no existe en el destino, se crea. Al fusionar, un alimento local conserva su categoría y solo toma la importada si no tenía ninguna.
 
@@ -245,7 +255,7 @@ Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, 
    - Se rellenan los huecos de la tabla nutricional.
    - Si ambos tienen valores distintos, se aplica la política: *Conservar los míos* (por defecto) o *Usar los importados*.
    - Se añaden las porciones y presentaciones que falten. Un código que ya es de otro alimento se ignora y se informa.
-4. **Recetas**: se emparejan por uuid o nombre; las que ya existen se omiten.
+4. **Recetas**: se emparejan por uuid o nombre; las que ya existen se omiten. Su alimento («Nombre · Receta») lo adopta la receta en cuanto el vigilante la pone al día.
 5. **Resultado**: importar dos veces el mismo archivo no duplica nada.
 
 **Primer arranque** (`OnboardingView`, solo con el repertorio vacío):
@@ -345,6 +355,11 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
   - respaldo completo
   - lectura del `.db` de la v1.2 (`test/fixtures/`) y migración completa de una instalación antigua
 - `test/unit/nutrition_label_parser_test.dart`: 23 casos: una y dos columnas, ruido de OCR, solo kJ, multilingüe, alemán, ración, sodio, trazas, "<" y ">", incoherencias, agrupación por geometría y peso neto.
+- `test/unit/schema_v3_test.dart`: **migración v2 → v3 con datos** (desde `test/fixtures/schema_v2.sql`), comparando tablas, columnas, índices y triggers con una instalación nueva.
+- `test/unit/recipe_food_sync_test.dart`: alimento de la receta (creación, aproximado sin peso final, peso final con escala, datos parciales, renombrar y borrar, no sobrescribir otro alimento, adoptar huérfanos y soltar vínculos antiguos, recetas anidadas y bucles, nombres únicos) y artículos que no son alimentos fuera del contador, de las sugerencias y de pendientes.
+- `test/unit/recipe_scale_shopping_test.dart`: textos de ingredientes (plurales, notas, escala), envase sugerido y lista de compra con mínimos escalados y sumados entre recetas.
+- `test/unit/recipe_ideas_test.dart`: órdenes, categorías, «hace X días» y sugerencias ponderadas sin repetir.
+- `test/unit/non_food_test.dart`: propuesta por el nombre, alta en tienda, repertorio y TSV con los campos nuevos (y archivos anteriores) y respaldo completo.
 - `test/unit/phase7_test.dart`:
   - adivinador de categorías e instalación nueva con categorías
   - **migración v1 → v2 con datos** (desde `test/fixtures/schema_v1.sql`, comparando el esquema con una instalación nueva)
@@ -353,11 +368,13 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
   - categoría en repertorio, TSV y respaldo
   - etiquetas de báscula: parseo, lectura, aprendizaje por tienda, carrito acumulado y clave de 6 dígitos
 - `test/widget/`:
-  - `modules_smoke_test.dart`: recorre la app real sobre una base de datos en memoria: alimentos, agregar ingesta, recetas con vinculación automática, compras y modo carrito con cámara simulada.
+  - `modules_smoke_test.dart`: recorre la app real sobre una base de datos en memoria: alimentos, agregar ingesta, recetas (vinculación automática, alimento de la receta, ingrediente desde el buscador, pegar lista e importar), compras y modo carrito con cámara simulada.
   - `onboarding_test.dart`: primer arranque.
   - `label_review_test.dart`: revisión de la lectura de etiquetas.
   - `phase7_widget_test.dart`: lista agrupada por pasillos, categoría sugerida y filtro; flujo completo de báscula en el modo carrito; pantalla de categorías.
   - `add_food_popup_test.dart`: "Nueva comida" no reutiliza un `Comida_N` existente y la cantidad acepta coma decimal.
+  - `recipes_v3_widget_test.dart`: peso final con olla guardada, aviso de tabla aproximada en el contador, escala de raciones hasta la lista de compra e ideas (sugerir, «La he preparado hoy», ordenar).
+  - `non_food_widget_test.dart`: filtro «No alimentarios», fuera del contador y alta sin tabla nutricional.
 - De la auditoría técnica (`docs/AUDITORIA_TECNICA.md`): `home_notifier_test.dart` (cambio de día con la app abierta, errores de carga, borrar el día), `meal_naming_test.dart`, `app_utils_test.dart` (decimales y ruta guardada), `ingredient_matcher_test.dart`, `recipe_text_codec_test.dart`, `settings_test.dart` y `theme_provider_test.dart`.
 - Integración continua (`.github/workflows/ci.yml`): `flutter analyze` y `flutter test` en cada push y pull request.
 
@@ -385,6 +402,8 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 18. **Códigos de báscula**: un EAN-13 con prefijo `2` nunca se guarda como `codigo_barras` de una presentación. Su clave va en `codigos_bascula`, por tienda.
 19. **Categorías por nombre** en repertorios, TSV y respaldos; nunca por id.
 20. **Diálogos con campos de texto**: crear los controladores con `DialogControllers` (`widgets/dialog_controllers.dart`). Liberarlos justo después de `await showDialog` provoca "used after being disposed" mientras el diálogo aún se cierra.
+21. **El alimento de una receta es derivado**: lo crea y actualiza `SyncRecipeFoods` (marca `Receta`). No editarlo a mano desde el código ni sobrescribir con él otro alimento; para cambiarlo, cambiar la receta. Guardar recetas con `SaveRecipe` (nombre único).
+22. **Artículos que no son alimentos** (`es_alimento = false`): fuera del contador, de los ingredientes y de pendientes (`kPendienteSql`, `search(soloAlimentos: true)`), pero con compras y precios como cualquier producto.
 
 \*\*
 NOTA PERSONAL:

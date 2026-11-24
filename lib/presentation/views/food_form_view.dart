@@ -13,6 +13,7 @@ import '../../domain/services/ingredient_matcher.dart';
 import '../../domain/services/money.dart';
 import '../../domain/usecases/food_registration.dart';
 import '../providers/foods_provider.dart';
+import '../providers/recipes_provider.dart';
 import '../widgets/category_widgets.dart';
 import '../widgets/food_widgets.dart';
 import '../widgets/label_reader.dart';
@@ -346,6 +347,10 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   Widget build(BuildContext context) {
     final faltan = _nutricion.faltantes;
     final esAlimento = _esAlimento;
+    final foodId = widget.food?.id;
+    final receta = foodId == null
+        ? null
+        : ref.watch(recipeByFoodProvider(foodId)).valueOrNull;
     final title = widget.completar
         ? 'Completar tabla nutricional'
         : (_isNew
@@ -370,6 +375,16 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
         child: ListView(
           padding: const EdgeInsets.all(AppStyles.paddingMedium),
           children: [
+            if (receta != null)
+              InfoBanner(
+                color: AppStyles.semaphBlue,
+                icon: Icons.menu_book_outlined,
+                text:
+                    'Es el alimento de la receta «${receta.nombre}»: su nombre '
+                    'y su tabla se calculan desde la receta y se actualizan '
+                    'solos, así que lo que cambies aquí se sobrescribirá. '
+                    'Cambia la receta.',
+              ),
             TextFormField(
               controller: _nameCtrl,
               autofocus: _isNew && _nameCtrl.text.isEmpty,

@@ -181,11 +181,12 @@ git config --global --add safe.directory /opt/flutter-sdk/flutter
 export PATH=/opt/flutter-sdk/flutter/bin:$PATH
 flutter --disable-analytics
 cd /home/user/cal_counter && flutter pub get
-flutter analyze && flutter test        # esperado: 168 tests en verde
+flutter analyze && flutter test        # esperado: 215 tests en verde (v3)
 ```
 
 Notas:
 
+- **Usar el Flutter de `/opt/flutter-sdk`**: algunos contenedores traen otro en `/usr/local/bin` (p. ej. 3.44) que, al hacer `flutter pub get`, rebaja versiones en `pubspec.lock` (`intl`, `meta`, `matcher`...). Ese cambio no se debe subir.
 - **`dart format`**: tras ejecutarlo, revertir `lib/domain/entities/user_settings.dart` (`git checkout HEAD -- lib/domain/entities/user_settings.dart`). El formateador lo cambia y no es parte del trabajo.
 - **Tras tocar `tables.dart`**: `dart run build_runner build`. El `.g.dart` se versiona y la CI comprueba que esté al día.
 - **Tests de widgets**:
