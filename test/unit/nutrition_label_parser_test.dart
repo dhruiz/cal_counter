@@ -157,6 +157,46 @@ Sal trazas
     );
   });
 
+  test('"<" y sus variantes cuentan como 0', () {
+    for (final texto in [
+      '<0,5 g',
+      '< 0,5 g',
+      '≤0,5 g',
+      '≤ 0,5 g',
+      'menos de 0,5 g',
+      'weniger als 0,5 g',
+    ]) {
+      final r = NutritionLabelParser.parseText('Grasas $texto');
+      expect(r.nutricion.grasas, 0, reason: texto);
+      expect(r.dudosos, isNot(contains(Nutrient.grasas)), reason: texto);
+    }
+  });
+
+  test('">" y sus variantes: toma el mínimo y lo marca para revisar', () {
+    for (final texto in [
+      '>6 g',
+      '> 6 g',
+      '≥6 g',
+      '≥ 6 g',
+      'más de 6 g',
+      'mas de 6 g',
+      'Más de 6 g',
+      'mehr als 6 g',
+    ]) {
+      final r = NutritionLabelParser.parseText('Fibra $texto');
+      expect(r.nutricion.fibra, 6, reason: texto);
+      expect(r.dudosos, contains(Nutrient.fibra), reason: texto);
+    }
+    final r = NutritionLabelParser.parseText('''
+Brennwert >1046 kJ / >250 kcal
+Ballaststoffe mehr als 6 g
+Eiweiß 8 g
+''');
+    expectFacts(r, kcal: 250, fibra: 6, proteinas: 8);
+    expect(r.dudosos, containsAll([Nutrient.kcal, Nutrient.fibra]));
+    expect(r.dudosos, isNot(contains(Nutrient.proteinas)));
+  });
+
   test('etiqueta multilingüe (ES/PT/FR/EN): toma la primera de cada', () {
     final r = NutritionLabelParser.parseText('''
 Valor energético/Energia/Énergie/Energy 1640 kJ/392 kcal
