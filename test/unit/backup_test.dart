@@ -307,6 +307,36 @@ void main() {
       expect(await b.foods.deleteFood(restored.id!), FoodDeletion.archivado);
     });
 
+    test(
+      'ajustes de los datos: se borran si el respaldo no los trae',
+      () async {
+        const clave = 'catalogo_frutas_version';
+        // Respaldo anterior a la lista de frutas y verduras: no trae la marca.
+        SharedPreferences.setMockInitialValues({'kcal_target': 2100});
+        final viejo = await FullBackupService(a.db).export();
+        // La instalación actual ya la había incorporado.
+        SharedPreferences.setMockInitialValues({clave: 1});
+        await FullBackupService(
+          b.db,
+        ).restore(viejo, ajustesDeLosDatos: {clave});
+        var prefs = await SharedPreferences.getInstance();
+        expect(prefs.containsKey(clave), isFalse); // se volverá a incorporar
+        expect(prefs.getInt('kcal_target'), 2100);
+
+        // Respaldo que sí la trae: se conserva su valor.
+        final nuevo = await FullBackupService(a.db).export();
+        expect(nuevo, isNot(contains(clave)));
+        await prefs.setInt(clave, 1);
+        final conMarca = await FullBackupService(a.db).export();
+        SharedPreferences.setMockInitialValues({});
+        await FullBackupService(
+          b.db,
+        ).restore(conMarca, ajustesDeLosDatos: {clave});
+        prefs = await SharedPreferences.getInstance();
+        expect(prefs.getInt(clave), 1);
+      },
+    );
+
     test('rechaza un archivo que no es un respaldo', () {
       expect(
         () => FullBackupService.inspect('{"formato":"otro"}'),

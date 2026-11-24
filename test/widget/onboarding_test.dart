@@ -1,3 +1,4 @@
+import 'package:cal_counter/data/backup/full_backup.dart';
 import 'package:cal_counter/data/db/app_database.dart';
 import 'package:cal_counter/data/repositories/food_repository_impl.dart';
 import 'package:cal_counter/domain/entities/food.dart';
@@ -119,6 +120,63 @@ void main() {
       await tester.pump(const Duration(seconds: 5));
     },
   );
+
+  testWidgets('al restaurar un respaldo la lista se repone si hace falta', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      kOnboardingDone: true,
+      kProduceCatalogVersionKey: kProduceCatalogVersion,
+    });
+    await tester.runAsync(
+      () => FoodRepositoryImpl(db).saveFood(const Food(nombre: 'Pan')),
+    );
+    await pump(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.text('Agregar Ingesta')),
+    );
+    final aviso = find.text(
+      'Se añadieron 229 frutas, verduras y hortalizas a tus alimentos.',
+    );
+
+    // Respaldo anterior a la lista (sin la marca), hecho con otra base.
+    final prefs = await SharedPreferences.getInstance();
+    final viejo = memoryDb();
+    final json = (await tester.runAsync(() async {
+      await FoodRepositoryImpl(viejo).saveFood(const Food(nombre: 'Arroz'));
+      await prefs.remove(kProduceCatalogVersionKey);
+      final j = await FullBackupService(viejo).export();
+      await prefs.setInt(kProduceCatalogVersionKey, kProduceCatalogVersion);
+      await viejo.close();
+      return j;
+    }))!;
+
+    // Como hace Datos y respaldos: restaurar e invalidar el provider.
+    await tester.runAsync(
+      () => FullBackupService(
+        db,
+      ).restore(json, ajustesDeLosDatos: kAjustesDeLosDatos),
+    );
+    expect(prefs.containsKey(kProduceCatalogVersionKey), isFalse);
+    container.invalidate(autoImportProduceProvider);
+    await esperar(tester, finder: aviso);
+    expect(aviso, findsOneWidget);
+    expect((await alimentos(tester)).length, 1 + 229); // Arroz + la lista
+
+    // Recargarlo otra vez (la lista ya está) no repite el aviso: el estado de
+    // carga conserva el 229 anterior y no debe contar.
+    ScaffoldMessenger.of(
+      tester.element(find.text('Agregar Ingesta')),
+    ).removeCurrentSnackBar();
+    await tester.pump();
+    expect(aviso, findsNothing);
+    container.invalidate(autoImportProduceProvider);
+    await esperar(tester, vueltas: 20);
+    expect(aviso, findsNothing);
+    expect((await alimentos(tester)).length, 1 + 229);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 5));
+  });
 
   testWidgets('la lista se añade una sola vez por versión', (tester) async {
     // Ya incorporada (por ejemplo, y luego se borraron alimentos): no vuelve.

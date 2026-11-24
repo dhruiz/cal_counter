@@ -4,4 +4,7 @@ class AppConstants {
   /// `tool/semilla/generar_frutas_verduras.py`.
   static const String produceCatalogAsset =
       'assets/semilla/frutas_verduras.json';
+
+  /// Alimentos de [produceCatalogAsset] (lo comprueba un test).
+  static const int produceCatalogCount = 229;
 }

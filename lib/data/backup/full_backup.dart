@@ -115,7 +115,15 @@ class FullBackupService {
   }
 
   /// Reemplaza todo el contenido por el del respaldo (transacción).
-  Future<void> restore(String content) async {
+  ///
+  /// [ajustesDeLosDatos] son claves de ajustes que describen el contenido de
+  /// la base de datos (por ejemplo, qué lista incluida ya se incorporó). Si el
+  /// respaldo no las trae se borran, porque su valor actual ya no corresponde
+  /// a los datos restaurados.
+  Future<void> restore(
+    String content, {
+    Set<String> ajustesDeLosDatos = const {},
+  }) async {
     final json = _parse(content);
     final datos = json['tablas'] as Map;
     final columnas = <String, Set<String>>{
@@ -150,8 +158,11 @@ class FullBackupService {
     db.notifyUpdates({for (final t in db.allTables) TableUpdate.onTable(t)});
 
     final ajustes = json['ajustes'];
+    final prefs = await SharedPreferences.getInstance();
+    for (final k in ajustesDeLosDatos) {
+      if (ajustes is! Map || !ajustes.containsKey(k)) await prefs.remove(k);
+    }
     if (ajustes is Map) {
-      final prefs = await SharedPreferences.getInstance();
       for (final e in ajustes.entries) {
         final k = e.key as String;
         final w = e.value;
