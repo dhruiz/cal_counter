@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants.dart';
 import '../../core/styles.dart';
 import '../../data/backup/foods_tsv_codec.dart';
 import '../../data/backup/full_backup.dart';
@@ -154,8 +155,12 @@ class _DataViewState extends ConsumerState<DataView> {
     if (ok != true) return;
     final service = ref.read(fullBackupProvider);
     final copia = await saveAutomaticBackup(service);
-    await service.restore(json);
+    await service.restore(json, ajustesDeLosDatos: kAjustesDeLosDatos);
     await markOnboardingDone();
+    // Si el respaldo es anterior a la lista de frutas y verduras, se vuelve a
+    // incorporar ya (MainShell escucha este provider y avisa). Si se salió de
+    // la pantalla, se hará en el próximo arranque.
+    if (mounted) ref.invalidate(autoImportProduceProvider);
     _msg(
       copia == null
           ? 'Respaldo restaurado.'
@@ -164,8 +169,7 @@ class _DataViewState extends ConsumerState<DataView> {
   }
 
   Future<void> _produce() => _run(() async {
-    final rep = await ref.read(produceCatalogProvider.future);
-    await _importRepertoire(rep, 'Frutas y verduras');
+    await _importRepertoire(await loadProduceCatalog(), 'Frutas y verduras');
   });
 
   Future<void> _migrateLegacy(String path) => _run(() async {
@@ -281,7 +285,8 @@ class _DataViewState extends ConsumerState<DataView> {
               leading: const Icon(Icons.local_florist_outlined),
               title: const Text('Añadir frutas y verduras'),
               subtitle: const Text(
-                '229 frutas, verduras y hortalizas (tablas CIQUAL y USDA)',
+                '${AppConstants.produceCatalogCount} frutas, verduras y '
+                'hortalizas (tablas CIQUAL y USDA)',
               ),
               onTap: _produce,
             ),

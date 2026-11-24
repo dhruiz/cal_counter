@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cal_counter/core/constants.dart';
 import 'package:cal_counter/data/backup/repertoire_codec.dart';
 import 'package:cal_counter/data/db/app_database.dart';
 import 'package:cal_counter/data/repositories/category_repository_impl.dart';
@@ -29,6 +30,8 @@ void main() {
   group('catálogo de frutas y verduras (CIQUAL 2025 y USDA SR Legacy)', () {
     test('229 alimentos completos, con uuid, categoría y fuente', () {
       expect(frutas.alimentos.length, 229);
+      // La cifra que muestra la interfaz.
+      expect(AppConstants.produceCatalogCount, frutas.alimentos.length);
       for (final rf in frutas.alimentos) {
         final f = rf.alimento;
         expect(f.uuid, isNotNull, reason: f.nombre);

@@ -52,12 +52,16 @@ final migrateLegacyProvider = Provider<MigrateLegacyData>(
   ),
 );
 
-/// Frutas, verduras y hortalizas con la tabla de CIQUAL 2025 o USDA SR Legacy
-/// (229 alimentos).
-final produceCatalogProvider = FutureProvider<Repertoire>((ref) async {
-  final json = await rootBundle.loadString(AppConstants.produceCatalogAsset);
+/// Lee la lista de frutas y verduras incluida (CIQUAL 2025 o USDA SR Legacy).
+/// Se usa una vez (al incorporarla), así que no se guarda en memoria: ni el
+/// texto en la caché de assets ni el repertorio decodificado.
+Future<Repertoire> loadProduceCatalog() async {
+  final json = await rootBundle.loadString(
+    AppConstants.produceCatalogAsset,
+    cache: false,
+  );
   return RepertoireCodec.decode(json);
-});
+}
 
 /// Ruta de la base de datos de la versión anterior si existe y aún no se
 /// migró. El archivo nunca se modifica.
@@ -94,6 +98,11 @@ const int kProduceCatalogVersion = 1;
 /// Clave de SharedPreferences con la última versión de la lista incorporada.
 const String kProduceCatalogVersionKey = 'catalogo_frutas_version';
 
+/// Ajustes que describen el contenido de la base de datos: al restaurar un
+/// respaldo que no los trae (anterior a la lista) se borran, y la lista se
+/// vuelve a incorporar sola.
+const Set<String> kAjustesDeLosDatos = {kProduceCatalogVersionKey};
+
 /// Marca la lista de frutas y verduras de esta versión como ya incorporada,
 /// para que no se importe sola.
 Future<void> markProduceCatalogDone() async {
@@ -109,8 +118,9 @@ final autoImportProduceProvider = FutureProvider<int>((ref) async {
   final prefs = await SharedPreferences.getInstance();
   final hecha = prefs.getInt(kProduceCatalogVersionKey) ?? 0;
   if (hecha >= kProduceCatalogVersion) return 0;
-  final rep = await ref.read(produceCatalogProvider.future);
-  final r = await ref.read(importRepertoireProvider)(rep);
+  final r = await ref.read(importRepertoireProvider)(
+    await loadProduceCatalog(),
+  );
   await prefs.setInt(kProduceCatalogVersionKey, kProduceCatalogVersion);
   return r.nuevos;
 });

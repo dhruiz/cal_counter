@@ -36,6 +36,9 @@ class _MainShellState extends ConsumerState<MainShell> {
     ref.watch(purgeOnStartupProvider);
     // Y se incorpora, una vez por versión, la lista de frutas y verduras.
     ref.listen<AsyncValue<int>>(autoImportProduceProvider, (_, next) {
+      // Al recargarlo (tras restaurar un respaldo), el estado de carga conserva
+      // el valor anterior: solo cuenta el resultado nuevo.
+      if (next.isLoading) return;
       final n = next.valueOrNull ?? 0;
       if (n > 0) {
         ScaffoldMessenger.of(context).showSnackBar(

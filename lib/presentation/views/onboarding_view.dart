@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants.dart';
 import '../../core/styles.dart';
 import '../../data/backup/full_backup.dart';
 import '../../data/backup/legacy_db.dart';
@@ -84,7 +85,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
 
   Future<void> _produce() => _run('Cargando frutas y verduras...', () async {
     final r = await ref.read(importRepertoireProvider)(
-      await ref.read(produceCatalogProvider.future),
+      await loadProduceCatalog(),
     );
     await markProduceCatalogDone();
     return '${r.nuevos} alimentos añadidos.';
@@ -106,7 +107,9 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
     }
     final texto = file.texto.trimLeft();
     if (texto.contains('"${FullBackupService.formato}"')) {
-      await ref.read(fullBackupProvider).restore(texto);
+      await ref
+          .read(fullBackupProvider)
+          .restore(texto, ajustesDeLosDatos: kAjustesDeLosDatos);
       return 'Respaldo restaurado.';
     }
     final r = await ref.read(importRepertoireProvider)(
@@ -185,8 +188,8 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
               icon: Icons.eco_outlined,
               title: 'Empezar con frutas y verduras',
               subtitle:
-                  '229 frutas, verduras y hortalizas con su tabla '
-                  'nutricional.',
+                  '${AppConstants.produceCatalogCount} frutas, verduras y '
+                  'hortalizas con su tabla nutricional.',
               onTap: _produce,
               destacada: legacy == null,
             ),
