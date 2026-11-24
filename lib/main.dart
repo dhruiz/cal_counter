@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/styles.dart';
 import 'presentation/views/main_shell.dart';
@@ -19,11 +20,17 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeProvider);
 
     return MaterialApp(
-      title: 'Calorie Counter',
+      // Nombre en la lista de apps recientes de Android.
+      title: 'Contador de calorías',
       debugShowCheckedModeBanner: false,
       theme: AppStyles.lightTheme,
       darkTheme: AppStyles.darkTheme,
       themeMode: themeMode,
+      // Sin esto los widgets de Material (p. ej. el selector de fecha de las
+      // compras) aparecían en inglés en una app en español.
+      locale: const Locale('es', 'ES'),
+      supportedLocales: const [Locale('es', 'ES')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: const MainShell(),
     );
   }

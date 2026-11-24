@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/meal.dart';
+import '../../domain/services/meal_naming.dart';
 import '../../domain/usecases/add_food_to_meal.dart';
 import '../../domain/usecases/create_meal_if_not_exists.dart';
 import '../providers/home_provider.dart';
 import '../providers/search_provider.dart';
 import '../providers/settings_provider.dart';
-
-// We need a provider for AddFoodToMeal and CreateMealIfNotExists
-// We can define them here or in home_provider.dart.
-// Let's assume they are needed here.
 
 final addFoodToMealProvider = Provider<AddFoodToMeal>((ref) {
   return AddFoodToMeal(ref.watch(mealRepositoryProvider));
@@ -76,6 +73,18 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
   Meal? _selectedMeal;
   bool _isCreatingNewMeal = false;
 
+  /// Evita un segundo envío mientras se guarda (antes, dos toques rápidos en
+  /// "Ok" añadían el alimento dos veces).
+  bool _submitting = false;
+
+  /// Nombre de la comida que se creará con "Nueva comida".
+  late final String _newMealName = nextMealName(widget.availableMeals);
+
+  double? get _quantity {
+    final q = AppUtils.parseDecimal(_quantityController.text);
+    return (q != null && q > 0) ? q : null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -87,9 +96,7 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     }
     final initial = widget.initialQuantity;
     if (initial != null && initial > 0) {
-      _quantityController.text = initial == initial.roundToDouble()
-          ? initial.toInt().toString()
-          : initial.toString();
+      _quantityController.text = AppUtils.formatNumero(initial);
       _quantityController.selection = TextSelection(
         baseOffset: 0,
         extentOffset: _quantityController.text.length,
@@ -106,7 +113,6 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
   /// no aporta nada, el campo se deja vacío.
   void _prefillSuggestedQuantity() {
     final settings = ref.read(settingsProvider);
-    final settingsNotifier = ref.read(settingsProvider.notifier);
     final home = ref.read(homeProvider);
     final food = widget.food;
 
@@ -118,10 +124,10 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     }
 
     consider(settings.kcalTarget - home.totalKcal, food.kcalPer100);
-    consider(settingsNotifier.fatsRequired - home.totalFats, food.grasasPer100);
-    consider(settingsNotifier.carbsRequired - home.totalCarbs, food.carbsPer100);
+    consider(settings.fatsRequired - home.totalFats, food.grasasPer100);
+    consider(settings.carbsRequired - home.totalCarbs, food.carbsPer100);
     consider(
-      settingsNotifier.proteinsRequired - home.totalProteins,
+      settings.proteinsRequired - home.totalProteins,
       food.proteinsPer100,
     );
 
@@ -146,44 +152,43 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_submitting || !_formKey.currentState!.validate()) return;
+    final quantity = _quantity;
+    if (quantity == null) return;
+    setState(() => _submitting = true);
 
-    final quantity = double.parse(_quantityController.text);
-    int mealId;
-
-    if (_isCreatingNewMeal || _selectedMeal == null) {
-      // Create new meal
-      // Name logic: Comida_n+1
-      // If we have meals, find max index.
-      int nextIndex = 1;
-      if (widget.availableMeals.isNotEmpty) {
-        // Try to parse "Comida_X"
-        // Or just count + 1?
-        // Requirement says "Nueva Comida permite crear Comida_n+1".
-        // Let's assume standard naming "Comida_1", "Comida_2".
-        // We can regex parse existing names or just use length + 1.
-        // Length + 1 is safer if they are sequential.
-        nextIndex = widget.availableMeals.length + 1;
+    try {
+      final int mealId;
+      if (_isCreatingNewMeal || _selectedMeal == null) {
+        // "Comida_N" libre (nextMealName): con `comidas + 1` el nombre podía
+        // existir ya y el alimento acababa en esa otra comida.
+        final createMeal = ref.read(createMealIfNotExistsProvider);
+        mealId = await createMeal(_newMealName, widget.selectedDate);
+      } else {
+        mealId = _selectedMeal!.id!;
       }
-      final name = 'Comida_$nextIndex';
 
-      final createMeal = ref.read(createMealIfNotExistsProvider);
-      mealId = await createMeal(name, widget.selectedDate);
-    } else {
-      mealId = _selectedMeal!.id!;
-    }
+      final addFood = ref.read(addFoodToMealProvider);
+      await addFood(mealId: mealId, food: widget.food, quantity: quantity);
 
-    final addFood = ref.read(addFoodToMealProvider);
-    await addFood(mealId: mealId, food: widget.food, quantity: quantity);
+      // Registra el uso para la lista de "más usados" (persistente en db_alimentos).
+      final foodId = widget.food.id;
+      if (foodId != null) {
+        await ref.read(recordFoodUsageProvider)(foodId);
+      }
 
-    // Registra el uso para la lista de "más usados" (persistente en db_alimentos).
-    final foodId = widget.food.id;
-    if (foodId != null) {
-      await ref.read(recordFoodUsageProvider)(foodId);
-    }
-
-    if (mounted) {
-      Navigator.pop(context, true); // Return true to indicate success
+      if (mounted) {
+        Navigator.pop(context, true); // Return true to indicate success
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo agregar: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -206,12 +211,10 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-              ],
+              inputFormatters: [AppUtils.decimalInputFormatter],
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Requerido';
-                final n = double.tryParse(value);
+                final n = AppUtils.parseDecimal(value);
                 if (n == null || n <= 0) return '> 0';
                 return null;
               },
@@ -245,7 +248,7 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  'Se creará: Comida_${widget.availableMeals.length + 1}',
+                  'Se creará: $_newMealName',
                   style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
               ),
@@ -258,12 +261,7 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed:
-              _quantityController.text.isNotEmpty &&
-                  double.tryParse(_quantityController.text) != null &&
-                  double.parse(_quantityController.text) > 0
-              ? _submit
-              : null,
+          onPressed: _quantity != null && !_submitting ? _submit : null,
           child: const Text('Ok'),
         ),
       ],

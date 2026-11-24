@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/shopping_local_data_source.dart';
 import '../../data/repositories/shopping_list_repository_impl.dart';
@@ -62,9 +64,14 @@ class ShoppingListsNotifier extends StateNotifier<ShoppingListsState> {
   }
 
   Future<void> load() async {
-    final lists = await _repo.getLists();
-    if (!mounted) return;
-    state = ShoppingListsState(lists: lists);
+    try {
+      final lists = await _repo.getLists();
+      if (!mounted) return;
+      state = ShoppingListsState(lists: lists);
+    } catch (e, st) {
+      log('Error cargando listas de compra', error: e, stackTrace: st);
+      if (mounted) state = ShoppingListsState(lists: state.lists);
+    }
   }
 
   Future<int> create(String nombre) async {
@@ -143,9 +150,14 @@ class ShoppingItemsNotifier extends StateNotifier<ShoppingItemsState> {
   }
 
   Future<void> load() async {
-    final items = await _repo.getItems(listaId);
-    if (!mounted) return;
-    state = ShoppingItemsState(items: items);
+    try {
+      final items = await _repo.getItems(listaId);
+      if (!mounted) return;
+      state = ShoppingItemsState(items: items);
+    } catch (e, st) {
+      log('Error cargando artículos de la lista', error: e, stackTrace: st);
+      if (mounted) state = ShoppingItemsState(items: state.items);
+    }
   }
 
   Future<void> _reloadAll() async {

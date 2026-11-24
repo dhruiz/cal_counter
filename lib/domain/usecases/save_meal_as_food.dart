@@ -1,6 +1,6 @@
+import '../entities/food.dart';
 import '../entities/meal_item.dart';
 import '../repositories/food_repository.dart';
-import '../../data/models/food_model.dart';
 
 /// Guarda una comida completa como un alimento en `db_alimentos`.
 ///
@@ -13,8 +13,9 @@ import '../../data/models/food_model.dart';
 /// ya cocinado, que difiere de la suma de los ingredientes crudos). Si es
 /// `null` se usa la suma de los pesos de los items.
 ///
-/// `insertFood` usa `ConflictAlgorithm.replace`, así que un alimento con el
-/// mismo nombre (columna UNIQUE) se sobrescribe. La confirmación de
+/// Un alimento con el mismo nombre (sin distinguir mayúsculas) se sobrescribe
+/// en su sitio (`saveFoodByName`): conserva id y contador de uso, así que las
+/// recetas y productos vinculados siguen apuntando a él. La confirmación de
 /// sobrescritura se decide en la UI antes de llamar aquí.
 class SaveMealAsFood {
   final FoodRepository repository;
@@ -46,7 +47,7 @@ class SaveMealAsFood {
     }
 
     final factor = 100.0 / grams;
-    final food = FoodModel(
+    final food = Food(
       name: name,
       kcalPer100: _round2(kcal * factor),
       grasasPer100: _round2(fats * factor),
@@ -54,7 +55,7 @@ class SaveMealAsFood {
       proteinsPer100: _round2(proteins * factor),
     );
 
-    return await repository.insertFood(food);
+    return await repository.saveFoodByName(food);
   }
 
   /// Redondea a 2 decimales para no almacenar precisión irreal.

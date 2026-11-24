@@ -1,11 +1,12 @@
-import '../../data/datasources/local_data_source.dart';
+import 'dart:typed_data';
 
+import '../repositories/food_repository.dart';
+
+/// Copia del catálogo de alimentos como archivo SQLite (bytes).
 class ExportDatabase {
-  final LocalDataSource dataSource;
+  final FoodRepository repository;
 
-  ExportDatabase(this.dataSource);
+  ExportDatabase(this.repository);
 
-  Future<void> call(String destinationPath) async {
-    await dataSource.exportDatabase(destinationPath);
-  }
+  Future<Uint8List> call() => repository.exportDatabase();
 }

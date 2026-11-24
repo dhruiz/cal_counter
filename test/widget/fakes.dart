@@ -1,4 +1,5 @@
-import 'package:cal_counter/data/models/food_model.dart';
+import 'dart:typed_data';
+
 import 'package:cal_counter/domain/entities/food.dart';
 import 'package:cal_counter/domain/entities/meal.dart';
 import 'package:cal_counter/domain/entities/meal_item.dart';
@@ -288,10 +289,13 @@ class FakeFoodRepository implements FoodRepository {
   }
 
   @override
-  Future<int> insertFood(FoodModel food) async => 0;
+  Future<int> insertFood(Food food) async => 0;
 
   @override
-  Future<int> updateFood(FoodModel food) async => 0;
+  Future<int> updateFood(Food food) async => 0;
+
+  @override
+  Future<int> saveFoodByName(Food food) async => 0;
 
   @override
   Future<int> deleteFood(int id) async => 0;
@@ -304,6 +308,18 @@ class FakeFoodRepository implements FoodRepository {
 
   @override
   Future<List<Food>> getMostUsedFoods({int limit = 20}) async => const [];
+
+  @override
+  Future<String> exportFoodsTsv() async => '';
+
+  @override
+  Future<int> importFoodsTsv(String content) async => 0;
+
+  @override
+  Future<Uint8List> exportDatabase() async => Uint8List(0);
+
+  @override
+  Future<int> importDatabase(String sourcePath) async => 0;
 }
 
 class FakeMealRepository implements MealRepository {

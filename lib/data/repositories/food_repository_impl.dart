@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../domain/entities/food.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../datasources/local_data_source.dart';
@@ -9,42 +11,49 @@ class FoodRepositoryImpl implements FoodRepository {
   FoodRepositoryImpl(this.localDataSource);
 
   @override
-  Future<List<Food>> searchFoods(String query) async {
-    return await localDataSource.searchFoods(query);
-  }
+  Future<List<Food>> searchFoods(String query) =>
+      localDataSource.searchFoods(query);
 
   @override
-  Future<Food?> getFoodById(int id) async {
-    return await localDataSource.getFoodById(id);
-  }
+  Future<Food?> getFoodById(int id) => localDataSource.getFoodById(id);
 
   @override
-  Future<int> insertFood(FoodModel food) async {
-    return await localDataSource.insertFood(food);
-  }
+  Future<int> insertFood(Food food) =>
+      localDataSource.insertFood(FoodModel.fromEntity(food));
 
   @override
-  Future<int> updateFood(FoodModel food) async {
-    return await localDataSource.updateFood(food);
-  }
+  Future<int> updateFood(Food food) =>
+      localDataSource.updateFood(FoodModel.fromEntity(food));
 
   @override
-  Future<int> deleteFood(int id) async {
-    return await localDataSource.deleteFood(id);
-  }
+  Future<int> saveFoodByName(Food food) =>
+      localDataSource.saveFoodByName(FoodModel.fromEntity(food));
 
   @override
-  Future<void> incrementUsage(int foodId) async {
-    return await localDataSource.incrementFoodUsage(foodId);
-  }
+  Future<int> deleteFood(int id) => localDataSource.deleteFood(id);
 
   @override
-  Future<void> resetUsage(int foodId) async {
-    return await localDataSource.resetFoodUsage(foodId);
-  }
+  Future<void> incrementUsage(int foodId) =>
+      localDataSource.incrementFoodUsage(foodId);
 
   @override
-  Future<List<Food>> getMostUsedFoods({int limit = 20}) async {
-    return await localDataSource.getMostUsedFoods(limit: limit);
-  }
+  Future<void> resetUsage(int foodId) => localDataSource.resetFoodUsage(foodId);
+
+  @override
+  Future<List<Food>> getMostUsedFoods({int limit = 20}) =>
+      localDataSource.getMostUsedFoods(limit: limit);
+
+  @override
+  Future<String> exportFoodsTsv() => localDataSource.exportFoodsTsv();
+
+  @override
+  Future<int> importFoodsTsv(String content) =>
+      localDataSource.importFoodsTsvFromString(content);
+
+  @override
+  Future<Uint8List> exportDatabase() => localDataSource.exportDatabaseBytes();
+
+  @override
+  Future<int> importDatabase(String sourcePath) =>
+      localDataSource.importDatabase(sourcePath);
 }

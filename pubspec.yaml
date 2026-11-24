@@ -30,19 +30,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Textos de los widgets de Material (selector de fecha, menús de texto...)
+  # en español.
+  flutter_localizations:
+    sdk: flutter
   flutter_riverpod: ^2.6.1
   sqflite: ^2.4.1
   path_provider: ^2.1.5
   csv: ^6.0.0
-  intl: ^0.19.0
+  intl: ^0.20.2
   equatable: ^2.0.7
   shared_preferences: ^2.3.5
-  permission_handler: ^11.3.1
   path: ^1.9.0
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
   file_picker: ^11.0.2
   mobile_scanner: ^7.5.0
 

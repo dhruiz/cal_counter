@@ -30,10 +30,10 @@ Aplicación Flutter de seguimiento de calorías y macronutrientes. Interfaz y da
 
 **cal_counter** es un contador de calorías y macronutrientes diario. El usuario:
 
-- Busca alimentos en una base de datos SQLite precargada con ~1700 alimentos en español.
+- Busca alimentos en una base de datos SQLite precargada con ~680 alimentos en español.
 - Agrega alimentos a "comidas" del día (Comida_1, Comida_2, etc.).
 - Ve en tiempo real los totales diarios de kcal, grasas, carbohidratos y proteínas.
-- Compara lo consumido contra sus metas personales con un sistema de semáforo de colores.
+- Compara lo consumido contra sus metas personales con anillos de progreso por nutriente.
 - Configura sus metas personales y calcula su TDEE automáticamente.
 - Exporta el día a CSV (vacía las tablas tras éxito).
 - Exporta/importa la lista de alimentos (`db_alimentos`) en formato TSV mediante SAF (Android 13+).
@@ -70,11 +70,10 @@ Ver [Módulos: Recetas, Listas de compra y Productos](#módulos-recetas-listas-d
 cal_counter/
 ├── assets/
 │   └── db/
-│       └── db_ctrl_calorias.db        ← Base de datos SQLite precargada (~1700 alimentos)
+│       └── db_ctrl_calorias.db        ← Base de datos SQLite precargada (~680 alimentos)
 ├── lib/
 │   ├── main.dart                      ← Entry point. Inicializa locale 'es', ProviderScope
 │   ├── core/
-│   │   ├── constants.dart             ← AppConstants (appName, dbName)
 │   │   ├── styles.dart                ← AppStyles (colores, temas, paddings)
 │   │   └── utils.dart                 ← Utilidades generales
 │   ├── domain/
@@ -113,7 +112,7 @@ cal_counter/
 │       │   ├── settings_provider.dart ← SettingsNotifier + cálculos derivados
 │       │   └── theme_provider.dart    ← ThemeNotifier (light/dark con persistencia)
 │       ├── views/
-│       │   ├── home_view.dart         ← Pantalla principal (semáforo + resumen)
+│       │   ├── home_view.dart         ← Pantalla principal (anillos de progreso)
 │       │   ├── search_view.dart       ← Búsqueda de alimentos + gestión de DB
 │       │   ├── settings_view.dart     ← Configuración personal + cálculo TDEE
 │       │   └── food_form_view.dart    ← Crear / editar alimento
@@ -311,7 +310,7 @@ Cada caso de uso es una clase con un único método `call(...)`.
 | `CreateMealIfNotExists` | Consulta si existe comida con ese nombre en esa fecha; si no, la crea                                                                                                                       |
 | `CheckNewDayOnStartup`  | Devuelve la última `DateTime` de comidas **solo si** `hasMealItems()` es `true` y la fecha es anterior a hoy. En cualquier otro caso devuelve `null`.                                       |
 | `ExportDayToCsv`        | Llama a `MealRepository.exportMealsByDateCSV(date)`. **Si el path resultante es no vacío (export exitoso), llama después a `clearMealsAndItems()`** para vaciar `comidas` e `items_comida`. |
-| `ExportDatabase`        | Llama a `LocalDataSource.exportDatabase(destinationPath)` (formato `.db` completo, legacy)                                                                                                  |
+| `ExportDatabase`        | `FoodRepository.exportDatabase()` → bytes de un `.db` con el catálogo; la UI lo guarda con `FilePicker.saveFile(bytes:)` (SAF)                                                              |
 | `ImportDatabase`        | Llama a `LocalDataSource.importDatabase(sourcePath)` (formato `.db` completo, legacy)                                                                                                       |
 | `ExportFoodsTsv`        | Llama a `LocalDataSource.exportFoodsTsv()`. Devuelve un `String` con el contenido TSV completo de `db_alimentos`.                                                                           |
 | `ImportFoodsTsv`        | Llama a `LocalDataSource.importFoodsTsvFromString(String)`. Devuelve el número de alimentos insertados con éxito (los duplicados por UNIQUE en `alimento` se ignoran).                      |
@@ -351,11 +350,11 @@ nuevasKcal     = kcalActuales     * ratio;
 
 #### Importación de base de datos completa (`.db` legacy)
 
-`importDatabase(String sourcePath)` usa `ConflictAlgorithm.ignore` sobre la restricción `UNIQUE` de la columna `alimento`. Los duplicados se saltan silenciosamente. Devuelve el número de registros insertados con éxito.
+`importDatabase(String sourcePath)` usa `ConflictAlgorithm.ignore` sobre la restricción `UNIQUE` de la columna `alimento`, en una transacción. Los duplicados y las filas con macros no finitos o negativos se saltan. Devuelve el número de alimentos **nuevos** (en Android un insert ignorado devuelve -1 y en FFI 0: solo cuentan ids > 0).
 
 #### Exportación de base de datos completa (`.db` legacy)
 
-`exportDatabase(String destinationPath)` crea un nuevo archivo `.db` en `destinationPath` con la misma estructura y copia todos los alimentos actuales.
+`exportDatabaseBytes()` crea un `.db` temporal en la caché (`getTemporaryDirectory`) con la misma estructura, copia todos los alimentos en una transacción y devuelve sus bytes (el temporal se borra). Antes se escribía en una carpeta elegida con `getDirectoryPath`, que fallaba sin permiso de almacenamiento.
 
 #### Exportación / importación TSV de `db_alimentos`
 
@@ -486,15 +485,14 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(...);
 final settingsProvider = StateNotifierProvider<SettingsNotifier, UserSettings>(...);
 ```
 
-**`SettingsNotifier`** expone getters calculados derivados del estado:
+Los requerimientos calculados viven en la entidad **`UserSettings`** (única implementación; la usan `HomeView`, `SettingsView` y `AddFoodPopup`):
 
 ```dart
-double get proteinsRequired => state.weightKg * state.proteinsPerKg;
-double get fatsRequired     => state.weightKg * state.fatsPerKg;
-double get carbsRequired {
-  final proteinKcal = proteinsRequired * 4;
-  final fatKcal     = fatsRequired * 9;
-  return (state.kcalTarget - (proteinKcal + fatKcal)) / 4;
+double get proteinsRequired => weightKg * proteinsPerKg;
+double get fatsRequired     => weightKg * fatsPerKg;
+double get carbsRequired {   // nunca negativo
+  final remaining = kcalTarget - (proteinsRequired * 4 + fatsRequired * 9);
+  return remaining <= 0 ? 0 : remaining / 4;
 }
 ```
 
@@ -506,7 +504,7 @@ double get carbsRequired {
 final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>(...);
 ```
 
-Persiste el tema en `SharedPreferences` con la clave `isDarkMode` (bool). Método `toggleTheme()`.
+Persiste el tema en `SharedPreferences` con la clave `theme_mode` (índice de `ThemeMode`; sin valor guardado = `ThemeMode.system`). `setDark(bool)` / `setTheme(ThemeMode)`; `ThemeNotifier.isDarkFor(modo, brilloSistema)` da el estado del interruptor de `SettingsView` (con "sistema" refleja el tema que se ve).
 
 ### Vistas
 
@@ -516,48 +514,19 @@ Tipo: `ConsumerStatefulWidget`
 
 **Estructura de la pantalla** (de arriba a abajo):
 
-1. `AppBar` con título "Calorie Counter". `actions` (de izquierda a derecha):
+1. `AppBar` con título "Contador de calorías". `actions` (de izquierda a derecha):
    - `PopupMenuButton` con icono `Icons.import_export`, dos opciones:
-     - **Exportar Alimentos (TSV)** → genera el TSV (`exportFoodsTsvProvider`), lo codifica a UTF-8 y lo guarda con `FileSaver.instance.saveAs` (SAF en Android 13+). Nombre: `db_alimentos_export_<yyyy-MM-dd_HH-mm-ss>.tsv`.
+     - **Exportar Alimentos (TSV)** → genera el TSV (`exportFoodsTsvProvider`), lo codifica a UTF-8 y lo guarda con `FilePicker.saveFile(bytes:)` (SAF). Nombre: `db_alimentos_export_<yyyy-MM-dd_HH-mm-ss>.tsv`.
      - **Importar Alimentos (TSV)** → `FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['tsv'], withData: true)`, decodifica UTF-8 y llama a `importFoodsTsvProvider`.
    - `IconButton` `Icons.settings` → navega a `SettingsView`.
-2. Sección **"Metas (Objetivo)"**: grid 4 columnas (Kcal, Grasas, Carbs, Prot) en color `AppStyles.neutral`.
-3. Sección **"Consumido"**: mismo grid con color calculado por semáforo.
-4. Sección **"Restante"**: mismo grid con color calculado por semáforo de restante.
-5. Botón **"Agregar Ingesta"** (navega a `SearchView`).
-6. `Card` con `ExpansionTile` **"Resumen del Día"** (expandido por defecto).
-   - Lista cada `Meal` como `ListTile` con: nombre, count items, totales de kcal/G/C/P.
-   - Tap en `ListTile` → `MealItemsDialog`.
-   - Icono delete → dialog de confirmación → `HomeNotifier.deleteMeal`.
-   - Botones al pie: "Exportar Día" y "Eliminar Día" (rojo).
+2. Sección **"Progreso Diario"**: cuatro `NutrientRing` (Calorías, Grasas, Carbohidratos, Proteínas) con % consumido, consumido/objetivo y restante; el exceso se pinta en `AppStyles.ringOver`.
+3. Botón **"Agregar Ingesta"** (navega a `SearchView`) y botón **"Gestionar Día"** (`DayManagementView`: editar, renombrar, guardar como alimento, exportar y eliminar comidas).
 
-**Lógica de semáforo** — `_computeColorForConsumed(target, consumed, tolerance)`:
+> El antiguo "semáforo" de colores (y su `tolerancePercent`) ya no se usa: la pantalla muestra anillos de progreso.
 
-| Condición                                          | Color          |
-| -------------------------------------------------- | -------------- |
-| `consumed < target` (por debajo, con epsilon 0.01) | `semaphRed`    |
-| `consumed ≈ target` (±0.01)                        | `semaphGreen`  |
-| `target < consumed ≤ target * (1 + tolerance/100)` | `semaphOrange` |
-| `consumed > target * (1 + tolerance/100)`          | `semaphRed`    |
+**Cálculo de targets en la vista**: `settings.kcalTarget`, `settings.proteinsRequired`, `settings.fatsRequired`, `settings.carbsRequired` (ver `UserSettings`).
 
-**Lógica de semáforo** — `_computeColorForRemaining(remaining)`:
-
-| Condición                                   | Color          |
-| ------------------------------------------- | -------------- |
-| `remaining ≤ -10` o `remaining ≥ 10`        | `semaphRed`    |
-| `-9 ≤ remaining ≤ -3` o `3 ≤ remaining ≤ 9` | `semaphOrange` |
-| `-2 ≤ remaining ≤ 2`                        | `semaphBlue`   |
-
-**Cálculo de targets en la vista** (fórmulas exactas):
-
-```dart
-final double targetKcal  = settings.kcalTarget.toDouble();
-final double targetProt  = settings.weightKg * settings.proteinsPerKg;
-final double targetFats  = settings.weightKg * settings.fatsPerKg;
-final double targetCarbs = (targetKcal - (targetProt * 4 + targetFats * 9)) / 4;
-```
-
-**Detección de nuevo día** (en `initState` via `addPostFrameCallback`):
+**Detección de nuevo día** (en `initState` via `addPostFrameCallback` y al volver la app a primer plano con `AppLifecycleListener`: `HomeNotifier.syncToday()` pasa `selectedDate` al día actual si cambió):
 
 1. Llama `CheckNewDayOnStartup`. **Solo devuelve no-null si hay items en `items_comida` Y la última fecha es anterior a hoy** (cualquier comida sin items o cualquier fecha = hoy → no muestra dialog).
 2. Si devuelve una fecha, muestra `AlertDialog` con tres opciones: Cancelar, Descartar, Exportar.
@@ -598,6 +567,10 @@ Tipo: `ConsumerStatefulWidget`
 | Proteínas (g/kg)    | decimal, requerido        | > 0                                  |
 | Grasas (g/kg)       | decimal, requerido        | > 0                                  |
 | Tolerancia (%)      | entero, requerido         | 0–100                                |
+
+> **Nota**: `tolerancePercent` (Tolerancia) se guarda pero **ninguna pantalla lo usa** desde que el semáforo se sustituyó por los anillos de progreso. Pendiente de decidir si se elimina el campo o se vuelve a usar.
+>
+> Los campos decimales aceptan coma o punto (`AppUtils.parseDecimal`); el teclado numérico en español escribe coma.
 
 > **Nota**: El selector de Sexo se **deshabilita** automáticamente cuando se ingresa un % de grasa corporal válido (porque Katch-McArdle no depende del sexo).
 
@@ -644,7 +617,7 @@ Renderiza una `Card` con el label arriba, el valor numérico grande en `valueCol
 **Lógica interna**:
 
 1. Carga la lista de comidas del día actual (`MealRepository.getMealsByDate`).
-2. Muestra dropdown de comidas existentes + opción "Nueva comida" (auto-nombrada `Comida_N+1` donde N es el número de comidas existentes).
+2. Muestra dropdown de comidas existentes + opción "Nueva comida" (auto-nombrada con `nextMealName`, ver más abajo).
 3. Campo de texto para cantidad en gramos.
 4. Al confirmar:
    - Si seleccionó "Nueva comida": llama `CreateMealIfNotExists` para crearla.
@@ -687,12 +660,7 @@ Ambos temas (light y dark) usan `useMaterial3: true` con `seedColor: primary`.
 - **Light**: AppBar fondo `primary`, foreground `Colors.white`.
 - **Dark**: AppBar fondo `Colors.grey[900]`, foreground `Colors.white`. Cards en `Colors.grey[850]`.
 
-### `AppConstants` — `lib/core/constants.dart`
-
-```dart
-static const String appName = 'Calorie Counter';
-static const String dbName  = 'db_ctrl_calorias.db';
-```
+El nombre de la BD es `LocalDataSourceImpl.dbName` (`db_ctrl_calorias.db`).
 
 ---
 
@@ -873,7 +841,7 @@ carbsReq    = (kcalTarget - (proteinsReq * 4 + fatsReq * 9)) / 4;
 
 ### Nomenclatura de comidas
 
-Las nuevas comidas se nombran automáticamente `Comida_N` donde `N` es el número de comidas que ya existen para ese día + 1. El `AddFoodPopup` calcula este valor consultando `getMealsByDate` antes de mostrar el popup.
+Las nuevas comidas se nombran automáticamente `Comida_N` con `nextMealName` (`lib/domain/services/meal_naming.dart`): el mayor `N` de las `Comida_N` del día + 1 (como mínimo, nº de comidas + 1) y nunca un nombre ya usado. Antes era `nº de comidas + 1`, que tras borrar o renombrar podía coincidir con una comida existente y `CreateMealIfNotExists` añadía el alimento a esa comida.
 
 ### Exportación CSV diaria
 
@@ -987,14 +955,7 @@ Botón/FAB «Modo carrito» en una lista: cámara siempre abierta para ir escane
 
 ### `AndroidManifest.xml`
 
-Permisos declarados:
-
-```xml
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-    android:maxSdkVersion="32"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-    android:maxSdkVersion="29"/>
-```
+Sin permisos de almacenamiento: todas las exportaciones e importaciones (TSV, CSV del día, BD, recetas, historial de precios) usan el selector del sistema (SAF) vía `file_picker`.
 
 Lector de códigos de barras (la cámara es opcional: sin ella se escribe el código a mano):
 
@@ -1005,17 +966,15 @@ Lector de códigos de barras (la cámara es opcional: sin ella se escribe el có
 
 `mobile_scanner` pide el permiso de cámara en tiempo de ejecución al abrir el escáner y exige `minSdk 23` (Flutter 3.44 usa 24). Con AGP 8.x y `android.builtInKotlin=false` el plugin aplica KGP por sí mismo.
 
-Flag de almacenamiento legacy (para compatibilidad):
+Sin `INTERNET` en el APK final: la app es 100 % local, pero ML Kit (dentro de `mobile_scanner`) añade `INTERNET` para telemetría de Google (`com.google.android.datatransport`); el manifiesto principal lo quita con `tools:node="remove"`. Los manifiestos de `debug`/`profile` lo vuelven a declarar para las herramientas de Flutter (hot reload, depurador). `ACCESS_NETWORK_STATE` se mantiene: lo usa el planificador de esa librería y quitarlo podría provocar `SecurityException`.
 
-```xml
-android:requestLegacyExternalStorage="true"
-```
+Firma de release: si existe `android/key.properties` (no versionado; `storeFile`, `storePassword`, `keyAlias`, `keyPassword`) se usa esa clave; si no, la de debug.
 
 La actividad principal soporta `processText` para integración con selección de texto del sistema.
 
 ### Permisos en runtime
 
-El paquete `permission_handler` gestiona los permisos de almacenamiento en tiempo de ejecución, necesarios para exportar/importar la base de datos en Android < 13.
+Solo la cámara (la pide `mobile_scanner` al abrir el escáner). No hay permisos de almacenamiento que pedir.
 
 ---
 
@@ -1030,13 +989,12 @@ El paquete `permission_handler` gestiona los permisos de almacenamiento en tiemp
 | `path_provider`      | `^2.1.5`  | Directorios del dispositivo           |
 | `path`               | `^1.9.0`  | Manipulación de rutas de archivo      |
 | `csv`                | `^6.0.0`  | Generación de CSV (exportación)       |
-| `intl`               | `^0.19.0` | Formato de fechas en español          |
+| `intl`               | `^0.20.2` | Formato de fechas y números en español (0.20 lo exige `flutter_localizations`) |
+| `flutter_localizations` | SDK    | Textos de los widgets de Material en español (selector de fecha...) |
 | `equatable`          | `^2.0.7`  | Comparación de entidades de dominio   |
 | `shared_preferences` | `^2.3.5`  | Persistencia de settings y tema       |
-| `permission_handler` | `^11.3.1` | Permisos de almacenamiento en Android |
 | `file_picker`        | `^11.0.2` | Selección y guardado de archivos      |
 | `mobile_scanner`     | `^7.5.0`  | Lector de códigos de barras (cámara, ML Kit empaquetado) |
-| `cupertino_icons`    | `^1.0.8`  | Iconos iOS (incluidos por defecto)    |
 
 ### Dev
 

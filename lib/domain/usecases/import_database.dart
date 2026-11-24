@@ -1,11 +1,9 @@
-import '../../data/datasources/local_data_source.dart';
+import '../repositories/food_repository.dart';
 
 class ImportDatabase {
-  final LocalDataSource dataSource;
+  final FoodRepository repository;
 
-  ImportDatabase(this.dataSource);
+  ImportDatabase(this.repository);
 
-  Future<int> call(String sourcePath) async {
-    return await dataSource.importDatabase(sourcePath);
-  }
+  Future<int> call(String sourcePath) => repository.importDatabase(sourcePath);
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
 import '../../core/styles.dart';
 import '../../domain/entities/food.dart';
 import '../providers/search_provider.dart';
@@ -88,109 +89,75 @@ class _SearchViewState extends ConsumerState<SearchView> {
     );
   }
 
+  /// Muestra un indicador modal mientras corre [task]. El indicador solo se
+  /// cierra si se llegó a mostrar: antes, un error previo (p. ej. al abrir el
+  /// selector) hacía `Navigator.pop` y cerraba la propia búsqueda.
+  Future<T> _withLoading<T>(Future<T> Function() task) async {
+    final navigator = Navigator.of(context);
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      // Sin PopScope el botón Atrás cerraba el indicador y el `pop` final
+      // cerraba entonces la propia búsqueda.
+      builder: (ctx) => const PopScope(
+        canPop: false,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+    );
+    try {
+      return await task();
+    } finally {
+      navigator.pop();
+    }
+  }
+
+  void _snack(String message, Color color) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+  }
+
+  /// La copia se genera en la caché y se guarda con el selector del sistema
+  /// (SAF), igual que el resto de exportaciones. Antes se escribía en una
+  /// carpeta elegida con `getDirectoryPath`, lo que en Android 7-10 fallaba
+  /// sin permiso de almacenamiento y en 11+ solo funcionaba en algunas carpetas.
   Future<void> _exportDatabase() async {
     try {
-      // Let user select destination directory
-      String? outputPath = await FilePicker.getDirectoryPath();
-
-      if (outputPath == null) {
-        return; // User cancelled
-      }
-
-      // Show loading
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => const Center(child: CircularProgressIndicator()),
+      final bytes = await _withLoading(
+        () => ref.read(exportDatabaseProvider).call(),
       );
-
-      // Export database
-      final fileName = 'db_alimentos_export.db';
-      final fullPath = '$outputPath/$fileName';
-      await ref.read(exportDatabaseProvider).call(fullPath);
-
-      // Hide loading
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      // Show success message
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Base de datos exportada a: $fullPath'),
-          backgroundColor: Colors.green,
-        ),
+      final timestamp = DateFormat(
+        'yyyy-MM-dd_HH-mm-ss',
+      ).format(DateTime.now());
+      final saved = await FilePicker.saveFile(
+        dialogTitle: 'Exportar base de datos',
+        fileName: 'db_alimentos_export_$timestamp.db',
+        bytes: bytes,
       );
+      if (saved == null || saved.isEmpty) return; // Cancelado
+      _snack('Base de datos exportada a: $saved', Colors.green);
     } catch (e) {
-      // Hide loading if showing
-      if (mounted) Navigator.pop(context);
-
-      // Show error message
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al exportar: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _snack('Error al exportar: $e', Colors.red);
     }
   }
 
   Future<void> _importDatabase() async {
     try {
-      // Let user select the database file to import
-      FilePickerResult? result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['db'],
-      );
-
-      if (result == null || result.files.single.path == null) {
-        return; // User cancelled
-      }
-
-      final sourcePath = result.files.single.path!;
-
-      // Show loading
+      // FileType.any: la extensión .db no tiene tipo MIME estándar y algunos
+      // selectores no la filtran; el contenido se valida al abrirla.
+      final result = await FilePicker.pickFiles(type: FileType.any);
+      final sourcePath = result?.files.single.path;
+      if (sourcePath == null) return; // Cancelado
       if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => const Center(child: CircularProgressIndicator()),
+
+      final importedCount = await _withLoading(
+        () => ref.read(importDatabaseProvider).call(sourcePath),
       );
-
-      // Import database
-      final importedCount = await ref
-          .read(importDatabaseProvider)
-          .call(sourcePath);
-
-      // Hide loading
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      // Refresh search if there's a query
       _refreshSearch();
-
-      // Show success message
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$importedCount alimentos importados exitosamente'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      _snack('$importedCount alimentos importados exitosamente', Colors.green);
     } catch (e) {
-      // Hide loading if showing
-      if (mounted) Navigator.pop(context);
-
-      // Show error message
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al importar: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _snack('Error al importar: $e', Colors.red);
     }
   }
 
@@ -314,7 +281,11 @@ class _SearchViewState extends ConsumerState<SearchView> {
     );
 
     if (confirm == true) {
-      await ref.read(foodRepositoryProvider).deleteFood(food.id!);
+      try {
+        await ref.read(foodRepositoryProvider).deleteFood(food.id!);
+      } catch (e) {
+        _snack('Error al eliminar: $e', Colors.red);
+      }
       _refreshSearch();
     }
   }

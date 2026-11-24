@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/meal_item.dart';
 import '../../domain/repositories/meal_repository.dart';
+import '../../domain/services/dates.dart';
 import '../datasources/local_data_source.dart';
 
 class MealRepositoryImpl implements MealRepository {
@@ -24,9 +25,9 @@ class MealRepositoryImpl implements MealRepository {
     return result
         .map(
           (e) => Meal(
-            id: e['id'],
-            name: e['nombre'],
-            date: DateTime.parse(e['fecha']),
+            id: e['id'] as int,
+            name: e['nombre'] as String,
+            date: DateTime.parse(e['fecha'] as String),
           ),
         )
         .toList();
@@ -49,17 +50,20 @@ class MealRepositoryImpl implements MealRepository {
   @override
   Future<List<MealItem>> getMealItems(int mealId) async {
     final result = await localDataSource.getMealItems(mealId);
+    // `num` → double: un REAL guardado como entero llega como int y el
+    // acceso dinámico anterior fallaba en tiempo de ejecución.
+    double d(Object? v) => (v as num).toDouble();
     return result
         .map(
           (e) => MealItem(
-            id: e['id'],
-            mealId: e['comida_id'],
-            alimento: e['alimento'],
-            cantidad: e['cantidad'],
-            grasas: e['grasas'],
-            carbohidratos: e['carbohidratos'],
-            proteinas: e['proteinas'],
-            kcal: e['kCal'],
+            id: e['id'] as int,
+            mealId: e['comida_id'] as int,
+            alimento: e['alimento'] as String,
+            cantidad: d(e['cantidad']),
+            grasas: d(e['grasas']),
+            carbohidratos: d(e['carbohidratos']),
+            proteinas: d(e['proteinas']),
+            kcal: d(e['kCal']),
           ),
         )
         .toList();
@@ -151,7 +155,7 @@ class MealRepositoryImpl implements MealRepository {
 
     String csv = const ListToCsvConverter(fieldDelimiter: '\t').convert(rows);
 
-    final dateStr = date.toIso8601String().split('T')[0];
+    final dateStr = dateKey(date);
     final fileName = 'comidas_$dateStr.csv';
 
     // Encode CSV string to bytes

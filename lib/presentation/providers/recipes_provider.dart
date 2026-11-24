@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/recipe_local_data_source.dart';
 import '../../data/repositories/recipe_repository_impl.dart';
@@ -77,8 +79,15 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
 
   Future<void> load() async {
     state = state.copyWith(isLoading: true);
-    final recipes = await _repo.getAllRecipes();
-    state = state.copyWith(recipes: recipes, isLoading: false);
+    try {
+      final recipes = await _repo.getAllRecipes();
+      if (!mounted) return;
+      state = state.copyWith(recipes: recipes, isLoading: false);
+    } catch (e, st) {
+      // Sin esto el indicador de carga quedaba girando para siempre.
+      log('Error cargando recetas', error: e, stackTrace: st);
+      if (mounted) state = state.copyWith(isLoading: false);
+    }
   }
 
   void setQuery(String q) => state = state.copyWith(query: q);

@@ -55,13 +55,23 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
   }
 
   Future<void> _search(String q) async {
-    if (q.trim().isEmpty) {
-      setState(() => _results = const []);
+    final query = q.trim();
+    if (query.isEmpty) {
+      setState(() {
+        _results = const [];
+        _searching = false;
+      });
       return;
     }
     setState(() => _searching = true);
-    final res = await ref.read(searchFoodsProvider)(q.trim());
-    if (!mounted) return;
+    List<Food> res;
+    try {
+      res = await ref.read(searchFoodsProvider)(query);
+    } catch (_) {
+      res = const [];
+    }
+    // Descarta resultados de una consulta que ya no es la escrita.
+    if (!mounted || _ctrl.text.trim() != query) return;
     setState(() {
       _results = res;
       _searching = false;
@@ -112,25 +122,28 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
           ),
           if (_searching) const LinearProgressIndicator(),
           Expanded(
-            child: ListView(
-              children: [
-                ..._results.map(
-                  (f) => ListTile(
-                    title: Text(f.name),
-                    subtitle: Text(
-                      '${f.kcalPer100} kcal | G: ${f.grasasPer100} | '
-                      'C: ${f.carbsPer100} | P: ${f.proteinsPer100} (por 100g)',
-                      style: AppStyles.labelText,
-                    ),
-                    onTap: () => Navigator.pop(context, f),
+            // Perezosa: una búsqueda corta ("a") devuelve cientos de alimentos.
+            child: ListView.builder(
+              itemCount: _results.length + 1,
+              itemBuilder: (context, i) {
+                if (i == _results.length) {
+                  return ListTile(
+                    leading: const Icon(Icons.add_circle_outline),
+                    title: const Text('Crear alimento nuevo'),
+                    onTap: _createFood,
+                  );
+                }
+                final f = _results[i];
+                return ListTile(
+                  title: Text(f.name),
+                  subtitle: Text(
+                    '${f.kcalPer100} kcal | G: ${f.grasasPer100} | '
+                    'C: ${f.carbsPer100} | P: ${f.proteinsPer100} (por 100g)',
+                    style: AppStyles.labelText,
                   ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.add_circle_outline),
-                  title: const Text('Crear alimento nuevo'),
-                  onTap: _createFood,
-                ),
-              ],
+                  onTap: () => Navigator.pop(context, f),
+                );
+              },
             ),
           ),
         ],

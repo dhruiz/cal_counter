@@ -17,7 +17,8 @@ class UserSettings extends Equatable {
 
   // Weight goal fields
   final String goal; // "lose" | "maintain" | "gain"
-  final int adjustmentPercent; // % déficit/superávit sobre el TDEE (0 = mantener)
+  final int
+  adjustmentPercent; // % déficit/superávit sobre el TDEE (0 = mantener)
 
   const UserSettings({
     required this.weightKg,
@@ -33,6 +34,27 @@ class UserSettings extends Equatable {
     this.goal = 'maintain',
     this.adjustmentPercent = 0,
   });
+
+  // Requerimientos diarios (única implementación de la regla de negocio; antes
+  // estaba copiada en HomeView, SettingsView y SettingsNotifier, y solo una de
+  // las copias recortaba los carbohidratos negativos).
+
+  /// Coeficientes kcal/g.
+  static const double kcalPorGProteina = 4;
+  static const double kcalPorGCarbohidrato = 4;
+  static const double kcalPorGGrasa = 9;
+
+  double get proteinsRequired => weightKg * proteinsPerKg;
+  double get fatsRequired => weightKg * fatsPerKg;
+
+  /// Carbohidratos = residuo calórico tras proteínas y grasas. Nunca negativo:
+  /// si proteínas y grasas ya superan la meta, el objetivo es 0 g.
+  double get carbsRequired {
+    final remaining =
+        kcalTarget -
+        (proteinsRequired * kcalPorGProteina + fatsRequired * kcalPorGGrasa);
+    return remaining <= 0 ? 0 : remaining / kcalPorGCarbohidrato;
+  }
 
   // Defaults
   factory UserSettings.initial() {

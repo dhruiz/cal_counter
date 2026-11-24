@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/product_local_data_source.dart';
 import '../../data/repositories/product_repository_impl.dart';
@@ -68,14 +70,25 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
   /// la última compra de cada producto) y se cargan los productos.
   Future<void> _init() async {
     state = state.copyWith(isLoading: true);
-    await _ref.read(purgeOldPurchasesProvider)();
+    try {
+      await _ref.read(purgeOldPurchasesProvider)();
+    } catch (e, st) {
+      // La purga es mantenimiento: si falla, se cargan igualmente los productos.
+      log('Error purgando el historial de compras', error: e, stackTrace: st);
+    }
     await load();
   }
 
   Future<void> load() async {
-    final products = await _repo.getProducts();
-    if (!mounted) return;
-    state = state.copyWith(products: products, isLoading: false);
+    try {
+      final products = await _repo.getProducts();
+      if (!mounted) return;
+      state = state.copyWith(products: products, isLoading: false);
+    } catch (e, st) {
+      // Sin esto el indicador de carga quedaba girando para siempre.
+      log('Error cargando productos', error: e, stackTrace: st);
+      if (mounted) state = state.copyWith(isLoading: false);
+    }
   }
 
   void setQuery(String q) => state = state.copyWith(query: q);

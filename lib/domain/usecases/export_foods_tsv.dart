@@ -1,11 +1,9 @@
-import '../../data/datasources/local_data_source.dart';
+import '../repositories/food_repository.dart';
 
 class ExportFoodsTsv {
-  final LocalDataSource dataSource;
+  final FoodRepository repository;
 
-  ExportFoodsTsv(this.dataSource);
+  ExportFoodsTsv(this.repository);
 
-  Future<String> call() async {
-    return await dataSource.exportFoodsTsv();
-  }
+  Future<String> call() => repository.exportFoodsTsv();
 }

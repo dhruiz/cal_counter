@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/styles.dart';
 import '../providers/home_provider.dart';
+import '../providers/search_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/nutrient_ring.dart';
 import 'settings_view.dart';
@@ -20,6 +21,9 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView> {
+  late final AppLifecycleListener _lifecycle;
+  bool _newDayDialogOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -27,67 +31,109 @@ class _HomeViewState extends ConsumerState<HomeView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkNewDay();
     });
+    // Android mantiene la app en memoria durante días: al volver a primer
+    // plano se comprueba si cambió la fecha (antes solo se hacía al arrancar
+    // y lo registrado tras la medianoche iba al día anterior).
+    _lifecycle = AppLifecycleListener(onResume: _onResume);
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onResume() async {
+    final changed = await ref.read(homeProvider.notifier).syncToday();
+    if (changed && mounted) await _checkNewDay();
   }
 
   Future<void> _checkNewDay() async {
-    final checkNewDay = ref.read(checkNewDayOnStartupProvider);
-    final lastDate = await checkNewDay();
-
-    if (lastDate != null && mounted) {
-      // Check if there are meals to export
-      final meals = await ref
-          .read(mealRepositoryProvider)
-          .getMealsByDate(lastDate);
-      if (meals.isEmpty) return;
-
-      if (meals.isEmpty) return;
-
-      if (!mounted) return;
-
-      final dateStr = DateFormat('yyyy-MM-dd').format(lastDate);
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Nuevo Día Detectado'),
-          content: Text(
-            '¿Desea exportar el día anterior ($dateStr) antes de iniciar el nuevo día?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext); // Cancel -> Stay
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                await ref.read(mealRepositoryProvider).clearMealsAndItems();
-                ref.read(homeProvider.notifier).refresh();
-              },
-              child: const Text('Descartar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                final export = ref.read(exportDayToCsvProvider);
-                final path = await export(lastDate);
-                if (path.isNotEmpty) {
-                  ref.read(homeProvider.notifier).refresh();
-                }
-                if (mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Exportado a: $path')));
-                }
-              },
-              child: const Text('Exportar'),
-            ),
-          ],
-        ),
-      );
+    if (_newDayDialogOpen) return;
+    final DateTime? found;
+    try {
+      found = await _previousDayToExport();
+    } catch (e) {
+      _showError('No se pudo comprobar el día anterior: $e');
+      return;
     }
+    if (found == null || !mounted) return;
+    final lastDate = found;
+
+    final dateStr = DateFormat('yyyy-MM-dd').format(lastDate);
+    _newDayDialogOpen = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Nuevo Día Detectado'),
+        content: Text(
+          '¿Desea exportar el día anterior ($dateStr) antes de iniciar el nuevo día?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext); // Cancel -> Stay
+            },
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              try {
+                await ref.read(mealRepositoryProvider).clearMealsAndItems();
+              } catch (e) {
+                _showError('No se pudo descartar el día: $e');
+              }
+              ref.read(homeProvider.notifier).refresh();
+            },
+            child: const Text('Descartar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await _exportDay(lastDate);
+            },
+            child: const Text('Exportar'),
+          ),
+        ],
+      ),
+    ).whenComplete(() => _newDayDialogOpen = false);
+  }
+
+  /// Fecha anterior con comidas sin exportar, o null.
+  Future<DateTime?> _previousDayToExport() async {
+    final lastDate = await ref.read(checkNewDayOnStartupProvider)();
+    if (lastDate == null) return null;
+    final meals = await ref
+        .read(mealRepositoryProvider)
+        .getMealsByDate(lastDate);
+    return meals.isEmpty ? null : lastDate;
+  }
+
+  /// Exporta el día (y vacía las comidas si se guardó, ver [ExportDayToCsv]).
+  /// Si el usuario cancela el diálogo de guardado no se muestra nada (antes
+  /// aparecía "Exportado a: " vacío).
+  Future<void> _exportDay(DateTime date) async {
+    try {
+      final path = await ref.read(exportDayToCsvProvider)(date);
+      if (path.isEmpty) return;
+      ref.read(homeProvider.notifier).refresh();
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Exportado a: $path')));
+      }
+    } catch (e) {
+      _showError('Error al exportar: $e');
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   Future<void> _exportFoodsTsv() async {
@@ -164,12 +210,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final settings = ref.watch(settingsProvider);
     final homeState = ref.watch(homeProvider);
 
-    // Targets
+    // Targets (fórmula única en UserSettings)
     final double targetKcal = settings.kcalTarget.toDouble();
-    final double targetProt = settings.weightKg * settings.proteinsPerKg;
-    final double targetFats = settings.weightKg * settings.fatsPerKg;
-    final double targetCarbs =
-        (targetKcal - (targetProt * 4 + targetFats * 9)) / 4;
+    final double targetProt = settings.proteinsRequired;
+    final double targetFats = settings.fatsRequired;
+    final double targetCarbs = settings.carbsRequired;
 
     // Consumed
     final double consumedKcal = homeState.totalKcal;
@@ -179,7 +224,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calorie Counter'),
+        title: const Text('Contador de calorías'),
         backgroundColor: AppStyles.primary,
         foregroundColor: Colors.white,
         actions: [
@@ -212,6 +257,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: 'Configuración',
             onPressed: () {
               Navigator.push(
                 context,
@@ -228,6 +274,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (homeState.error != null)
+                    Card(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      child: ListTile(
+                        leading: const Icon(Icons.error_outline),
+                        title: Text(homeState.error!),
+                        trailing: TextButton(
+                          onPressed: () =>
+                              ref.read(homeProvider.notifier).refresh(),
+                          child: const Text('Reintentar'),
+                        ),
+                      ),
+                    ),
                   _buildSectionTitle('Progreso Diario'),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

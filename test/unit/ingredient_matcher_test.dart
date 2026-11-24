@@ -109,4 +109,37 @@ void main() {
       'ajo',
     ]);
   });
+
+  group('regresiones de la auditoría', () {
+    test('línea vacía o en blanco no lanza RangeError', () {
+      expect(parseIngredientLine('').nombre, '');
+      expect(parseIngredientLine('   ').tokens, isEmpty);
+    });
+
+    test('normalizeText (versión optimizada) mantiene el resultado', () {
+      expect(normalizeText('ÁÉÍÓÚ ñandú ÇA'), 'aeiou nandu ca');
+      expect(normalizeText('--200g//arroz--'), '200g arroz');
+      expect(normalizeText('¡¡!!'), '');
+      expect(normalizeText('a\t\nb'), 'a b');
+      expect(normalizeText('café😀leche'), 'cafe leche');
+    });
+
+    test('los tokens cacheados son inmodificables y estables', () {
+      final a = parseIngredientLine('200 g de arroz');
+      final b = parseIngredientLine('200 g de arroz');
+      expect(a.tokens, {'arroz'});
+      expect(identical(a, b), isTrue); // misma instancia (caché)
+      expect(() => a.tokens.add('x'), throwsUnsupportedError);
+    });
+
+    test('coveredByUserTokens / coversTokens equivalen a las versiones por '
+        'línea', () {
+      final av = IngredientAvailability(['pollo'], incluirBasicos: true);
+      for (final linea in ['1 pechuga de pollo', 'Sal', '2 huevos']) {
+        final tokens = parseIngredientLine(linea).tokens;
+        expect(av.coveredByUserTokens(tokens), av.coveredByUser(linea));
+        expect(av.coversTokens(tokens), av.covers(linea));
+      }
+    });
+  });
 }

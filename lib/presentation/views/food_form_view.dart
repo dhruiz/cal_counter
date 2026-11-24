@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/styles.dart';
-import '../../data/models/food_model.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
+import '../../domain/errors.dart';
 import '../providers/search_provider.dart';
 
 class FoodFormView extends ConsumerStatefulWidget {
@@ -25,6 +25,7 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   late TextEditingController _protController;
   late TextEditingController _fatsController;
   late TextEditingController _carbsController;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -33,18 +34,11 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
     _nameController = TextEditingController(
       text: f?.name ?? widget.initialName ?? '',
     );
-    _kcalController = TextEditingController(
-      text: f?.kcalPer100.toString() ?? '',
-    );
-    _protController = TextEditingController(
-      text: f?.proteinsPer100.toString() ?? '',
-    );
-    _fatsController = TextEditingController(
-      text: f?.grasasPer100.toString() ?? '',
-    );
-    _carbsController = TextEditingController(
-      text: f?.carbsPer100.toString() ?? '',
-    );
+    String num(double? v) => v == null ? '' : AppUtils.formatDecimalEditable(v);
+    _kcalController = TextEditingController(text: num(f?.kcalPer100));
+    _protController = TextEditingController(text: num(f?.proteinsPer100));
+    _fatsController = TextEditingController(text: num(f?.grasasPer100));
+    _carbsController = TextEditingController(text: num(f?.carbsPer100));
   }
 
   @override
@@ -58,38 +52,27 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_saving || !_formKey.currentState!.validate()) return;
 
-    final name = _nameController.text.trim();
-    final kcal = double.parse(_kcalController.text);
-    final prot = double.parse(_protController.text);
-    final fats = double.parse(_fatsController.text);
-    final carbs = double.parse(_carbsController.text);
+    final food = Food(
+      id: widget.foodToEdit?.id,
+      name: _nameController.text.trim(),
+      kcalPer100: AppUtils.parseDecimal(_kcalController.text)!,
+      proteinsPer100: AppUtils.parseDecimal(_protController.text)!,
+      grasasPer100: AppUtils.parseDecimal(_fatsController.text)!,
+      carbsPer100: AppUtils.parseDecimal(_carbsController.text)!,
+    );
 
     final repo = ref.read(foodRepositoryProvider);
+    setState(() => _saving = true);
 
     try {
       if (widget.foodToEdit == null) {
-        // Create
-        final newFood = FoodModel(
-          name: name,
-          kcalPer100: kcal,
-          proteinsPer100: prot,
-          grasasPer100: fats,
-          carbsPer100: carbs,
-        );
-        await repo.insertFood(newFood);
+        // Alta: si el nombre ya existe se avisa (antes se sobrescribía en
+        // silencio el alimento existente).
+        await repo.insertFood(food);
       } else {
-        // Update
-        final updatedFood = FoodModel(
-          id: widget.foodToEdit!.id,
-          name: name,
-          kcalPer100: kcal,
-          proteinsPer100: prot,
-          grasasPer100: fats,
-          carbsPer100: carbs,
-        );
-        await repo.updateFood(updatedFood);
+        await repo.updateFood(food);
       }
 
       if (mounted) {
@@ -98,13 +81,19 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
         ).showSnackBar(const SnackBar(content: Text('Alimento guardado')));
         Navigator.pop(context, true);
       }
+    } on DuplicateFoodNameException catch (e) {
+      _fail(e.toString());
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
+      _fail('Error: $e');
     }
+  }
+
+  void _fail(String message) {
+    if (!mounted) return;
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   @override
@@ -125,7 +114,8 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Requerido' : null,
               ),
               const SizedBox(height: 16),
               _buildNumField(_kcalController, 'Kcal (por 100g)'),
@@ -137,7 +127,7 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
               _buildNumField(_protController, 'Proteínas (g)'),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: _save,
+                onPressed: _saving ? null : _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppStyles.primary,
                   foregroundColor: Colors.white,
@@ -157,12 +147,10 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
       controller: controller,
       decoration: InputDecoration(labelText: label),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-      ],
+      inputFormatters: [AppUtils.decimalInputFormatter],
       validator: (v) {
         if (v == null || v.isEmpty) return 'Requerido';
-        if (double.tryParse(v) == null) return 'Inválido';
+        if (AppUtils.parseDecimal(v) == null) return 'Inválido';
         return null;
       },
     );

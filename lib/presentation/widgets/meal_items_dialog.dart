@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/meal_item.dart';
 import '../providers/home_provider.dart';
 
@@ -86,10 +87,7 @@ class MealItemsDialog extends ConsumerWidget {
                           child: Align(
                             alignment: const Alignment(1.0, 0.5),
                             child: IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
                                 _showDeleteConfirmation(context, ref, item);
                               },
@@ -118,7 +116,7 @@ class MealItemsDialog extends ConsumerWidget {
     MealItem item,
   ) {
     final controller = TextEditingController(
-      text: item.cantidad.toStringAsFixed(1),
+      text: AppUtils.formatNumero(item.cantidad),
     );
 
     showDialog(
@@ -141,7 +139,8 @@ class MealItemsDialog extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
-              final newCantidad = double.tryParse(controller.text);
+              // Coma o punto decimal (teclado en español).
+              final newCantidad = AppUtils.parseDecimal(controller.text);
               if (newCantidad != null && newCantidad > 0) {
                 Navigator.pop(ctx);
                 await ref

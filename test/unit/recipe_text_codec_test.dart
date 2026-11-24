@@ -170,4 +170,31 @@ Triturar y servir caliente.
     expect(RecipeTextCodec.parseMinutes('45'), 45);
     expect(RecipeTextCodec.parseMinutes('rápido'), isNull);
   });
+
+  group('regresiones de la auditoría', () {
+    test('JSON con "recetas" que no es una lista → FormatException (antes '
+        'TypeError)', () {
+      expect(
+        () => RecipeTextCodec.parseJson('{"recetas": {"nombre": "X"}}'),
+        throwsFormatException,
+      );
+    });
+
+    test('un número enorme no aborta la importación', () {
+      final res = RecipeTextCodec.parseText(
+        'RECETA: Tarta\nPORCIONES: 99999999999999999999999\n'
+        'INGREDIENTES:\n- 2 huevos',
+      );
+      expect(res, hasLength(1));
+      expect(res.single.porciones, isNull);
+      expect(res.single.ingredientes, ['2 huevos']);
+    });
+
+    test('se quita el BOM inicial', () {
+      final res = RecipeTextCodec.parse(
+        '\uFEFFRECETA: Sopa\nINGREDIENTES:\n- Agua',
+      );
+      expect(res.single.nombre, 'Sopa');
+    });
+  });
 }

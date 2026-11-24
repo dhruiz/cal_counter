@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/styles.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/meal_item.dart';
 import '../providers/home_provider.dart';
@@ -76,7 +77,10 @@ class DayManagementView extends ConsumerWidget {
                             horizontal: AppStyles.paddingMedium,
                           ),
                           children: state.meals
-                              .map((meal) => _buildMealCard(context, ref, state, meal))
+                              .map(
+                                (meal) =>
+                                    _buildMealCard(context, ref, state, meal),
+                              )
                               .toList(),
                         ),
                 ),
@@ -187,14 +191,22 @@ class DayManagementView extends ConsumerWidget {
           children: [
             TextButton.icon(
               onPressed: () async {
-                final export = ref.read(exportDayToCsvProvider);
-                final path = await export(state.selectedDate);
-                if (path.isNotEmpty) {
+                final messenger = ScaffoldMessenger.of(context);
+                try {
+                  final export = ref.read(exportDayToCsvProvider);
+                  final path = await export(state.selectedDate);
+                  // Cancelado: antes se mostraba "Exportado a: " vacío.
+                  if (path.isEmpty) return;
                   ref.read(homeProvider.notifier).refresh();
-                }
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(content: Text('Exportado a: $path')),
+                  );
+                } catch (e) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('Error al exportar: $e'),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                 }
               },
@@ -236,7 +248,9 @@ class DayManagementView extends ConsumerWidget {
               final name = controller.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('El nombre no puede estar vacío')),
+                  const SnackBar(
+                    content: Text('El nombre no puede estar vacío'),
+                  ),
                 );
                 return;
               }
@@ -270,7 +284,7 @@ class DayManagementView extends ConsumerWidget {
     // el valor por 100g de la preparación.
     final suggestedGrams = items.fold<double>(0, (sum, i) => sum + i.cantidad);
     final weightController = TextEditingController(
-      text: _formatGrams(suggestedGrams),
+      text: AppUtils.formatNumero(suggestedGrams),
     );
     // Resaltar el peso y dejar el foco/teclado sobre él para editarlo rápido.
     weightController.selection = TextSelection(
@@ -322,11 +336,13 @@ class DayManagementView extends ConsumerWidget {
               final name = nameController.text.trim();
               if (name.isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('El nombre no puede estar vacío')),
+                  const SnackBar(
+                    content: Text('El nombre no puede estar vacío'),
+                  ),
                 );
                 return;
               }
-              final totalGrams = double.tryParse(weightController.text);
+              final totalGrams = AppUtils.parseDecimal(weightController.text);
               if (totalGrams == null || totalGrams <= 0) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   const SnackBar(content: Text('Ingrese un peso válido')),
@@ -343,10 +359,6 @@ class DayManagementView extends ConsumerWidget {
     );
   }
 
-  /// Formatea gramos sin decimales si es entero; con 1 decimal en caso contrario.
-  String _formatGrams(double g) =>
-      g == g.roundToDouble() ? g.toStringAsFixed(0) : g.toStringAsFixed(1);
-
   Future<void> _saveMealAsFood(
     BuildContext context,
     WidgetRef ref,
@@ -356,7 +368,9 @@ class DayManagementView extends ConsumerWidget {
   ) async {
     // ¿Ya existe un alimento con ese nombre? (coincidencia exacta).
     final matches = await ref.read(foodRepositoryProvider).searchFoods(name);
-    final exists = matches.any((f) => f.name.toLowerCase() == name.toLowerCase());
+    final exists = matches.any(
+      (f) => f.name.toLowerCase() == name.toLowerCase(),
+    );
 
     if (exists) {
       if (!context.mounted) return;
@@ -456,9 +470,9 @@ class DayManagementView extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              for (final m in state.meals) {
-                await ref.read(homeProvider.notifier).deleteMeal(m.id!);
-              }
+              await ref
+                  .read(homeProvider.notifier)
+                  .deleteMeals(state.meals.map((m) => m.id!));
             },
             child: const Text('Eliminar Todo'),
           ),

@@ -13,7 +13,8 @@ import 'package:path/path.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-class _FakeFilePicker extends FilePickerPlatform with MockPlatformInterfaceMixin {
+class _FakeFilePicker extends FilePickerPlatform
+    with MockPlatformInterfaceMixin {
   _FakeFilePicker({required this.saveDir});
 
   final String saveDir;

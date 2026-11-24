@@ -1,11 +1,9 @@
-import '../../data/datasources/local_data_source.dart';
+import '../repositories/food_repository.dart';
 
 class ImportFoodsTsv {
-  final LocalDataSource dataSource;
+  final FoodRepository repository;
 
-  ImportFoodsTsv(this.dataSource);
+  ImportFoodsTsv(this.repository);
 
-  Future<int> call(String tsvContent) async {
-    return await dataSource.importFoodsTsvFromString(tsvContent);
-  }
+  Future<int> call(String tsvContent) => repository.importFoodsTsv(tsvContent);
 }
