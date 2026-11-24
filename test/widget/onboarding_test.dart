@@ -66,7 +66,7 @@ void main() {
     final foods = (await tester.runAsync(
       () => FoodRepositoryImpl(db).search('', limit: 1000),
     ))!;
-    expect(foods.length, 678);
+    expect(foods.length, 678 + 229); // catálogo base + frutas y verduras
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool(kOnboardingDone), isTrue);
     await tester.pumpWidget(const SizedBox());

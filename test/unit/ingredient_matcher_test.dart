@@ -122,6 +122,8 @@ void main() {
       expect(normalizeText('¡¡!!'), '');
       expect(normalizeText('a\t\nb'), 'a b');
       expect(normalizeText('café😀leche'), 'cafe leche');
+      expect(normalizeText('Weißkohl Süßkartoffel'), 'weisskohl susskartoffel');
+      expect(normalizeText('Eiweiß'), 'eiweiss');
     });
 
     test('los tokens cacheados son inmodificables y estables', () {
