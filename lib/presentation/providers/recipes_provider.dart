@@ -283,6 +283,12 @@ final recipeAnalysisProvider = StreamProvider.autoDispose
       });
     });
 
+/// Escala con la que se ve una receta (×2 = el doble de todo). Se usa en el
+/// detalle, el modo cocina, la lista de compra y el peso final.
+final recipeScaleProvider = StateProvider.autoDispose.family<double, int>(
+  (ref, id) => 1,
+);
+
 /// Receta cuyo alimento "preparado" es este (para avisar en el contador de
 /// por qué su tabla es aproximada).
 final recipeByFoodProvider = StreamProvider.autoDispose.family<Recipe?, int>(

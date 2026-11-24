@@ -7,6 +7,7 @@ import '../../data/parsers/recipe_text_codec.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/services/ingredient_matcher.dart';
+import '../../domain/services/ingredient_text.dart';
 import '../providers/recipes_provider.dart';
 import '../widgets/add_to_shopping_list_dialog.dart';
 import '../widgets/empty_state.dart';
@@ -123,7 +124,11 @@ class RecipeDetailView extends ConsumerWidget {
           ? null
           : FloatingActionButton.extended(
               heroTag: 'cocinar',
-              onPressed: () => CookModeView.open(context, recipe.id!),
+              onPressed: () => CookModeView.open(
+                context,
+                recipe.id!,
+                factor: ref.read(recipeScaleProvider(recipe.id!)),
+              ),
               icon: const Icon(Icons.soup_kitchen),
               label: const Text('Cocinar'),
             ),
@@ -167,6 +172,7 @@ class _RecipeBody extends ConsumerWidget {
     final pasos = r.pasos;
     final analisis = ref.watch(recipeAnalysisProvider(r.id!)).valueOrNull;
     final alimentos = analisis?.alimentos ?? const <int, Food>{};
+    final factor = ref.watch(recipeScaleProvider(r.id!));
 
     final meta = <Widget>[
       if ((r.categoria ?? '').isNotEmpty)
@@ -201,8 +207,10 @@ class _RecipeBody extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Wrap(spacing: 8, runSpacing: 4, children: meta),
           ),
-        if (analisis != null) RecipeNutritionCard(analisis: analisis),
+        if (analisis != null)
+          RecipeNutritionCard(analisis: analisis, factor: factor),
         SectionTitle('Ingredientes (${r.ingredientes.length})'),
+        _ScaleControl(receta: r, factor: factor),
         if (av != null)
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
@@ -224,7 +232,7 @@ class _RecipeBody extends ConsumerWidget {
             ),
           ),
         for (var i = 0; i < r.ingredientes.length; i++)
-          _ingredientTile(context, ref, r, i, alimentos, av, theme),
+          _ingredientTile(context, ref, r, i, alimentos, av, theme, factor),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: OutlinedButton.icon(
@@ -234,6 +242,11 @@ class _RecipeBody extends ConsumerWidget {
                     context,
                     ingredientes: r.ingredientes,
                     preseleccionados: faltantes,
+                    factor: factor,
+                    textos: [
+                      for (final ing in r.ingredientes)
+                        _texto(ing, alimentos, factor),
+                    ],
                   ),
             icon: const Icon(Icons.add_shopping_cart),
             label: Text(
@@ -289,6 +302,7 @@ class _RecipeBody extends ConsumerWidget {
     Map<int, Food> alimentos,
     IngredientAvailability? av,
     ThemeData theme,
+    double factor,
   ) {
     final ing = r.ingredientes[i];
     final linea = ing.texto;
@@ -320,7 +334,10 @@ class _RecipeBody extends ConsumerWidget {
       dense: true,
       visualDensity: VisualDensity.compact,
       leading: SizedBox(width: 24, child: Center(child: leading)),
-      title: Text(linea, style: const TextStyle(fontSize: 16)),
+      title: Text(
+        _texto(ing, alimentos, factor),
+        style: const TextStyle(fontSize: 16),
+      ),
       subtitle: food == null
           ? null
           : Text(
@@ -340,6 +357,76 @@ class _RecipeBody extends ConsumerWidget {
                       .valueOrNull
                       ?.porciones[food.id] ??
                   const [],
+      ),
+    );
+  }
+}
+
+/// Texto de la línea con la escala aplicada.
+String _texto(RecipeIngredient ing, Map<int, Food> alimentos, double factor) {
+  final f = ing.alimentoId == null ? null : alimentos[ing.alimentoId];
+  return scaledIngredientText(
+    texto: ing.texto,
+    factor: factor,
+    nombreAlimento: f?.nombre,
+    cantidad: ing.cantidad,
+    unidad: ing.unidad,
+    nota: ing.nota,
+    opcional: ing.opcional,
+  );
+}
+
+/// Escala de la receta: por raciones si se conocen, si no por factor
+/// (×½, ×1, ×1½, ×2...). Las cantidades, la lista de compra y el modo
+/// cocina la usan.
+class _ScaleControl extends ConsumerWidget {
+  final Recipe receta;
+  final double factor;
+
+  const _ScaleControl({required this.receta, required this.factor});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(recipeScaleProvider(receta.id!).notifier);
+    final porciones = receta.porciones;
+    final String etiqueta;
+    final double? menos;
+    final double mas;
+    if (porciones != null && porciones > 0) {
+      final n = (factor * porciones).round();
+      etiqueta = '$n ${n == 1 ? 'ración' : 'raciones'}';
+      menos = n > 1 ? (n - 1) / porciones : null;
+      mas = (n + 1) / porciones;
+    } else {
+      etiqueta = '×${formatQuantity(factor)}';
+      menos = factor > 0.5 ? factor - 0.5 : null;
+      mas = factor + 0.5;
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const Icon(Icons.tune, size: 18, color: AppStyles.neutral),
+          const SizedBox(width: 6),
+          const Text('Cantidades para', style: AppStyles.labelText),
+          IconButton(
+            tooltip: 'Menos',
+            icon: const Icon(Icons.remove_circle_outline),
+            onPressed: menos == null ? null : () => notifier.state = menos!,
+          ),
+          Text(etiqueta, key: const Key('escala_receta')),
+          IconButton(
+            tooltip: 'Más',
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () => notifier.state = mas,
+          ),
+          if (factor != 1)
+            TextButton(
+              onPressed: () => notifier.state = 1,
+              child: const Text('Original'),
+            ),
+        ],
       ),
     );
   }

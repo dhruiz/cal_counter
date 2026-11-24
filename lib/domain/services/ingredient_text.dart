@@ -107,3 +107,10 @@ String scaledIngredientText({
   }
   return '$texto (×${formatQuantity(factor)})';
 }
+
+/// Cantidad legible para listas: "750 g", "1,25 kg", "500 ml", "1,5 L".
+String humanQuantity(double v, String unidad) {
+  if (unidad == 'g' && v >= 1000) return '${formatQuantity(v / 1000)} kg';
+  if (unidad == 'ml' && v >= 1000) return '${formatQuantity(v / 1000)} L';
+  return quantityText(v, unidad);
+}

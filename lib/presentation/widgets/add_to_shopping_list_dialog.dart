@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/recipe.dart';
+import '../../domain/usecases/add_ingredients_to_shopping_list.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../providers/shopping_provider.dart';
 
@@ -10,14 +11,22 @@ import '../providers/shopping_provider.dart';
 /// (existente o nueva). [preseleccionados] indica qué líneas van marcadas;
 /// si es null se marcan todas salvo los básicos (sal, aceite...). Los
 /// ingredientes vinculados a un alimento conservan el vínculo en la lista.
+/// Con [factor] (escala de la receta) las cantidades se multiplican y se
+/// guardan como mínimo a comprar.
 class AddToShoppingListDialog extends ConsumerStatefulWidget {
   final List<RecipeIngredient> ingredientes;
   final Set<String>? preseleccionados;
+  final double factor;
+
+  /// Texto de cada línea (escalada) para mostrar.
+  final List<String>? textos;
 
   const AddToShoppingListDialog({
     super.key,
     required this.ingredientes,
     this.preseleccionados,
+    this.factor = 1,
+    this.textos,
   });
 
   List<String> get lineas => [for (final i in ingredientes) i.texto];
@@ -27,6 +36,8 @@ class AddToShoppingListDialog extends ConsumerStatefulWidget {
     BuildContext context, {
     required List<RecipeIngredient> ingredientes,
     Set<String>? preseleccionados,
+    double factor = 1,
+    List<String>? textos,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
     final msg = await showDialog<String>(
@@ -34,6 +45,8 @@ class AddToShoppingListDialog extends ConsumerStatefulWidget {
       builder: (_) => AddToShoppingListDialog(
         ingredientes: ingredientes,
         preseleccionados: preseleccionados,
+        factor: factor,
+        textos: textos,
       ),
     );
     if (msg != null) messenger.showSnackBar(SnackBar(content: Text(msg)));
@@ -78,7 +91,7 @@ class _AddToShoppingListDialogState
     setState(() => _saving = true);
     var listaId = _listaId!;
     var nombre = '';
-    final int n;
+    final ShoppingAddResult n;
     try {
       if (listaId == _nuevaLista) {
         nombre = _nameCtrl.text.trim().isEmpty
@@ -94,7 +107,11 @@ class _AddToShoppingListDialogState
         for (var i = 0; i < widget.ingredientes.length; i++)
           if (_checked.contains(i)) widget.ingredientes[i],
       ];
-      n = await notifier.addIngredients(listaId, elegidos);
+      n = await notifier.addIngredients(
+        listaId,
+        elegidos,
+        factor: widget.factor,
+      );
     } catch (e) {
       // Sin esto el diálogo quedaba con los botones deshabilitados.
       if (!mounted) return;
@@ -105,11 +122,18 @@ class _AddToShoppingListDialogState
       return;
     }
     if (!mounted) return;
+    final partes = [
+      if (n.anadidos > 0)
+        '${n.anadidos} ${n.anadidos == 1 ? 'artículo añadido' : 'artículos añadidos'}',
+      if (n.actualizados > 0)
+        '${n.actualizados} ${n.actualizados == 1 ? 'actualizado' : 'actualizados'} '
+            '(se suma la cantidad)',
+    ];
     Navigator.pop(
       context,
-      n == 0
+      n.total == 0
           ? 'Esos ingredientes ya estaban en "$nombre"'
-          : '$n ${n == 1 ? 'artículo añadido' : 'artículos añadidos'} a "$nombre"',
+          : '${partes.join(' y ')} a "$nombre"',
     );
   }
 
@@ -148,14 +172,19 @@ class _AddToShoppingListDialogState
                 ),
               ),
             const SizedBox(height: 12),
-            const Text('Marca lo que necesitas comprar:'),
+            Text(
+              widget.factor == 1
+                  ? 'Marca lo que necesitas comprar:'
+                  : 'Marca lo que necesitas comprar (cantidades a '
+                        '×${AppUtils.formatNumero(widget.factor)}):',
+            ),
             ...List.generate(widget.lineas.length, (i) {
               return CheckboxListTile(
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
                 value: _checked.contains(i),
-                title: Text(widget.lineas[i]),
+                title: Text(widget.textos?[i] ?? widget.lineas[i]),
                 onChanged: (v) => setState(
                   () => v == true ? _checked.add(i) : _checked.remove(i),
                 ),

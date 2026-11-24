@@ -89,6 +89,7 @@ class ShoppingItem extends Equatable {
     String? texto,
     String? cantidad,
     double? cantidadMinima,
+    bool clearCantidadMinima = false,
     bool? comprado,
     int? orden,
     int? compraId,
@@ -100,7 +101,9 @@ class ShoppingItem extends Equatable {
       alimentoId: clearAlimento ? null : (alimentoId ?? this.alimentoId),
       texto: texto ?? this.texto,
       cantidad: cantidad ?? this.cantidad,
-      cantidadMinima: cantidadMinima ?? this.cantidadMinima,
+      cantidadMinima: clearCantidadMinima
+          ? null
+          : (cantidadMinima ?? this.cantidadMinima),
       comprado: comprado ?? this.comprado,
       orden: orden ?? this.orden,
       compraId: clearCompra ? null : (compraId ?? this.compraId),

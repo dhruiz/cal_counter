@@ -7,6 +7,7 @@ import '../../domain/entities/food.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/entities/shopping_list.dart';
 import '../../domain/repositories/shopping_list_repository.dart';
+import '../../domain/usecases/add_ingredients_to_shopping_list.dart';
 import 'core_providers.dart';
 
 export 'core_providers.dart';
@@ -35,12 +36,14 @@ class ShoppingListsActions {
   Future<void> delete(int id) => _repo.deleteList(id);
 
   /// Añade ingredientes de una receta. Devuelve cuántos se añadieron.
-  Future<int> addIngredients(
+  Future<ShoppingAddResult> addIngredients(
     int listaId,
-    List<RecipeIngredient> ingredientes,
-  ) => _ref.read(addIngredientsToShoppingListProvider)(
+    List<RecipeIngredient> ingredientes, {
+    double factor = 1,
+  }) => _ref.read(addIngredientsToShoppingListProvider)(
     listaId: listaId,
     ingredientes: ingredientes,
+    factor: factor,
   );
 }
 

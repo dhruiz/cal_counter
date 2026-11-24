@@ -8,7 +8,6 @@ import 'package:cal_counter/domain/entities/food.dart';
 import 'package:cal_counter/domain/entities/nutrition_facts.dart';
 import 'package:cal_counter/domain/entities/recipe.dart';
 import 'package:cal_counter/domain/usecases/recipe_food.dart';
-import 'package:cal_counter/presentation/providers/core_providers.dart';
 import 'package:cal_counter/presentation/providers/data_provider.dart';
 import 'package:cal_counter/presentation/views/main_shell.dart';
 import 'package:cal_counter/presentation/views/recipe_detail_view.dart';
@@ -128,9 +127,9 @@ void main() {
 
     expect(find.text('Nutrición'), findsOneWidget);
     expect(find.textContaining('Peso final: 500 g'), findsOneWidget);
-    final r = (await tester.runAsync(() => recipes.get(recetaId)))!!;
+    final r = (await tester.runAsync(() => recipes.get(recetaId)))!;
     expect(r.pesoFinalG, 500);
-    final f = (await tester.runAsync(() => foods.getFood(r.alimentoId!)))!!;
+    final f = (await tester.runAsync(() => foods.getFood(r.alimentoId!)))!;
     expect(f.aproximado, isFalse);
     expect(f.nutricion.kcal, 140);
     final pots = (await tester.runAsync(CookingPotRepositoryImpl().getAll))!;
@@ -155,6 +154,39 @@ void main() {
       find.textContaining('no se ha introducido el peso total final'),
       findsOneWidget,
     );
+    await unmount(tester);
+  });
+
+  testWidgets('escalar la receta y llevarla a la lista como mínimo', (
+    tester,
+  ) async {
+    await pumpApp(tester, RecipeDetailView(recipeId: recetaId));
+    await tester.scrollUntilVisible(find.text('200 g de arroz redondo'), 200);
+    expect(find.text('2 raciones'), findsOneWidget);
+    expect(find.text('200 g de arroz redondo'), findsOneWidget);
+    await tester.tap(find.byTooltip('Más'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 raciones'), findsOneWidget);
+    expect(find.text('300 g de arroz redondo'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Añadir a la lista de compra'),
+      200,
+    );
+    await tester.tap(find.text('Añadir a la lista de compra'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('cantidades a ×1,5'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Añadir'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('1 artículo añadido'), findsOneWidget);
+
+    final listas = (await tester.runAsync(() => shopping.watchLists().first))!;
+    final items = (await tester.runAsync(
+      () => shopping.getItems(listas.single.id!),
+    ))!;
+    expect(items.single.texto, 'Arroz redondo');
+    expect(items.single.cantidad, '300 g');
+    expect(items.single.cantidadMinima, 300);
     await unmount(tester);
   });
 }

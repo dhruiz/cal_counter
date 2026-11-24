@@ -8,6 +8,7 @@ import '../../domain/entities/food.dart';
 import '../../domain/entities/shopping_list.dart';
 import '../../domain/services/aisle_grouping.dart';
 import '../../domain/services/ingredient_matcher.dart';
+import '../../domain/services/package_suggestion.dart';
 import '../providers/foods_provider.dart';
 import '../providers/shopping_provider.dart';
 import '../widgets/cart_price_sheet.dart';
@@ -248,15 +249,19 @@ class _ShoppingListDetailViewState
     );
     if (valores != null && valores[0].trim().isNotEmpty) {
       final mismoAlimento = food?.id == item.alimentoId;
+      final cantidad = valores[1].trim();
       // Cambiar de alimento saca el artículo del carrito (la compra queda en
-      // el historial del alimento anterior).
+      // el historial del alimento anterior). Cambiar la cantidad a mano o el
+      // alimento quita el mínimo que venía de las recetas.
       await _notifier.update(
         item.copyWith(
           texto: valores[0].trim(),
-          cantidad: valores[1].trim(),
+          cantidad: cantidad,
           alimentoId: food?.id,
           clearAlimento: food == null,
           clearCompra: !mismoAlimento,
+          clearCantidadMinima:
+              !mismoAlimento || cantidad != (item.cantidad ?? '').trim(),
         ),
       );
     }
@@ -398,10 +403,32 @@ class _ShoppingListDetailViewState
     }
   }
 
+  /// "mín. 750 g → 1 × Paquete 1 kg": cantidad mínima de las recetas y el
+  /// envase que la cubre (si se conoce el contenido de sus presentaciones).
+  String? _minimo(ShoppingItem item) {
+    final minima = item.cantidadMinima;
+    if (minima == null) return null;
+    final texto = 'mín. ${item.cantidad ?? AppUtils.formatNumero(minima)}';
+    final id = item.alimentoId;
+    if (id == null || item.comprado) return texto;
+    final packs = ref.watch(foodPackagesProvider(id)).valueOrNull ?? const [];
+    final s = suggestPackage(minima, packs);
+    if (s == null) return texto;
+    final p = s.presentacion;
+    final nombre = p.descripcion.trim().isNotEmpty
+        ? p.descripcion.trim()
+        : 'envase de ${AppUtils.formatNumero(p.contenido!)}';
+    return '$texto → ${s.unidades} × $nombre';
+  }
+
   Widget _itemTile(ShoppingItem item) {
     final theme = Theme.of(context);
+    final minimo = _minimo(item);
     final info = [
-      if ((item.cantidad ?? '').isNotEmpty) item.cantidad!,
+      if (minimo != null)
+        minimo
+      else if ((item.cantidad ?? '').isNotEmpty)
+        item.cantidad!,
       if (item.comprado && item.precioCent != null)
         '${item.unidades} × ${AppUtils.formatPrecioCent(item.precioCent!)} = '
             '${AppUtils.formatPrecioCent(item.subtotalCent!)}'

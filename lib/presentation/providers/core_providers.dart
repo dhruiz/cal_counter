@@ -156,6 +156,7 @@ final addIngredientsToShoppingListProvider =
     Provider<AddIngredientsToShoppingList>(
       (ref) => AddIngredientsToShoppingList(
         ref.watch(shoppingListRepositoryProvider),
+        ref.watch(foodRepositoryProvider),
       ),
     );
 

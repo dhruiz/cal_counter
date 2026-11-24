@@ -445,7 +445,7 @@ void main() {
     });
 
     test('ingredientes de receta heredan el vínculo y no se repiten', () async {
-      final add = AddIngredientsToShoppingList(shopping);
+      final add = AddIngredientsToShoppingList(shopping, foods);
       final n = await add(
         listaId: listaId,
         ingredientes: [
@@ -454,10 +454,14 @@ void main() {
           const RecipeIngredient(texto: 'Harina'),
         ],
       );
-      expect(n, 2);
+      // La segunda «harina» no tiene cantidad que sumar: no se repite.
+      expect(n.anadidos, 2);
+      expect(n.actualizados, 0);
       final items = await shopping.getItems(listaId);
       expect(items.first.alimentoId, leche.id);
       expect(items.first.cantidad, '1 L');
+      expect(items.first.cantidadMinima, 1000);
+      expect(items.last.cantidadMinima, 200);
     });
 
     test('borrar la lista conserva las compras', () async {
