@@ -91,6 +91,7 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
   - En casa, `FoodFlows.scanAtHome` la reconoce en cualquier tienda y con formato peso precarga los gramos.
   - **Un código de báscula nunca se guarda como `codigo_barras`** de una presentación.
 - **Catálogo base**: `assets/semilla/alimentos_base.json` (678 alimentos, uuid v5 determinista).
+- **Frutas y verduras**: `assets/semilla/frutas_verduras_usda.json` (222, USDA SR28; `produceCatalogProvider`). **Generado** por `tool/semilla/generar_frutas_verduras.py` (`python3 tool/semilla/generar_frutas_verduras.py`), que también reescribe `docs/FRUTAS_VERDURAS_USDA.md`: no editar a mano. Ningún valor se escribe ni se estima: un dato ausente en la fuente queda `null`. Carbohidratos totales de USDA (incluyen la fibra); sal = sodio × 2,5.
 - **OCR**: `NutritionLabelParser` (Dart puro, con tests) y `MlKitLabelRecognizer`. Los valores se revisan (`LabelReviewSheet`) y pasan al formulario: **nunca se guardan sin confirmar**.
 - **Precios**: mostrar con `AppUtils.formatPrecioCent` ("1,05 €"); campos con `suffixText: '€'`; leer con `parsePrecioCent` (coma o punto).
 - **Escáner**: `mobile_scanner`; siempre se ofrece escribir el código a mano. **Todo local**: no consultar servicios online.

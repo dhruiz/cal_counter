@@ -58,6 +58,12 @@ final seedCatalogProvider = FutureProvider<Repertoire>((ref) async {
   return RepertoireCodec.decode(json);
 });
 
+/// Frutas, verduras y hortalizas con la tabla de USDA (222 alimentos).
+final produceCatalogProvider = FutureProvider<Repertoire>((ref) async {
+  final json = await rootBundle.loadString(AppConstants.produceCatalogAsset);
+  return RepertoireCodec.decode(json);
+});
+
 /// Ruta de la base de datos de la versión anterior si existe y aún no se
 /// migró. El archivo nunca se modifica.
 final legacyDatabaseProvider = FutureProvider<String?>((ref) async {

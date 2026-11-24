@@ -83,9 +83,12 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       });
 
   Future<void> _seed() => _run('Cargando el catálogo base...', () async {
-    final rep = await ref.read(seedCatalogProvider.future);
-    final r = await ref.read(importRepertoireProvider)(rep);
-    return '${r.nuevos} alimentos añadidos.';
+    final importar = ref.read(importRepertoireProvider);
+    final base = await importar(await ref.read(seedCatalogProvider.future));
+    final frutas = await importar(
+      await ref.read(produceCatalogProvider.future),
+    );
+    return '${base.nuevos + frutas.nuevos} alimentos añadidos.';
   });
 
   Future<void> _import() => _run('Importando...', () async {
@@ -176,7 +179,9 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
             option(
               icon: Icons.eco_outlined,
               title: 'Empezar con el catálogo base',
-              subtitle: '678 alimentos genéricos con su tabla nutricional.',
+              subtitle:
+                  '678 alimentos genéricos y 222 frutas, verduras y '
+                  'hortalizas, con su tabla nutricional.',
               onTap: _seed,
               destacada: legacy == null,
             ),

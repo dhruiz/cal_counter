@@ -13,7 +13,7 @@ import '../widgets/file_transfer.dart';
 import '../widgets/food_widgets.dart';
 
 /// Ajustes → Datos: compartir repertorios, hoja de cálculo, respaldo
-/// completo, formatos antiguos y catálogo base.
+/// completo, formatos antiguos y catálogos incluidos.
 class DataView extends ConsumerStatefulWidget {
   const DataView({super.key});
 
@@ -168,6 +168,11 @@ class _DataViewState extends ConsumerState<DataView> {
     await _importRepertoire(rep, 'Catálogo base');
   });
 
+  Future<void> _produce() => _run(() async {
+    final rep = await ref.read(produceCatalogProvider.future);
+    await _importRepertoire(rep, 'Frutas y verduras (USDA)');
+  });
+
   Future<void> _migrateLegacy(String path) => _run(() async {
     final data = LegacyData.read(path);
     if (!mounted) return;
@@ -276,7 +281,7 @@ class _DataViewState extends ConsumerState<DataView> {
               title: Text('Restaurar un respaldo'),
               subtitle: Text('Usa «Importar» y elige el archivo de respaldo.'),
             ),
-            const _Section('Catálogo base'),
+            const _Section('Catálogos incluidos'),
             ListTile(
               leading: const Icon(Icons.eco_outlined),
               title: const Text('Añadir el catálogo base'),
@@ -284,6 +289,14 @@ class _DataViewState extends ConsumerState<DataView> {
                 '678 alimentos genéricos con su tabla nutricional',
               ),
               onTap: _seed,
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_florist_outlined),
+              title: const Text('Añadir frutas y verduras'),
+              subtitle: const Text(
+                '222 frutas, verduras y hortalizas con la tabla de USDA',
+              ),
+              onTap: _produce,
             ),
           ],
         ),

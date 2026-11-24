@@ -256,6 +256,7 @@ Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, 
   - Se migran las listas con el carrito, las recetas y las comidas.
   - El archivo antiguo **no se modifica**.
 - **Catálogo base**: 678 alimentos genéricos en `assets/semilla/alimentos_base.json`, con uuid determinista para que el mismo catálogo coincida entre usuarios.
+- **Frutas, verduras y hortalizas**: 222 alimentos en `assets/semilla/frutas_verduras_usda.json` con la tabla de USDA SR28 (sin ningún valor estimado; los datos que la fuente no publica quedan vacíos), porciones caseras de USDA y la nota de la fuente con su número NDB. Se carga junto al catálogo base y también desde *Datos y respaldos → Catálogos incluidos*. Lo genera `tool/semilla/generar_frutas_verduras.py`; criterios y lista completa en `docs/FRUTAS_VERDURAS_USDA.md`.
 - **Restaurar o importar** un archivo.
 - **Empezar vacío.**
 
