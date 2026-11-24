@@ -7,7 +7,7 @@ import 'package:cal_counter/domain/entities/food.dart';
 import 'package:cal_counter/domain/entities/nutrition_facts.dart';
 import 'package:cal_counter/domain/entities/shopping_list.dart';
 import 'package:cal_counter/domain/services/scale_barcode.dart';
-import 'package:cal_counter/presentation/providers/core_providers.dart';
+import 'package:cal_counter/presentation/providers/data_provider.dart';
 import 'package:cal_counter/data/repositories/category_repository_impl.dart';
 import 'package:cal_counter/presentation/views/cart_mode_view.dart';
 import 'package:cal_counter/presentation/views/categories_view.dart';
@@ -41,7 +41,10 @@ void main() {
   late int listaId, polloId;
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
+    // La lista de frutas y verduras ya incorporada: no se importa sola.
+    SharedPreferences.setMockInitialValues({
+      kProduceCatalogVersionKey: kProduceCatalogVersion,
+    });
     db = memoryDb();
     foods = FoodRepositoryImpl(db);
     shopping = ShoppingListRepositoryImpl(db);

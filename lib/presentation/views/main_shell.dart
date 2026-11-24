@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/data_provider.dart';
 import '../providers/foods_provider.dart';
 import '../providers/purchases_provider.dart';
 import 'foods_view.dart';
@@ -33,6 +34,19 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     // Al abrir la app se purga el historial de precios de más de 3 meses.
     ref.watch(purgeOnStartupProvider);
+    // Y se incorpora, una vez por versión, la lista de frutas y verduras.
+    ref.listen<AsyncValue<int>>(autoImportProduceProvider, (_, next) {
+      final n = next.valueOrNull ?? 0;
+      if (n > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Se añadieron $n frutas, verduras y hortalizas a tus alimentos.',
+            ),
+          ),
+        );
+      }
+    });
     final pendientes = ref.watch(pendingCountProvider).valueOrNull ?? 0;
 
     return Scaffold(
