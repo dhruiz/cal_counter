@@ -157,6 +157,46 @@ Sal trazas
     );
   });
 
+  test('"<" y sus variantes cuentan como 0', () {
+    for (final texto in [
+      '<0,5 g',
+      '< 0,5 g',
+      '≤0,5 g',
+      '≤ 0,5 g',
+      'menos de 0,5 g',
+      'weniger als 0,5 g',
+    ]) {
+      final r = NutritionLabelParser.parseText('Grasas $texto');
+      expect(r.nutricion.grasas, 0, reason: texto);
+      expect(r.dudosos, isNot(contains(Nutrient.grasas)), reason: texto);
+    }
+  });
+
+  test('">" y sus variantes: toma el mínimo y lo marca para revisar', () {
+    for (final texto in [
+      '>6 g',
+      '> 6 g',
+      '≥6 g',
+      '≥ 6 g',
+      'más de 6 g',
+      'mas de 6 g',
+      'Más de 6 g',
+      'mehr als 6 g',
+    ]) {
+      final r = NutritionLabelParser.parseText('Fibra $texto');
+      expect(r.nutricion.fibra, 6, reason: texto);
+      expect(r.dudosos, contains(Nutrient.fibra), reason: texto);
+    }
+    final r = NutritionLabelParser.parseText('''
+Brennwert >1046 kJ / >250 kcal
+Ballaststoffe mehr als 6 g
+Eiweiß 8 g
+''');
+    expectFacts(r, kcal: 250, fibra: 6, proteinas: 8);
+    expect(r.dudosos, containsAll([Nutrient.kcal, Nutrient.fibra]));
+    expect(r.dudosos, isNot(contains(Nutrient.proteinas)));
+  });
+
   test('etiqueta multilingüe (ES/PT/FR/EN): toma la primera de cada', () {
     final r = NutritionLabelParser.parseText('''
 Valor energético/Energia/Énergie/Energy 1640 kJ/392 kcal
@@ -177,6 +217,90 @@ Sal/Sel/Salt 0,40 g
       proteinas: 6.5,
       sal: 0.4,
     );
+  });
+
+  test('etiqueta alemana típica: Brennwert, Eiweiß y Nettofüllmenge', () {
+    final r = NutritionLabelParser.parseText('''
+Nettofüllmenge: 500 g
+Nährwerte pro 100 g
+Brennwert 1046 kJ / 250 kcal
+Fett 9,0 g
+davon gesättigte Fettsäuren 3,2 g
+einfach ungesättigte Fettsäuren 4,1 g
+Kohlenhydrate 30 g
+davon Zucker 12 g
+Ballaststoffe 2,1 g
+Eiweiß 8,5 g
+Salz 0,9 g
+''');
+    expectFacts(
+      r,
+      kcal: 250,
+      grasas: 9,
+      saturadas: 3.2,
+      hidratos: 30,
+      azucares: 12,
+      fibra: 2.1,
+      proteinas: 8.5,
+      sal: 0.9,
+    );
+    expect(r.nutricion.estaCompleta, isTrue);
+    expect(r.contenido, 500);
+    expect(r.dudosos, isEmpty);
+  });
+
+  test('Eiweiß también con ss o con la ß leída como B', () {
+    for (final palabra in ['Eiweiß', 'EIWEISS', 'Eiweiss', 'EiweiB']) {
+      final r = NutritionLabelParser.parseText('$palabra 8,5 g');
+      expect(r.nutricion.proteinas, 8.5, reason: palabra);
+    }
+  });
+
+  test('alemán: Brennwert en dos filas y sin unidades', () {
+    expectFacts(
+      NutritionLabelParser.parseText('Brennwert 2255 kJ\n539 kcal\nFett 30 g'),
+      kcal: 539,
+    );
+    expectFacts(
+      NutritionLabelParser.parseText('Brennwert 1046 / 250\nFett 9 g'),
+      kcal: 250,
+    );
+  });
+
+  test('alemán: "weniger als" y "Spuren" cuentan como 0', () {
+    final r = NutritionLabelParser.parseText('''
+Energie 15 kJ / 4 kcal
+Fett weniger als 0,5 g
+davon gesättigte Fettsäuren Spuren
+Kohlenhydrate 0,9 g
+Eiweiß < 0,5 g
+Salz Spuren
+''');
+    expectFacts(r, kcal: 4, grasas: 0, saturadas: 0, hidratos: 0.9);
+    expectFacts(r, proteinas: 0, sal: 0);
+  });
+
+  test('alemán: Natrium en mg → sal', () {
+    final r = NutritionLabelParser.parseText('''
+Energie 120 kcal
+Fett 3 g
+Kohlenhydrate 20 g
+Eiweiß 2 g
+Natrium 400 mg
+''');
+    expectFacts(r, sal: 1.0);
+  });
+
+  test('alemán: por ración (Portion)', () {
+    final r = NutritionLabelParser.parseText('''
+Nährwerte pro Portion (25 g)
+Energie 100 kcal
+Fett 5 g
+Kohlenhydrate 12 g
+Eiweiß 2 g
+''');
+    expectFacts(r, kcal: 400, grasas: 20, hidratos: 48, proteinas: 8);
+    expect(r.porcion, 25);
   });
 
   test('solo por ración: convierte a 100 g', () {
@@ -314,5 +438,17 @@ Proteínas 3 g
       1500,
     );
     expect(NutritionLabelParser.parseText('Grasas 1 g').contenido, isNull);
+  });
+
+  test('contenido neto en alemán', () {
+    double? contenido(String t) =>
+        NutritionLabelParser.parseText('$t\nFett 1 g').contenido;
+    expect(contenido('Nettofüllmenge: 500 g'), 500);
+    expect(contenido('Füllmenge 750 ml'), 750);
+    expect(contenido('Nettogewicht 1,5 kg'), 1500);
+    expect(contenido('Nettoinhalt: 33 cl'), 330);
+    expect(contenido('Inhalt: 1 l'), 1000);
+    // "Inhaltsstoffe" (ingredientes) no es el contenido neto.
+    expect(contenido('Inhaltsstoffe: 2 g Vitamin C'), isNull);
   });
 }

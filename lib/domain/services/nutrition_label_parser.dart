@@ -78,10 +78,16 @@ class LabelParseResult {
 ///   se ignoran los % de ingesta de referencia).
 /// - Energía: prefiere kcal; si solo hay kJ, kcal = kJ / 4,184.
 /// - Corrige confusiones típicas del OCR (O→0, l→1, coma decimal) y entiende
-///   "<0,5 g" y "trazas" (→ 0).
+///   "<0,5 g", "≤ 0,5 g", "menos de", "weniger als", "trazas" y "Spuren"
+///   (→ 0). Con ">6 g", "≥ 6 g", "más de" o "mehr als" toma el mínimo (6) y
+///   lo marca como dudoso.
 /// - Si solo hay valores por ración y se lee su peso, los convierte a 100 g.
 class NutritionLabelParser {
   NutritionLabelParser._();
+
+  /// Confianza de un valor que la etiqueta da como mínimo (">6 g"): queda
+  /// por debajo de 0,8 para que la revisión lo marque.
+  static const double _confianzaMinimo = 0.7;
 
   // Palabras clave por nutriente (texto normalizado: minúsculas sin tildes).
   // El orden importa: las subcategorías se comprueban antes que su padre.
@@ -103,6 +109,7 @@ class NutritionLabelParser {
         'energie',
         'valeur energetique',
         'valore energetico',
+        'brennwert',
         'kcal',
         'kj',
       ],
@@ -134,13 +141,26 @@ class NutritionLabelParser {
       ],
     ),
     (Nutrient.fibra, ['fibra', 'fibre', 'fiber', 'ballaststoff']),
-    (Nutrient.proteinas, ['proteina', 'protein', 'proteine', 'eiweiss']),
+    // "eiwei" cubre "Eiweiß" (la ß no es una letra a-z y la normalización la
+    // quita), "Eiweiss" y "EiweiB" (el OCR confunde a menudo la ß con una B).
+    (Nutrient.proteinas, ['proteina', 'protein', 'proteine', 'eiwei']),
     (Nutrient.sal, ['sal', 'salt', 'sel', 'sale', 'salz']),
   ];
 
+  /// Número con su cota y su unidad. Grupos: 1 = "menor que" ("<", "≤",
+  /// "menos de", "weniger als"), 2 = "mayor que" (">", "≥", "más de",
+  /// "mehr als"), 3 = valor, 4 = unidad.
   static final RegExp _numero = RegExp(
-    r'(<|≤|menos de\s*)?(\d+(?:[.,]\d+)?)\s*(kcal|kj|mg|g|%)?',
+    r'(?:(<\s*|≤\s*|\bmenos de\s*|\bweniger als\s*)|(>\s*|≥\s*|\bm[aá]s de\s*|\bmehr als\s*))?(\d+(?:[.,]\d+)?)\s*(kcal|kj|mg|g|%)?',
   );
+
+  static _Cota? _cotaDe(RegExpMatch m) =>
+      m[1] != null ? _Cota.menor : (m[2] != null ? _Cota.mayor : null);
+
+  static final RegExp _sodioRe = RegExp(r'(^|[^a-z])(sodio|sodium|natrium)');
+
+  /// "trazas", "traces", "Spuren": cantidad despreciable (→ 0).
+  static final RegExp _trazasRe = RegExp(r'traza|trace|spur');
 
   /// Interpreta líneas con o sin caja.
   static LabelParseResult parse(List<RecognizedLine> lines) {
@@ -249,6 +269,14 @@ class NutritionLabelParser {
     var hay100 = false;
     double? sodioG;
 
+    // Un valor dado como mínimo (">6 g") se guarda, pero como dudoso.
+    void guardar(Nutrient n, double v, double c, _Cota? cota) {
+      valores[n] = v;
+      confianza[n] = cota == _Cota.mayor && c > _confianzaMinimo
+          ? _confianzaMinimo
+          : c;
+    }
+
     final textoTotal = _simple(filasOriginales.map(_arreglarOcr).join(' '));
     if (RegExp(r'100\s*ml').hasMatch(textoTotal)) unidad = 'ml';
     if (RegExp(r'100\s*(g|gr|ml)').hasMatch(textoTotal)) hay100 = true;
@@ -263,13 +291,13 @@ class NutritionLabelParser {
       if (norm.isEmpty) continue;
 
       // Sodio (mg o g) → sal = sodio × 2,5 si no hay sal.
-      if (RegExp(r'(^|[^a-z])(sodio|sodium)').hasMatch(norm)) {
+      if (_sodioRe.hasMatch(norm)) {
         final m = _numero.firstMatch(
           fila.toLowerCase().replaceFirst(RegExp(r'^[^\d<]*'), ''),
         );
         if (m != null) {
-          final v = _toDouble(m[2]!);
-          if (v != null) sodioG = m[3] == 'mg' ? v / 1000 : v;
+          final v = _toDouble(m[3]!);
+          if (v != null) sodioG = m[4] == 'mg' ? v / 1000 : v;
         }
         continue;
       }
@@ -285,11 +313,11 @@ class NutritionLabelParser {
 
       // Números de la fila (después de la etiqueta).
       final lower = fila.toLowerCase();
-      final nums = <(double, String?, bool)>[];
+      final nums = <(double, String?, _Cota?)>[];
       for (final m in _numero.allMatches(lower)) {
-        final v = _toDouble(m[2]!);
+        final v = _toDouble(m[3]!);
         if (v == null) continue;
-        final u = m[3];
+        final u = m[4];
         if (u == '%') continue; // % de ingesta de referencia
         // El "100" de "por 100 g" en la misma fila no es un valor.
         final despues = lower.substring(m.end);
@@ -298,9 +326,9 @@ class NutritionLabelParser {
             u == null) {
           continue;
         }
-        nums.add((v, u, m[1] != null));
+        nums.add((v, u, _cotaDe(m)));
       }
-      if (nums.isEmpty && RegExp(r'traza|trace').hasMatch(norm)) {
+      if (nums.isEmpty && _trazasRe.hasMatch(norm)) {
         valores[n] = 0;
         confianza[n] = 0.9;
         continue;
@@ -311,22 +339,21 @@ class NutritionLabelParser {
         final kcal = nums.where((x) => x.$2 == 'kcal').toList();
         final kj = nums.where((x) => x.$2 == 'kj').toList();
         if (kcal.isNotEmpty) {
-          valores[n] = kcal.first.$1;
-          confianza[n] = 1;
+          guardar(n, kcal.first.$1, 1, kcal.first.$3);
         } else if (valores.containsKey(n)) {
           continue; // ya había un valor y esta fila no trae kcal
         } else if (nums.length >= 2 &&
             (nums[0].$1 / (nums[1].$1 == 0 ? 1 : nums[1].$1) - 4.184).abs() <
                 0.25) {
           // "1046 / 250" sin unidades: kJ / kcal.
-          valores[n] = nums[1].$1;
-          confianza[n] = 0.85;
+          guardar(n, nums[1].$1, 0.85, nums[1].$3);
         } else if (kj.isNotEmpty) {
-          valores[n] = double.parse((kj.first.$1 / 4.184).toStringAsFixed(0));
-          confianza[n] = 0.8;
+          final kcalDeKj = double.parse(
+            (kj.first.$1 / 4.184).toStringAsFixed(0),
+          );
+          guardar(n, kcalDeKj, 0.8, kj.first.$3);
         } else {
-          valores[n] = nums.first.$1;
-          confianza[n] = 0.6;
+          guardar(n, nums.first.$1, 0.6, nums.first.$3);
         }
         continue;
       }
@@ -337,9 +364,8 @@ class NutritionLabelParser {
       );
       var v = primero.$1;
       if (primero.$2 == 'mg') v = v / 1000;
-      if (primero.$3) v = 0; // "<0,5 g": despreciable
-      valores[n] = v;
-      confianza[n] = primero.$2 == null ? 0.7 : 1;
+      if (primero.$3 == _Cota.menor) v = 0; // "<0,5 g": despreciable
+      guardar(n, v, primero.$2 == null ? 0.7 : 1, primero.$3);
     }
 
     if (!valores.containsKey(Nutrient.sal) && sodioG != null) {
@@ -388,11 +414,14 @@ class NutritionLabelParser {
     );
   }
 
-  /// "Peso neto 500 g", "Contenido neto: 1 L", "e 750 ml" → g o ml.
+  /// "Peso neto 500 g", "Contenido neto: 1 L", "Nettofüllmenge 750 ml",
+  /// "Inhalt: 1,5 kg" → g o ml.
+  static final RegExp _contenidoNetoRe = RegExp(
+    r'(peso neto|contenido neto|cont neto|net weight|poids net|peso netto|netto[a-z]*|fullmenge|\binhalt\b|net)\D{0,8}(\d+(?:[.,]\d+)?)\s*(kg|g|gr|cl|ml|l)\b',
+  );
+
   static double? _contenidoNeto(String norm) {
-    final m = RegExp(
-      r'(peso neto|contenido neto|cont neto|net weight|poids net|peso netto|net)\D{0,8}(\d+(?:[.,]\d+)?)\s*(kg|g|gr|cl|ml|l)\b',
-    ).firstMatch(norm);
+    final m = _contenidoNetoRe.firstMatch(norm);
     if (m == null) return null;
     final v = _toDouble(m[2]!);
     if (v == null) return null;
@@ -403,3 +432,6 @@ class NutritionLabelParser {
     };
   }
 }
+
+/// Cota que acompaña a un número de la etiqueta: "<0,5 g" o ">6 g".
+enum _Cota { menor, mayor }

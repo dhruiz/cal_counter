@@ -269,12 +269,12 @@ Desde el formulario de alimento, *Leer la etiqueta con la cámara* sigue estos p
 2. Reconocimiento de texto con **ML Kit** en el dispositivo (`MlKitLabelRecognizer`, modelo latino incluido: sin internet).
 3. Interpretación con `NutritionLabelParser`, que es Dart puro y está probado con textos reales:
    - Agrupa en filas las líneas que están a la misma altura, porque el OCR devuelve las columnas por separado.
-   - Reconoce las etiquetas UE en español, portugués, francés, inglés, italiano y alemán.
+   - Reconoce las etiquetas UE en español, portugués, francés, inglés, italiano y alemán (incluidos "Brennwert" y "Eiweiß", también leído como "Eiweiss" o "EiweiB").
    - Toma la columna "por 100 g/ml" e ignora los % de ingesta de referencia.
    - Energía: usa las kcal; si solo hay kJ, divide entre 4,184.
    - Corrige errores típicos del OCR (`O`→`0`, `l`→`1`, comas sueltas).
-   - "<0,5 g" y "trazas" cuentan como 0. Con sodio, `sal = sodio × 2,5`.
-   - Si solo hay valores por ración y lee su peso, los convierte a 100 g. También lee el contenido neto.
+   - "<0,5 g" (también "≤", "menos de" y "weniger als", con o sin espacio), "trazas" y "Spuren" cuentan como 0. Con ">6 g" (también "≥", "más de" y "mehr als") toma el mínimo y lo marca como dudoso. Con sodio o Natrium, `sal = sodio × 2,5`.
+   - Si solo hay valores por ración y lee su peso, los convierte a 100 g. También lee el contenido neto ("Peso neto", "Nettofüllmenge", "Inhalt"…).
    - Marca como dudosos los valores sin unidad o incoherentes (saturadas > grasas, azúcares > hidratos, kcal que no cuadran con los macros).
 4. Hoja de revisión (`LabelReviewSheet`) con la foto, los valores y avisos. Los valores pasan al formulario y **nunca se guardan sin que el usuario confirme**. El origen queda como `etiqueta_ocr`.
 
@@ -344,7 +344,7 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
   - TSV (incluido el formato antiguo)
   - respaldo completo
   - lectura del `.db` de la v1.2 (`test/fixtures/`) y migración completa de una instalación antigua
-- `test/unit/nutrition_label_parser_test.dart`: 14 etiquetas: una y dos columnas, ruido de OCR, solo kJ, multilingüe, ración, sodio, trazas, incoherencias, agrupación por geometría y peso neto.
+- `test/unit/nutrition_label_parser_test.dart`: 23 casos: una y dos columnas, ruido de OCR, solo kJ, multilingüe, alemán, ración, sodio, trazas, "<" y ">", incoherencias, agrupación por geometría y peso neto.
 - `test/unit/phase7_test.dart`:
   - adivinador de categorías e instalación nueva con categorías
   - **migración v1 → v2 con datos** (desde `test/fixtures/schema_v1.sql`, comparando el esquema con una instalación nueva)
