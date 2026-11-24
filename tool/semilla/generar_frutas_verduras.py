@@ -1098,8 +1098,8 @@ def escribir_doc(rep, filas_doc):
         '',
         f'`assets/semilla/frutas_verduras.json` contiene **{total} alimentos** '
         f'({n_ciqual} de CIQUAL 2025 y {total - n_ciqual} de USDA SR Legacy) en '
-        'formato `cal_counter/repertorio` v1. Se carga junto al catálogo base '
-        'en la bienvenida; en una instalación que ya tenía datos se incorpora '
+        'formato `cal_counter/repertorio` v1. Se carga en la bienvenida '
+        '(«Empezar con frutas y verduras»); en una instalación que ya tenía datos se incorpora '
         'sola la primera vez que se abre la app tras actualizar (una vez por '
         'versión de la lista: `kProduceCatalogVersion`). También se puede '
         'añadir desde *Datos y respaldos → Catálogos incluidos → Añadir frutas '

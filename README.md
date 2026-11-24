@@ -36,7 +36,7 @@ Cuatro pestañas (`MainShell`, `NavigationBar` + `IndexedStack`):
 
 **Ajustes**:
 
-- **Datos y respaldos**: compartir el repertorio, respaldo completo, TSV, importar `.db` antiguos y añadir el catálogo base.
+- **Datos y respaldos**: compartir el repertorio, respaldo completo, TSV, importar `.db` antiguos y añadir la lista de frutas y verduras.
 - **Categorías y pasillos**: crear, renombrar, borrar y ordenar las categorías arrastrando; orden general u orden propio de cada tienda.
 
 ---
@@ -255,8 +255,8 @@ Estructura del repertorio: `{"formato": "cal_counter/repertorio", "version": 1, 
   - Las compras pasan a céntimos.
   - Se migran las listas con el carrito, las recetas y las comidas.
   - El archivo antiguo **no se modifica**.
-- **Catálogo base**: 678 alimentos genéricos en `assets/semilla/alimentos_base.json`, con uuid determinista para que el mismo catálogo coincida entre usuarios.
-- **Frutas, verduras y hortalizas**: 229 alimentos en `assets/semilla/frutas_verduras.json` con el nombre en español y en alemán («Manzana con piel, cruda / Apfel mit Schale, roh»). La tabla sale de CIQUAL 2025 (ANSES; carbohidratos sin fibra y proteína bruta, como las etiquetas de la UE) cuando publica cifra para kcal, proteínas, grasas y carbohidratos, y si no, del alimento entero en USDA SR Legacy (FoodData Central; carbohidratos con fibra). Ningún valor está estimado: lo que la fuente no publica queda vacío. Lleva porciones caseras de USDA y una nota con la fuente y su código. Se carga junto al catálogo base en la bienvenida; en una instalación que ya tenía datos se incorpora sola, una vez, la primera vez que se abre la app tras actualizar (y no vuelve aunque se borren alimentos). También se puede añadir desde *Datos y respaldos → Catálogos incluidos*. Lo genera `tool/semilla/generar_frutas_verduras.py`; criterios y lista completa en `docs/FRUTAS_VERDURAS.md`.
+- **Catálogo base (retirado)**: las versiones anteriores ofrecían 678 alimentos genéricos (`alimentos_base.json`). Ya no se incluye en la app; las instalaciones que lo cargaron lo conservan y el archivo queda en `test/fixtures/alimentos_base_v1.json` para comprobar que la lista nueva no choca con él.
+- **Frutas, verduras y hortalizas**: 229 alimentos en `assets/semilla/frutas_verduras.json` con el nombre en español y en alemán («Manzana con piel, cruda / Apfel mit Schale, roh»). La tabla sale de CIQUAL 2025 (ANSES; carbohidratos sin fibra y proteína bruta, como las etiquetas de la UE) cuando publica cifra para kcal, proteínas, grasas y carbohidratos, y si no, del alimento entero en USDA SR Legacy (FoodData Central; carbohidratos con fibra). Ningún valor está estimado: lo que la fuente no publica queda vacío. Lleva porciones caseras de USDA y una nota con la fuente y su código. Se carga en la bienvenida («Empezar con frutas y verduras»); en una instalación que ya tenía datos se incorpora sola, una vez, la primera vez que se abre la app tras actualizar (y no vuelve aunque se borren alimentos). También se puede añadir desde *Datos y respaldos → Catálogos incluidos*. Lo genera `tool/semilla/generar_frutas_verduras.py`; criterios y lista completa en `docs/FRUTAS_VERDURAS.md`.
 - **Restaurar o importar** un archivo.
 - **Empezar vacío.**
 
@@ -341,7 +341,6 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 - `test/unit/domain_services_test.dart`: GTIN, céntimos, cantidades de ingredientes, `NutritionFacts` y cálculo nutricional de recetas.
 - `test/unit/backup_test.dart`:
   - repertorio de ida y vuelta, importar dos veces, huecos y conflictos, emparejado por código y versiones
-  - catálogo base
   - TSV (incluido el formato antiguo)
   - respaldo completo
   - lectura del `.db` de la v1.2 (`test/fixtures/`) y migración completa de una instalación antigua

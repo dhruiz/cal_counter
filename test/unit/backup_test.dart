@@ -242,16 +242,6 @@ void main() {
         throwsA(isA<ValidationException>()),
       );
     });
-
-    test('catálogo base: 678 alimentos válidos con uuid', () {
-      final json = File(
-        'assets/semilla/alimentos_base.json',
-      ).readAsStringSync();
-      final rep = RepertoireCodec.decode(json);
-      expect(rep.alimentos.length, 678);
-      expect(rep.alimentos.every((f) => f.alimento.uuid != null), isTrue);
-      expect(rep.alimentos.every((f) => !f.alimento.pendiente), isTrue);
-    });
   });
 
   group('TSV', () {

@@ -48,14 +48,14 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('primera vez: catálogo base y luego la app', (tester) async {
+  testWidgets('primera vez: frutas y verduras y luego la app', (tester) async {
     await pump(tester);
     expect(find.text('Tus alimentos, en el centro de todo'), findsOneWidget);
     expect(
       find.text('Importar mis datos de la versión anterior'),
       findsNothing,
     );
-    await tester.tap(find.text('Empezar con el catálogo base'));
+    await tester.tap(find.text('Empezar con frutas y verduras'));
     // La carga del asset (grande) decodifica en otro isolate: tiempo real.
     for (var i = 0; i < 100; i++) {
       if (find.text('Agregar Ingesta').evaluate().isNotEmpty) break;
@@ -69,7 +69,7 @@ void main() {
     final foods = (await tester.runAsync(
       () => FoodRepositoryImpl(db).search('', limit: 1000),
     ))!;
-    expect(foods.length, 678 + 229); // catálogo base + frutas y verduras
+    expect(foods.length, 229);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool(kOnboardingDone), isTrue);
     // Ya incorporada: al abrir la app no se vuelve a importar.

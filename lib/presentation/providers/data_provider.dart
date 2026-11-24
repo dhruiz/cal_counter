@@ -52,12 +52,6 @@ final migrateLegacyProvider = Provider<MigrateLegacyData>(
   ),
 );
 
-/// Catálogo base incluido en la app (678 alimentos genéricos).
-final seedCatalogProvider = FutureProvider<Repertoire>((ref) async {
-  final json = await rootBundle.loadString(AppConstants.seedCatalogAsset);
-  return RepertoireCodec.decode(json);
-});
-
 /// Frutas, verduras y hortalizas con la tabla de CIQUAL 2025 o USDA SR Legacy
 /// (229 alimentos).
 final produceCatalogProvider = FutureProvider<Repertoire>((ref) async {
