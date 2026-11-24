@@ -189,4 +189,36 @@ void main() {
     expect(items.single.cantidadMinima, 300);
     await unmount(tester);
   });
+
+  testWidgets('ideas: sugerir una receta y ordenar', (tester) async {
+    await pumpApp(tester, const MainShell());
+    await tester.tap(find.text('Recetas'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Sugiéreme algo'));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Qué tal esta?'), findsOneWidget);
+    expect(find.text('Arroz blanco'), findsWidgets);
+    expect(find.text('Aún no la has marcado como preparada.'), findsOneWidget);
+    await tester.tap(find.text('Ver receta'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RecipeDetailView), findsOneWidget);
+
+    // «La he preparado hoy» y la lista lo muestra.
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('La he preparado hoy'));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Por nombre'));
+    await tester.pumpAndSettle();
+    expect(find.text('Favoritas primero'), findsOneWidget);
+    expect(find.text('hoy'), findsOneWidget);
+    await tester.tap(find.text('Favoritas primero'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hace más tiempo que no la preparas').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Hace más tiempo que no la preparas'), findsOneWidget);
+    await unmount(tester);
+  });
 }

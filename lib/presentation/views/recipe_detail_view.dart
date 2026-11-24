@@ -103,12 +103,29 @@ class RecipeDetailView extends ConsumerWidget {
               ),
             ),
             PopupMenuButton<String>(
-              onSelected: (v) {
+              onSelected: (v) async {
+                if (v == 'cooked') {
+                  await ref
+                      .read(recipeRepositoryProvider)
+                      .setLastPrepared(recipe.id!, DateTime.now());
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Marcada como preparada hoy'),
+                      ),
+                    );
+                  }
+                }
+                if (!context.mounted) return;
                 if (v == 'link') RecipeLinkView.open(context, recipe);
                 if (v == 'copy') _copy(context, recipe);
                 if (v == 'delete') _delete(context, ref, recipe);
               },
               itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: 'cooked',
+                  child: Text('La he preparado hoy'),
+                ),
                 PopupMenuItem(
                   value: 'link',
                   child: Text('Vincular ingredientes'),

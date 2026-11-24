@@ -4,6 +4,7 @@ import '../../data/parsers/recipe_text_codec.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/entities/recipe_match.dart';
 import '../../domain/services/ingredient_matcher.dart';
+import '../../domain/services/recipe_ideas.dart';
 
 /// Tarjeta de receta. Con [match] muestra cuántos ingredientes tiene el
 /// usuario y cuáles le faltan.
@@ -34,6 +35,8 @@ class RecipeCard extends StatelessWidget {
       if (recipe.porciones != null)
         _Meta(Icons.people_outline, '${recipe.porciones}'),
       _Meta(Icons.format_list_bulleted, '${recipe.ingredientes.length} ingr.'),
+      if (daysSincePrepared(recipe, DateTime.now()) case final dias?)
+        _Meta(Icons.history, preparedAgo(dias)),
       if (recipe.ingredientes.isNotEmpty &&
           recipe.ingredientes.every((i) => i.vinculado || i.opcional))
         const _Meta(Icons.local_fire_department_outlined, 'calculable')

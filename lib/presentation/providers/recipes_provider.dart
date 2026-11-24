@@ -9,6 +9,7 @@ import '../../domain/entities/recipe_match.dart';
 import '../../domain/repositories/recipe_repository.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../../domain/services/nutrition_calculator.dart';
+import '../../domain/services/recipe_ideas.dart';
 import '../../domain/usecases/import_recipes.dart';
 import '../../domain/usecases/recipe_food.dart';
 import '../../domain/usecases/search_recipes_by_ingredients.dart';
@@ -104,6 +105,12 @@ class RecipesState {
   final bool incluirBasicos;
   final bool soloCompletas;
 
+  /// Orden de la lista (modo por nombre).
+  final RecipeOrder orden;
+
+  /// Solo las recetas de esta categoría (null = todas).
+  final String? categoria;
+
   const RecipesState({
     this.recipes = const [],
     this.isLoading = false,
@@ -111,7 +118,19 @@ class RecipesState {
     this.query = '',
     this.incluirBasicos = true,
     this.soloCompletas = false,
+    this.orden = RecipeOrder.favoritas,
+    this.categoria,
   });
+
+  /// Recetas de la categoría elegida (todas si no hay ninguna).
+  List<Recipe> get deLaCategoria {
+    final c = categoria;
+    if (c == null) return recipes;
+    return [
+      for (final r in recipes)
+        if (isInCategory(r, c)) r,
+    ];
+  }
 
   /// Ingredientes escritos por el usuario (solo en modo ingredientes).
   List<String> get terminos =>
@@ -124,6 +143,9 @@ class RecipesState {
     String? query,
     bool? incluirBasicos,
     bool? soloCompletas,
+    RecipeOrder? orden,
+    String? categoria,
+    bool clearCategoria = false,
   }) {
     return RecipesState(
       recipes: recipes ?? this.recipes,
@@ -132,6 +154,8 @@ class RecipesState {
       query: query ?? this.query,
       incluirBasicos: incluirBasicos ?? this.incluirBasicos,
       soloCompletas: soloCompletas ?? this.soloCompletas,
+      orden: orden ?? this.orden,
+      categoria: clearCategoria ? null : (categoria ?? this.categoria),
     );
   }
 }
@@ -162,6 +186,12 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
   void setMode(RecipeSearchMode m) => state = state.copyWith(mode: m);
   void setIncluirBasicos(bool v) => state = state.copyWith(incluirBasicos: v);
   void setSoloCompletas(bool v) => state = state.copyWith(soloCompletas: v);
+  void setOrden(RecipeOrder o) => state = state.copyWith(orden: o);
+
+  /// Filtra por categoría (null = todas).
+  void setCategoria(String? c) => state = c == null
+      ? state.copyWith(clearCategoria: true)
+      : state.copyWith(categoria: c);
 
   /// Quita un término de la búsqueda por ingredientes.
   void removeTermino(String termino) {
@@ -205,18 +235,23 @@ final recipeMatchesProvider = Provider<List<RecipeMatch>>((ref) {
   );
 });
 
-/// Recetas filtradas por nombre o categoría (sin tildes ni mayúsculas).
+/// Recetas filtradas por nombre o categoría (sin tildes ni mayúsculas), de
+/// la categoría elegida y en el orden elegido.
 final recipesByNameProvider = Provider<List<Recipe>>((ref) {
   final s = ref.watch(recipesProvider);
+  if (s.mode != RecipeSearchMode.nombre) return s.recipes;
   final q = normalizeText(s.query);
-  if (s.mode != RecipeSearchMode.nombre || q.isEmpty) return s.recipes;
-  return s.recipes
-      .where(
-        (r) =>
-            normalizeText(r.nombre).contains(q) ||
-            normalizeText(r.categoria ?? '').contains(q),
-      )
-      .toList();
+  final base = s.deLaCategoria;
+  final filtradas = q.isEmpty
+      ? base
+      : base
+            .where(
+              (r) =>
+                  normalizeText(r.nombre).contains(q) ||
+                  normalizeText(r.categoria ?? '').contains(q),
+            )
+            .toList();
+  return sortRecipes(filtradas, s.orden);
 });
 
 final recipeDetailProvider = StreamProvider.autoDispose.family<Recipe?, int>(
