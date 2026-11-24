@@ -72,6 +72,16 @@ class FoodFlows {
     Food food, {
     double? initialQuantity,
   }) async {
+    if (!food.esAlimento) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '«${food.nombreCompleto}» no es un alimento: no se cuenta en el día.',
+          ),
+        ),
+      );
+      return false;
+    }
     final complete = await ensureComplete(context, ref, food);
     if (complete == null || !context.mounted) return false;
     return AddFoodPopup.showForToday(

@@ -19,6 +19,12 @@ class FoodSearchBody extends ConsumerWidget {
   final bool showMostUsed;
   final String emptyHint;
 
+  /// Deja fuera los artículos que no son alimentos (contador, recetas).
+  final bool soloAlimentos;
+
+  /// Alimentos que no se ofrecen (p. ej. el de la propia receta).
+  final Set<int> excluir;
+
   const FoodSearchBody({
     super.key,
     required this.query,
@@ -28,6 +34,8 @@ class FoodSearchBody extends ConsumerWidget {
     this.onCreate,
     this.showMostUsed = true,
     this.emptyHint = 'Escribe para buscar o escanea un código',
+    this.soloAlimentos = false,
+    this.excluir = const {},
   });
 
   Widget _createTile(BuildContext context) {
@@ -43,7 +51,10 @@ class FoodSearchBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final q = query.trim();
     if (q.isEmpty && showMostUsed && filter == FoodFilter.todos) {
-      final mostUsed = ref.watch(mostUsedFoodsProvider).valueOrNull ?? [];
+      final mostUsed = [
+        for (final f in ref.watch(mostUsedFoodsProvider).valueOrNull ?? [])
+          if (!excluir.contains(f.id)) f,
+      ];
       if (mostUsed.isEmpty) {
         return ListView(
           children: [
@@ -75,8 +86,12 @@ class FoodSearchBody extends ConsumerWidget {
       );
     }
 
-    final async = ref.watch(foodSearchProvider(FoodQuery(q, filter)));
-    final results = async.valueOrNull;
+    final async = ref.watch(
+      foodSearchProvider(FoodQuery(q, filter, null, soloAlimentos)),
+    );
+    final results = async.valueOrNull
+        ?.where((f) => !excluir.contains(f.id))
+        .toList();
     if (results == null) {
       return const Center(child: CircularProgressIndicator());
     }

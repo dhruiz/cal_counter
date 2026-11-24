@@ -6,6 +6,7 @@ import '../../data/parsers/recipe_text_codec.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../providers/recipes_provider.dart';
+import 'recipe_link_view.dart';
 
 /// Importación de recetas en dos pasos: (1) pegar texto (si no viene ya de
 /// un archivo) y (2) vista previa con casillas antes de guardar.
@@ -119,12 +120,31 @@ class _RecipeImportViewState extends ConsumerState<RecipeImportView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          saved == 1 ? '1 receta importada' : '$saved recetas importadas',
+          saved == 1
+              ? '1 receta importada. Vincula sus ingredientes a tus alimentos '
+                    'para calcular sus calorías.'
+              : '$saved recetas importadas. Abre cada una para vincular sus '
+                    'ingredientes a tus alimentos.',
         ),
         backgroundColor: Colors.green,
       ),
     );
-    Navigator.pop(context);
+    // Una sola receta: se pasa directamente a vincular sus ingredientes.
+    if (saved == 1 && toSave.length == 1) {
+      final key = normalizeText(toSave.single.nombre);
+      final todas = await ref.read(recipeRepositoryProvider).getAll();
+      final receta = todas
+          .where((r) => normalizeText(r.nombre) == key)
+          .firstOrNull;
+      if (receta != null && mounted) {
+        await Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => RecipeLinkView(receta: receta)),
+        );
+        return;
+      }
+    }
+    if (mounted) Navigator.pop(context);
   }
 
   void _preview(Recipe r) {

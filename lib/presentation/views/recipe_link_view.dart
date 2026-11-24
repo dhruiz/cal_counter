@@ -14,16 +14,32 @@ import 'food_picker_view.dart';
 /// Vinculación asistida: propone un alimento del repertorio para cada línea
 /// sin vincular (con la cantidad que se lee en la línea). El usuario marca
 /// cuáles acepta, cambia las que no encajan y guarda.
+///
+/// Con [guardar] en false no escribe en la base de datos: devuelve los
+/// ingredientes con los vínculos (formulario de una receta sin guardar).
 class RecipeLinkView extends ConsumerStatefulWidget {
   final Recipe receta;
+  final bool guardar;
 
-  const RecipeLinkView({super.key, required this.receta});
+  const RecipeLinkView({super.key, required this.receta, this.guardar = true});
 
   static Future<void> open(BuildContext context, Recipe receta) =>
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => RecipeLinkView(receta: receta)),
       );
+
+  /// Propone vínculos para [receta] y devuelve sus ingredientes vinculados
+  /// (null si se cancela), sin guardar.
+  static Future<List<RecipeIngredient>?> review(
+    BuildContext context,
+    Recipe receta,
+  ) => Navigator.push<List<RecipeIngredient>>(
+    context,
+    MaterialPageRoute(
+      builder: (_) => RecipeLinkView(receta: receta, guardar: false),
+    ),
+  );
 
   @override
   ConsumerState<RecipeLinkView> createState() => _RecipeLinkViewState();
@@ -78,6 +94,8 @@ class _RecipeLinkViewState extends ConsumerState<RecipeLinkView> {
       context,
       initialQuery: parseIngredientLine(ing.texto).nombre,
       title: 'Vincular «${ing.texto}»',
+      soloAlimentos: true,
+      excluir: {?widget.receta.alimentoId},
     );
     if (food == null) return;
     final q = parseQuantity(ing.texto);
@@ -110,6 +128,10 @@ class _RecipeLinkViewState extends ConsumerState<RecipeLinkView> {
           );
         }(),
     ];
+    if (!widget.guardar) {
+      Navigator.pop(context, list);
+      return;
+    }
     await ref.read(saveRecipeProvider)(
       widget.receta.copyWith(ingredientes: list),
     );
