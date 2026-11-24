@@ -21,7 +21,7 @@ flutter build apk --release                 # build/app/outputs/flutter-apk/app-
 - Tests de widgets: app real con `ProviderScope(overrides: [appDatabaseProvider.overrideWithValue(db)])`. Para leer la base de datos desde un `testWidgets` usar `tester.runAsync(...)`. Al final, `pumpWidget(SizedBox())` para cancelar los streams. Las listas largas necesitan `scrollUntilVisible`.
 - Tests de widgets que abren `MainShell`: fijar `kProduceCatalogVersionKey` en `SharedPreferences.setMockInitialValues` si no prueban la importación automática. Si un test lee assets (`rootBundle`), llamar a `rootBundle.clear()` en `setUp`: un `Future` en caché de un test anterior queda ligado a su reloj simulado y no se completa.
 - `CartModeView.scannerBuilder` permite sustituir la cámara. `labelRecognizerProvider` permite sustituir el OCR.
-- Entorno sin Flutter (contenedor en la nube): ver `docs/TRASPASO.md` §5 para instalar el SDK. Tras `dart format`, revertir `lib/domain/entities/user_settings.dart` (el formateador lo cambia y no es parte del trabajo).
+- **Versión de Flutter: 3.47.9** (la del CI y la de referencia). El entorno en la nube `cal_counter` la instala al arrancar; con otra versión, `flutter pub get` reescribe `pubspec.lock` (baja `intl`, `matcher`…) y esos cambios no se suben. Instalación manual: `docs/TRASPASO.md` §5. `dart format` solo sobre los archivos tocados (los dos `phase7_*` de test no están formateados).
 
 ## Arquitectura
 

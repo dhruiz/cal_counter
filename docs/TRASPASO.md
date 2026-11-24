@@ -169,9 +169,10 @@ Lista original, ya completada:
 
 ## 5. Preparar el entorno en una sesión nueva
 
-Flutter no viene instalado. En el contenedor anterior se instaló así (la red
-permite `storage.googleapis.com`, `pub.dev` y GitHub; `dl.google.com` está
-bloqueado):
+El entorno en la nube `cal_counter` instala al arrancar **Flutter 3.47.9** (la
+misma versión que el CI) y el SDK de Android. Usar siempre esa versión: con
+otra, `flutter pub get` reescribe `pubspec.lock` (baja `intl`, `matcher`…) y
+crea diferencias con la rama `main`. Instalación manual, si hiciera falta:
 
 ```bash
 mkdir -p /opt/flutter-sdk && cd /opt/flutter-sdk
@@ -181,12 +182,12 @@ git config --global --add safe.directory /opt/flutter-sdk/flutter
 export PATH=/opt/flutter-sdk/flutter/bin:$PATH
 flutter --disable-analytics
 cd /home/user/cal_counter && flutter pub get
-flutter analyze && flutter test        # esperado: 168 tests en verde
+flutter analyze && flutter test        # esperado: 186 tests en verde
 ```
 
 Notas:
 
-- **`dart format`**: tras ejecutarlo, revertir `lib/domain/entities/user_settings.dart` (`git checkout HEAD -- lib/domain/entities/user_settings.dart`). El formateador lo cambia y no es parte del trabajo.
+- **`dart format`**: solo sobre los archivos tocados. Con Flutter 3.47.9 no cambia nada más salvo `test/unit/phase7_test.dart` y `test/widget/phase7_widget_test.dart`, que no están formateados; `dart format .` los mezclaría con el trabajo.
 - **Tras tocar `tables.dart`**: `dart run build_runner build`. El `.g.dart` se versiona y la CI comprueba que esté al día.
 - **Tests de widgets**:
   - Base de datos en memoria con `ProviderScope(overrides: [appDatabaseProvider.overrideWithValue(db)])`.
