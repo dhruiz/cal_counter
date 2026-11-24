@@ -206,7 +206,7 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_saving || !_formKey.currentState!.validate()) return;
     final nutricion = _nutricion;
     if (!await _confirmAvisos(nutricion.avisos)) return;
 

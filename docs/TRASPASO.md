@@ -9,6 +9,15 @@
 > continúa `claude/database-tables-recipes-kyqj0h` sin reescribir su historia.
 > No queda nada pendiente de este plan (ver §4). Las secciones 5 y 6 siguen
 > vigentes para preparar el entorno y respetar las decisiones.
+>
+> **Actualización (24-11-2026): rama unificada `claude/peaceful-hawking-ishyo2`.**
+> Reúne el rediseño (`traspaso-md-continuation-77gbi5`), el commit WIP de
+> `claude/tender-cray-63vymf` y la rama `claude/flutter-sdk-environment-r2k60q`
+> (auditoría técnica + AGP 9.1, Gradle 9.3.1, Kotlin 2.4.0 y file_picker 13).
+> Qué se portó de la auditoría y qué quedó resuelto por el rediseño: nota al
+> principio de `docs/AUDITORIA_TECNICA.md`. Verificado con Flutter 3.47.9:
+> `flutter analyze` limpio y 168 tests en verde. Las ramas anteriores quedan
+> como histórico; se trabaja sobre la unificada.
 
 ## 1. Contexto
 
@@ -166,13 +175,13 @@ bloqueado):
 
 ```bash
 mkdir -p /opt/flutter-sdk && cd /opt/flutter-sdk
-curl -sS https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.44.9-stable.tar.xz -o f.tar.xz
+curl -sS https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.47.9-stable.tar.xz -o f.tar.xz
 tar xf f.tar.xz && rm f.tar.xz
 git config --global --add safe.directory /opt/flutter-sdk/flutter
 export PATH=/opt/flutter-sdk/flutter/bin:$PATH
 flutter --disable-analytics
 cd /home/user/cal_counter && flutter pub get
-flutter analyze && flutter test        # esperado: 150 tests en verde
+flutter analyze && flutter test        # esperado: 168 tests en verde
 ```
 
 Notas:
@@ -187,8 +196,9 @@ Notas:
 
 ## 6. Decisiones y avisos importantes
 
-- **Toolchain Android anclada**: AGP 8.13.1, `android.builtInKotlin=false`, `android.newDsl=false`.
-  - `google_mlkit_text_recognition` **anclado a `^0.16.0`**: 0.17+ y 1.x necesitan AGP 9.
+- **Toolchain Android**: AGP 9.1.0, Gradle 9.3.1, KGP 2.4.0, `android.builtInKotlin=false`, `android.newDsl=false` (plantilla de Flutter 3.47).
+  - `file_picker` 13+ (la 11 no compila bajo AGP 9). API: `saveFile` → `Uri?`, `pickFile()` + `readAsBytes()`.
+  - `google_mlkit_text_recognition` **anclado a `^0.16.0`** (con AGP 9 podría subirse; no hace falta).
   - No reintroducir `file_saver`.
 - **SQLite** viene con el paquete `sqlite3` (build hooks; descarga binarios al compilar).
 - **Reglas que no se rompen** (detalle en `README.md` y `CLAUDE.md`):

@@ -78,21 +78,32 @@ class _AddToShoppingListDialogState
     setState(() => _saving = true);
     var listaId = _listaId!;
     var nombre = '';
-    if (listaId == _nuevaLista) {
-      nombre = _nameCtrl.text.trim().isEmpty
-          ? 'Lista de compra'
-          : _nameCtrl.text.trim();
-      listaId = await notifier.create(nombre);
-    } else {
-      nombre = (ref.read(shoppingListsProvider).valueOrNull ?? const [])
-          .firstWhere((l) => l.id == listaId)
-          .nombre;
+    final int n;
+    try {
+      if (listaId == _nuevaLista) {
+        nombre = _nameCtrl.text.trim().isEmpty
+            ? 'Lista de compra'
+            : _nameCtrl.text.trim();
+        listaId = await notifier.create(nombre);
+      } else {
+        nombre = (ref.read(shoppingListsProvider).valueOrNull ?? const [])
+            .firstWhere((l) => l.id == listaId)
+            .nombre;
+      }
+      final elegidos = [
+        for (var i = 0; i < widget.ingredientes.length; i++)
+          if (_checked.contains(i)) widget.ingredientes[i],
+      ];
+      n = await notifier.addIngredients(listaId, elegidos);
+    } catch (e) {
+      // Sin esto el diálogo quedaba con los botones deshabilitados.
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo añadir: $e')));
+      return;
     }
-    final elegidos = [
-      for (var i = 0; i < widget.ingredientes.length; i++)
-        if (_checked.contains(i)) widget.ingredientes[i],
-    ];
-    final n = await notifier.addIngredients(listaId, elegidos);
     if (!mounted) return;
     Navigator.pop(
       context,

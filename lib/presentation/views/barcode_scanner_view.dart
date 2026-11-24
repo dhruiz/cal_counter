@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -109,7 +111,33 @@ class BarcodeScannerPanel extends StatefulWidget {
   State<BarcodeScannerPanel> createState() => _BarcodeScannerPanelState();
 }
 
-class _BarcodeScannerPanelState extends State<BarcodeScannerPanel> {
+/// Al pasar un controlador propio, `MobileScanner` no pausa la cámara al
+/// salir de la app (solo lo hace con su controlador interno; la doc de
+/// mobile_scanner pide gestionarlo uno mismo): se para en `inactive` y se
+/// reanuda en `resumed`, como hace el widget internamente.
+class _BarcodeScannerPanelState extends State<BarcodeScannerPanel>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_controller.value.hasCameraPermission) return;
+    switch (state) {
+      case AppLifecycleState.resumed:
+        unawaited(_controller.start());
+      case AppLifecycleState.inactive:
+        unawaited(_controller.stop());
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        break;
+    }
+  }
+
   final MobileScannerController _controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.normal,
     detectionTimeoutMs: 500,
@@ -126,6 +154,7 @@ class _BarcodeScannerPanelState extends State<BarcodeScannerPanel> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }

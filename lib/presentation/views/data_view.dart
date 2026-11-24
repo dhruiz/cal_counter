@@ -56,7 +56,6 @@ class _DataViewState extends ConsumerState<DataView> {
     final path = await FileTransfer.saveText(
       nombre: 'repertorio_${dateKey(DateTime.now())}.json',
       texto: RepertoireCodec.encode(rep),
-      extension: 'json',
       titulo: 'Exportar repertorio',
     );
     if (path != null) {
@@ -72,7 +71,6 @@ class _DataViewState extends ConsumerState<DataView> {
     final path = await FileTransfer.saveText(
       nombre: 'alimentos_${dateKey(DateTime.now())}.tsv',
       texto: FoodsTsvCodec.encode(rep),
-      extension: 'tsv',
       titulo: 'Exportar alimentos (TSV)',
     );
     if (path != null) _msg('${rep.alimentos.length} alimentos exportados.');
@@ -83,7 +81,6 @@ class _DataViewState extends ConsumerState<DataView> {
     final path = await FileTransfer.saveText(
       nombre: 'cal_counter_respaldo_${dateKey(DateTime.now())}.json',
       texto: json,
-      extension: 'json',
       titulo: 'Guardar respaldo completo',
     );
     if (path != null) _msg('Respaldo guardado.');

@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../../core/utils.dart';
+
 /// Archivo elegido por el usuario.
 class PickedData {
   final String nombre;
@@ -39,30 +41,30 @@ class PickedData {
 class FileTransfer {
   FileTransfer._();
 
-  /// Guarda [texto] (UTF-8). Devuelve la ruta, o null si se cancela.
+  /// Guarda [texto] (UTF-8). Devuelve una ruta legible, o null si se cancela.
+  ///
+  /// Desde file_picker 12 `saveFile` devuelve un [Uri] y escribe los bytes él
+  /// mismo (SAF en Android); el tipo MIME sale de la extensión de [nombre].
   static Future<String?> saveText({
     required String nombre,
     required String texto,
-    required String extension,
     String titulo = 'Guardar archivo',
   }) async {
     final saved = await FilePicker.saveFile(
       dialogTitle: titulo,
       fileName: nombre,
-      type: FileType.custom,
-      allowedExtensions: [extension],
       bytes: Uint8List.fromList(utf8.encode(texto)),
     );
-    return (saved == null || saved.isEmpty) ? null : saved;
+    return saved == null ? null : AppUtils.formatRutaGuardada(saved);
   }
 
   /// Abre un archivo cualquiera (el tipo se detecta por su contenido).
+  ///
+  /// `FileType.any`: algunos gestores no reconocen .json/.tsv/.db como tipos
+  /// personalizados; el contenido se valida al leerlo.
   static Future<PickedData?> pick() async {
-    final res = await FilePicker.pickFiles(type: FileType.any, withData: true);
-    if (res == null || res.files.isEmpty) return null;
-    final f = res.files.single;
-    final bytes = f.bytes;
-    if (bytes == null) return null;
-    return PickedData(f.name, bytes);
+    final f = await FilePicker.pickFile(type: FileType.any);
+    if (f == null) return null; // Cancelado
+    return PickedData(f.name, await f.readAsBytes());
   }
 }

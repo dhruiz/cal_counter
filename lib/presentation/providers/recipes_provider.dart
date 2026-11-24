@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -86,11 +87,18 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
   StreamSubscription<List<Recipe>>? _sub;
 
   RecipesNotifier(this._ref) : super(const RecipesState(isLoading: true)) {
-    _sub = _repo.watchAll().listen((recipes) {
-      if (mounted) {
-        state = state.copyWith(recipes: recipes, isLoading: false);
-      }
-    });
+    _sub = _repo.watchAll().listen(
+      (recipes) {
+        if (mounted) {
+          state = state.copyWith(recipes: recipes, isLoading: false);
+        }
+      },
+      onError: (Object e, StackTrace st) {
+        // Sin esto el indicador de carga quedaba girando para siempre.
+        log('Error cargando recetas', error: e, stackTrace: st);
+        if (mounted) state = state.copyWith(isLoading: false);
+      },
+    );
   }
 
   RecipeRepository get _repo => _ref.read(recipeRepositoryProvider);

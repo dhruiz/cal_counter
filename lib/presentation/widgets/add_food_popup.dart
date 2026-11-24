@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/meal.dart';
+import '../../domain/services/meal_naming.dart';
 import '../../domain/services/money.dart';
 import '../providers/foods_provider.dart';
 import '../providers/home_provider.dart';
@@ -64,6 +65,11 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
   bool _isCreatingNewMeal = false;
   bool _saving = false;
 
+  /// Nombre de la comida que se creará con "Nueva comida": el siguiente
+  /// `Comida_N` libre (con `comidas + 1` podía coincidir con una existente y
+  /// el alimento acababa en esa otra comida).
+  late final String _newMealName = nextMealName(widget.availableMeals);
+
   String get _u => widget.food.u;
 
   @override
@@ -95,7 +101,6 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
   /// no aporta nada, el campo se deja vacío.
   void _prefillSuggestedQuantity() {
     final settings = ref.read(settingsProvider);
-    final settingsNotifier = ref.read(settingsProvider.notifier);
     final home = ref.read(homeProvider);
     final n = widget.food.nutricion;
 
@@ -107,12 +112,9 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     }
 
     consider(settings.kcalTarget - home.totalKcal, n.kcal);
-    consider(settingsNotifier.fatsRequired - home.totalFats, n.grasas);
-    consider(settingsNotifier.carbsRequired - home.totalCarbs, n.carbohidratos);
-    consider(
-      settingsNotifier.proteinsRequired - home.totalProteins,
-      n.proteinas,
-    );
+    consider(settings.fatsRequired - home.totalFats, n.grasas);
+    consider(settings.carbsRequired - home.totalCarbs, n.carbohidratos);
+    consider(settings.proteinsRequired - home.totalProteins, n.proteinas);
 
     if (maxGrams == null) return;
     final suggestion = maxGrams!.floor();
@@ -138,9 +140,8 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     try {
       int mealId;
       if (_isCreatingNewMeal || _selectedMeal == null) {
-        final name = 'Comida_${widget.availableMeals.length + 1}';
         mealId = await ref.read(createMealIfNotExistsProvider)(
-          name,
+          _newMealName,
           widget.selectedDate,
         );
       } else {
@@ -246,7 +247,7 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
-                    'Se creará: Comida_${widget.availableMeals.length + 1}',
+                    'Se creará: $_newMealName',
                     style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ),

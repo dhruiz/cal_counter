@@ -27,13 +27,15 @@ class PriceHistoryView extends ConsumerWidget {
       final saved = await FilePicker.saveFile(
         dialogTitle: 'Exportar historial de precios',
         fileName: 'historial_precios_${dateKey(DateTime.now())}.csv',
-        type: FileType.custom,
-        allowedExtensions: ['csv'],
         bytes: Uint8List.fromList(utf8.encode(tsv)),
       );
-      if (saved == null || saved.isEmpty) return;
+      if (saved == null) return; // Cancelado
       messenger.showSnackBar(
-        SnackBar(content: Text('Historial exportado a: $saved')),
+        SnackBar(
+          content: Text(
+            'Historial exportado a: ${AppUtils.formatRutaGuardada(saved)}',
+          ),
+        ),
       );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Error al exportar: $e')));

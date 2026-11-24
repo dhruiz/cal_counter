@@ -94,11 +94,18 @@ Clean Architecture en 3 capas, con las dependencias apuntando al dominio:
 - **OCR**: `NutritionLabelParser` (Dart puro, con tests) y `MlKitLabelRecognizer`. Los valores se revisan (`LabelReviewSheet`) y pasan al formulario: **nunca se guardan sin confirmar**.
 - **Precios**: mostrar con `AppUtils.formatPrecioCent` ("1,05 €"); campos con `suffixText: '€'`; leer con `parsePrecioCent` (coma o punto).
 - **Escáner**: `mobile_scanner`; siempre se ofrece escribir el código a mano. **Todo local**: no consultar servicios online.
+- **Fórmula de requerimientos única**: getters `proteinsRequired`, `fatsRequired` y `carbsRequired` (recortado a 0) de `UserSettings`; no duplicarla en vistas ni notifiers.
+- **Cambio de día con la app abierta**: `HomeView` escucha `AppLifecycleListener(onResume:)` → `HomeNotifier.syncToday()` (reloj inyectable), que mueve `selectedDate` al día actual, vuelve a observar `watchDay` y relanza el diálogo de nuevo día. `refresh()` también reintenta si el flujo del día falló (`HomeState.error`).
+- **Comidas nuevas**: `nextMealName` (mayor `Comida_N` + 1, nunca un nombre existente).
+- **Campos numéricos**: coma o punto (`parseDecimal` de `money.dart` o `AppUtils.parseDecimal`, `AppUtils.decimalInputFormatter`); precargar con `AppUtils.formatNumero`/`formatDecimalEditable`.
+- **Búsqueda de recetas por ingredientes** (`ingredient_matcher.dart`): se ejecuta en cada pulsación; `parseIngredientLine` tiene caché (función pura, `ParsedIngredient.tokens` inmodificable). No crear `RegExp` dentro de bucles.
 
 ## Toolchain Android (no tocar sin revisar)
 
-- AGP 8.13.1 + `android.builtInKotlin=false` / `android.newDsl=false`. Flutter 3.44 no soporta el DSL de AGP 9, y bajo AGP 9 `file_picker` no compila.
-- **`google_mlkit_text_recognition` anclado a `^0.16.0`**: 0.17+ y 1.x requieren AGP 9 con Kotlin integrado.
+- AGP 9.1.0 + Gradle 9.3.1 + KGP 2.4.0, con `android.builtInKotlin=false` / `android.newDsl=false` (los flags de la plantilla de Flutter 3.47: su plugin de Gradle aún no soporta `newDsl=true`). Flutter de referencia: 3.47.x.
+- **`file_picker` 13+** (la 11 no aplicaba KGP bajo AGP 9 y no compilaba). API 12+: `saveFile(fileName:, bytes:)` escribe el archivo vía SAF y devuelve `Uri?` (mostrar con `AppUtils.formatRutaGuardada`; ruta vacía = cancelado para `ExportDayToCsv`); `pickFile()` devuelve `PlatformFile?` y se lee con `readAsBytes()` (sin `withData` ni `FilePickerResult`). Todo pasa por `FileTransfer` salvo el CSV del día, recetas e historial.
+- **`google_mlkit_text_recognition` anclado a `^0.16.0`** (se probó con AGP 8; con AGP 9 podría subirse, pero no hace falta).
+- **Manifiesto**: sin permisos de almacenamiento (todo por SAF) y sin `INTERNET` en release (`tools:node="remove"`; lo añade la telemetría de ML Kit). Debug/profile lo declaran para las herramientas de Flutter. Firma de release opcional con `android/key.properties` (no versionado).
 - `file_saver` se eliminó; no reintroducirlo.
 - SQLite la incluye `sqlite3` mediante build hooks (descarga binarios al compilar).
 

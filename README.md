@@ -45,9 +45,9 @@ Cuatro pestañas (`MainShell`, `NavigationBar` + `IndexedStack`):
 
 | Componente | Versión |
 |---|---|
-| Flutter | 3.44 (Dart 3.12) |
+| Flutter | 3.47 (Dart 3.13) |
 | Base de datos | Drift 2.35 sobre SQLite 3.5x **incluida en la app** (paquete `sqlite3`, con FTS5) |
-| Android | AGP 8.13.1, `android.builtInKotlin=false`, `android.newDsl=false` (ver [Configuración Android](#configuración-android)) |
+| Android | AGP 9.1.0, Gradle 9.3.1, Kotlin 2.4.0, `android.builtInKotlin=false`, `android.newDsl=false` (ver [Configuración Android](#configuración-android)) |
 
 ```bash
 flutter pub get
@@ -287,24 +287,29 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 - **Objetivos**:
   - `proteinas = peso × g/kg`
   - `grasas = peso × g/kg`
-  - **carbohidratos = residuo calórico**: `(kcalObjetivo − (proteinas·4 + grasas·9)) / 4`
+  - **carbohidratos = residuo calórico**: `(kcalObjetivo − (proteinas·4 + grasas·9)) / 4`, nunca negativo
+  - Una sola implementación: getters `proteinsRequired`, `fatsRequired` y `carbsRequired` de `UserSettings`.
 - **TDEE** (`SettingsView`):
   - Con % de grasa corporal válido: **Katch-McArdle**, `TMB = 370 + 21,6 × masa magra` (el sexo no interviene y su selector se deshabilita).
   - Si no: **Mifflin-St Jeor**, `10·peso + 6,25·altura − 5·edad + (5 | −161)`.
   - `TDEE = TMB × factor de actividad`.
 - **Agregar** (`AddFoodToMeal`): `factor = cantidad / 100` sobre la tabla del alimento. **Editar la cantidad** (`updateMealItem`) aplica `ratio = nueva / anterior` sobre lo ya guardado, sin volver a consultar el alimento.
-- **Comidas**: se nombran `Comida_N`. La cantidad sugerida es el máximo que cabe en todas las metas restantes. Las porciones caseras aparecen como atajos.
+- **Comidas**: se nombran `Comida_N` con `nextMealName` (el mayor N + 1, nunca un nombre que ya exista). La cantidad sugerida es el máximo que cabe en todas las metas restantes. Las porciones caseras aparecen como atajos.
 - **Exportar el día** (`ExportDayToCsv`): TAB, cabecera `nombre_comida\tcantidad\talimento\tgrasas\tcarbos\tproteinas\tkcal`, fila final `Total`. **Tras exportar con éxito vacía `comidas` e `items_comida`.**
-- **Nuevo día** (`CheckNewDayOnStartup`): al abrir la app, si hay items **y** la última fecha es anterior a hoy, se ofrece exportar o descartar el día anterior.
+- **Nuevo día** (`CheckNewDayOnStartup`): al abrir la app **o al volver a primer plano** (`AppLifecycleListener` → `HomeNotifier.syncToday()`), si hay items **y** la última fecha es anterior a hoy, se ofrece exportar o descartar el día anterior. Si la app quedó abierta pasada la medianoche, el contador pasa solo al día nuevo.
+- **Decimales**: los campos numéricos aceptan coma o punto, y Material está en español (`flutter_localizations`, `es-ES`).
 
 ---
 
 ## Configuración Android
 
-- **Toolchain anclada**: AGP 8.13.1 con `android.builtInKotlin=false` y `android.newDsl=false`. Flutter 3.44 no soporta todavía el DSL nuevo de AGP 9, y bajo AGP 9 `file_picker` deja de aplicar KGP. Revisar al actualizar Flutter.
-- **`google_mlkit_text_recognition` anclado a `^0.16.0`**: las versiones 0.17+ y 1.x se compilan para AGP 9 con Kotlin integrado y romperían el build. La 0.16 aplica `kotlin-android` por sí misma, igual que `file_picker` y `mobile_scanner`.
+- **Toolchain**: AGP 9.1.0, Gradle 9.3.1 y KGP 2.4.0, con `android.builtInKotlin=false` y `android.newDsl=false`, los mismos flags que la plantilla de Flutter 3.47 (su plugin de Gradle aún no soporta `newDsl=true`). Con `builtInKotlin=false` cada plugin aplica KGP. Revisar al actualizar Flutter.
+- **`file_picker` 13+**: la 11 omitía KGP bajo AGP 9 y su código Kotlin no se compilaba. Desde la 12, `saveFile(fileName:, bytes:)` escribe el archivo con SAF y devuelve `Uri?` (se muestra con `AppUtils.formatRutaGuardada`), y `pickFile()` devuelve un `PlatformFile?` que se lee con `readAsBytes()`.
+- **`google_mlkit_text_recognition` anclado a `^0.16.0`**: aplica `kotlin-android` por sí misma, igual que `mobile_scanner`. Con AGP 9 se podría subir a 0.17+/1.x, pero no hace falta.
 - **SQLite**: la incluye el paquete `sqlite3` mediante *build hooks*. Durante el build descarga binarios precompilados, así que el build necesita internet.
-- **Permisos**: `CAMERA` (escáner de códigos con `mobile_scanner` y fotos con `image_picker`), con `uses-feature camera required=false`: sin cámara se escribe el código a mano. Los permisos de almacenamiento heredados solo aplican a Android ≤ 12. Importar y exportar usa SAF.
+- **Permisos**: `CAMERA` (escáner de códigos con `mobile_scanner` y fotos con `image_picker`), con `uses-feature camera required=false`: sin cámara se escribe el código a mano. **Sin permisos de almacenamiento**: importar y exportar usa SAF.
+- **Sin `INTERNET` en release**: ML Kit lo añade para su telemetría (`com.google.android.datatransport`) y el manifiesto principal lo quita con `tools:node="remove"`. Los manifiestos de debug y profile lo declaran para las herramientas de Flutter.
+- **Firma de release** opcional con `android/key.properties` (no versionado: `storeFile`, `storePassword`, `keyAlias`, `keyPassword`). Sin él se firma con la clave de debug.
 - **iOS**: `Info.plist` incluye `NSCameraUsageDescription` y `NSPhotoLibraryUsageDescription`. No se ha probado en iOS.
 - `file_saver` se eliminó (aplicaba KGP y bloqueaba la toolchain); no reintroducirlo.
 
@@ -351,6 +356,8 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
   - `onboarding_test.dart`: primer arranque.
   - `label_review_test.dart`: revisión de la lectura de etiquetas.
   - `phase7_widget_test.dart`: lista agrupada por pasillos, categoría sugerida y filtro; flujo completo de báscula en el modo carrito; pantalla de categorías.
+  - `add_food_popup_test.dart`: "Nueva comida" no reutiliza un `Comida_N` existente y la cantidad acepta coma decimal.
+- De la auditoría técnica (`docs/AUDITORIA_TECNICA.md`): `home_notifier_test.dart` (cambio de día con la app abierta, errores de carga, borrar el día), `meal_naming_test.dart`, `app_utils_test.dart` (decimales y ruta guardada), `ingredient_matcher_test.dart`, `recipe_text_codec_test.dart`, `settings_test.dart` y `theme_provider_test.dart`.
 - Integración continua (`.github/workflows/ci.yml`): `flutter analyze` y `flutter test` en cada push y pull request.
 
 ---

@@ -17,17 +17,6 @@ class AppStyles {
   static const Color ringOver = semaphRed; // tramo de sobreingesta
 
   // Text Styles
-  static const TextStyle heading1 = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: Colors.black,
-  );
-
-  static const TextStyle bodyText = TextStyle(
-    fontSize: 16,
-    color: Colors.black87,
-  );
-
   static const TextStyle labelText = TextStyle(fontSize: 14, color: neutral);
 
   // Sizes & Paddings
@@ -36,9 +25,6 @@ class AppStyles {
   static const double paddingLarge = 24.0;
 
   static const double borderRadius = 8.0;
-
-  // Default Font
-  static const String defaultFontFamily = 'Roboto';
 
   // Light Theme
   static ThemeData get lightTheme {

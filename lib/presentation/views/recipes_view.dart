@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/styles.dart';
+import '../../core/utils.dart';
 import '../../data/parsers/recipe_text_codec.dart';
 import '../../domain/entities/recipe.dart';
 import '../providers/recipes_provider.dart';
@@ -61,15 +62,12 @@ class _RecipesViewState extends ConsumerState<RecipesView> {
     try {
       // FileType.any: algunos gestores de archivos no reconocen .txt/.csv/.json
       // como tipos personalizados; el contenido se valida al leerlo.
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        withData: true,
+      final file = await FilePicker.pickFile(type: FileType.any);
+      if (file == null) return; // Cancelado
+      final content = utf8.decode(
+        await file.readAsBytes(),
+        allowMalformed: true,
       );
-      if (result == null || result.files.isEmpty) return;
-      final file = result.files.single;
-      final bytes = file.bytes;
-      if (bytes == null) throw Exception('No se pudo leer el archivo.');
-      final content = utf8.decode(bytes, allowMalformed: true);
       final recipes = RecipeTextCodec.parse(content, fileName: file.name);
       if (!mounted) return;
       if (recipes.isEmpty) {
@@ -112,14 +110,12 @@ class _RecipesViewState extends ConsumerState<RecipesView> {
       final saved = await FilePicker.saveFile(
         dialogTitle: 'Guardar archivo',
         fileName: fileName,
-        type: FileType.custom,
-        allowedExtensions: ['txt'],
         bytes: Uint8List.fromList(utf8.encode(content)),
       );
-      if (saved == null || saved.isEmpty) return;
+      if (saved == null) return; // Cancelado
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Guardado en: $saved'),
+          content: Text('Guardado en: ${AppUtils.formatRutaGuardada(saved)}'),
           backgroundColor: Colors.green,
         ),
       );

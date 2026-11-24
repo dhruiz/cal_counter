@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -85,9 +86,21 @@ class ShoppingItemsNotifier extends StateNotifier<ShoppingItemsState> {
 
   ShoppingItemsNotifier(this._ref, this.listaId)
     : super(const ShoppingItemsState(isLoading: true)) {
-    _sub = _repo.watchItems(listaId).listen((items) {
-      if (mounted) state = ShoppingItemsState(items: items);
-    });
+    _sub = _repo
+        .watchItems(listaId)
+        .listen(
+          (items) {
+            if (mounted) state = ShoppingItemsState(items: items);
+          },
+          onError: (Object e, StackTrace st) {
+            log(
+              'Error cargando artículos de la lista',
+              error: e,
+              stackTrace: st,
+            );
+            if (mounted) state = ShoppingItemsState(items: state.items);
+          },
+        );
   }
 
   ShoppingListRepository get _repo => _ref.read(shoppingListRepositoryProvider);

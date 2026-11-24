@@ -29,12 +29,14 @@ class SearchRecipesByIngredients {
       var porUsuario = 0;
 
       for (final linea in recipe.lineas) {
+        // Se interpreta una sola vez por línea (antes, tres).
         final parsed = parseIngredientLine(linea);
-        if (parsed.opcional || parsed.tokens.isEmpty) continue;
-        if (availability.coveredByUser(linea)) {
+        final tokens = parsed.tokens;
+        if (parsed.opcional || tokens.isEmpty) continue;
+        if (availability.coveredByUserTokens(tokens)) {
           porUsuario++;
           disponibles.add(linea);
-        } else if (availability.covers(linea)) {
+        } else if (availability.coversTokens(tokens)) {
           disponibles.add(linea);
         } else {
           faltantes.add(linea);
