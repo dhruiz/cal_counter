@@ -78,7 +78,7 @@ class LabelParseResult {
 ///   se ignoran los % de ingesta de referencia).
 /// - Energía: prefiere kcal; si solo hay kJ, kcal = kJ / 4,184.
 /// - Corrige confusiones típicas del OCR (O→0, l→1, coma decimal) y entiende
-///   "<0,5 g" y "trazas" (→ 0).
+///   "<0,5 g", "< 0,5 g", "weniger als 0,5 g", "trazas" y "Spuren" (→ 0).
 /// - Si solo hay valores por ración y se lee su peso, los convierte a 100 g.
 class NutritionLabelParser {
   NutritionLabelParser._();
@@ -103,6 +103,7 @@ class NutritionLabelParser {
         'energie',
         'valeur energetique',
         'valore energetico',
+        'brennwert',
         'kcal',
         'kj',
       ],
@@ -134,13 +135,20 @@ class NutritionLabelParser {
       ],
     ),
     (Nutrient.fibra, ['fibra', 'fibre', 'fiber', 'ballaststoff']),
-    (Nutrient.proteinas, ['proteina', 'protein', 'proteine', 'eiweiss']),
+    // "eiwei" cubre "Eiweiß" (la ß no es una letra a-z y la normalización la
+    // quita), "Eiweiss" y "EiweiB" (el OCR confunde a menudo la ß con una B).
+    (Nutrient.proteinas, ['proteina', 'protein', 'proteine', 'eiwei']),
     (Nutrient.sal, ['sal', 'salt', 'sel', 'sale', 'salz']),
   ];
 
   static final RegExp _numero = RegExp(
-    r'(<|≤|menos de\s*)?(\d+(?:[.,]\d+)?)\s*(kcal|kj|mg|g|%)?',
+    r'(<\s*|≤\s*|menos de\s*|weniger als\s*)?(\d+(?:[.,]\d+)?)\s*(kcal|kj|mg|g|%)?',
   );
+
+  static final RegExp _sodioRe = RegExp(r'(^|[^a-z])(sodio|sodium|natrium)');
+
+  /// "trazas", "traces", "Spuren": cantidad despreciable (→ 0).
+  static final RegExp _trazasRe = RegExp(r'traza|trace|spur');
 
   /// Interpreta líneas con o sin caja.
   static LabelParseResult parse(List<RecognizedLine> lines) {
@@ -263,7 +271,7 @@ class NutritionLabelParser {
       if (norm.isEmpty) continue;
 
       // Sodio (mg o g) → sal = sodio × 2,5 si no hay sal.
-      if (RegExp(r'(^|[^a-z])(sodio|sodium)').hasMatch(norm)) {
+      if (_sodioRe.hasMatch(norm)) {
         final m = _numero.firstMatch(
           fila.toLowerCase().replaceFirst(RegExp(r'^[^\d<]*'), ''),
         );
@@ -300,7 +308,7 @@ class NutritionLabelParser {
         }
         nums.add((v, u, m[1] != null));
       }
-      if (nums.isEmpty && RegExp(r'traza|trace').hasMatch(norm)) {
+      if (nums.isEmpty && _trazasRe.hasMatch(norm)) {
         valores[n] = 0;
         confianza[n] = 0.9;
         continue;
@@ -388,11 +396,14 @@ class NutritionLabelParser {
     );
   }
 
-  /// "Peso neto 500 g", "Contenido neto: 1 L", "e 750 ml" → g o ml.
+  /// "Peso neto 500 g", "Contenido neto: 1 L", "Nettofüllmenge 750 ml",
+  /// "Inhalt: 1,5 kg" → g o ml.
+  static final RegExp _contenidoNetoRe = RegExp(
+    r'(peso neto|contenido neto|cont neto|net weight|poids net|peso netto|netto[a-z]*|fullmenge|\binhalt\b|net)\D{0,8}(\d+(?:[.,]\d+)?)\s*(kg|g|gr|cl|ml|l)\b',
+  );
+
   static double? _contenidoNeto(String norm) {
-    final m = RegExp(
-      r'(peso neto|contenido neto|cont neto|net weight|poids net|peso netto|net)\D{0,8}(\d+(?:[.,]\d+)?)\s*(kg|g|gr|cl|ml|l)\b',
-    ).firstMatch(norm);
+    final m = _contenidoNetoRe.firstMatch(norm);
     if (m == null) return null;
     final v = _toDouble(m[2]!);
     if (v == null) return null;
