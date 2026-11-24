@@ -170,7 +170,7 @@ class _DataViewState extends ConsumerState<DataView> {
 
   Future<void> _produce() => _run(() async {
     final rep = await ref.read(produceCatalogProvider.future);
-    await _importRepertoire(rep, 'Frutas y verduras (USDA)');
+    await _importRepertoire(rep, 'Frutas y verduras');
   });
 
   Future<void> _migrateLegacy(String path) => _run(() async {
@@ -294,7 +294,7 @@ class _DataViewState extends ConsumerState<DataView> {
               leading: const Icon(Icons.local_florist_outlined),
               title: const Text('Añadir frutas y verduras'),
               subtitle: const Text(
-                '222 frutas, verduras y hortalizas con la tabla de USDA',
+                '229 frutas, verduras y hortalizas (tablas CIQUAL y USDA)',
               ),
               onTap: _produce,
             ),

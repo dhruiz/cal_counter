@@ -180,7 +180,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
               icon: Icons.eco_outlined,
               title: 'Empezar con el catálogo base',
               subtitle:
-                  '678 alimentos genéricos y 222 frutas, verduras y '
+                  '678 alimentos genéricos y 229 frutas, verduras y '
                   'hortalizas, con su tabla nutricional.',
               onTap: _seed,
               destacada: legacy == null,

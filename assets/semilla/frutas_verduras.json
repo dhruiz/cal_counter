@@ -1,0 +1,5565 @@
+{
+ "formato": "cal_counter/repertorio",
+ "version": 1,
+ "exportado": "2026-11-24T00:00:00Z",
+ "alimentos": [
+  {
+   "uuid": "f04e51f6-c399-50ac-9d8a-6d57539c0c9b",
+   "nombre": "Manzana con piel, cruda / Apfel mit Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 54,
+    "proteinas": 0.25,
+    "grasas": 0.25,
+    "grasas_saturadas": 0.052,
+    "carbohidratos": 11.6,
+    "azucares": 10.6,
+    "fibra": 1.4,
+    "sal": 0.0037,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13039 «Pomme, chair et peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 171688, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 182
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 149
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 223
+    }
+   ]
+  },
+  {
+   "uuid": "3dede3e4-418f-58ea-bdfa-a10fccf1621f",
+   "nombre": "Manzana sin piel, cruda / Apfel ohne Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 51.3,
+    "proteinas": 0.26,
+    "grasas": 0.24,
+    "carbohidratos": 11.9,
+    "azucares": 11.4,
+    "fibra": 2.39,
+    "sal": 0.0064,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13396 «Pomme, chair sans peau, crue (aliment moyen)». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: grasas saturadas (< 0,01). Porciones: pesos de USDA SR Legacy (FDC ID 171689, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 161
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 132
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 216
+    }
+   ]
+  },
+  {
+   "uuid": "a3f9380e-8e4f-5fe6-a3a5-7710738fbd77",
+   "nombre": "Pera con piel, cruda / Birne mit Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 56.6,
+    "proteinas": 0.36,
+    "grasas": 0.27,
+    "grasas_saturadas": 0.067,
+    "carbohidratos": 12.3,
+    "azucares": 9.75,
+    "fibra": 2.9,
+    "sal": 0.0045,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13037 «Poire, chair et peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169118, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 178
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 148
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 230
+    }
+   ]
+  },
+  {
+   "uuid": "5a99623c-deb4-5fd0-baed-de4bccb21840",
+   "nombre": "Cambur (banano, banana), crudo / Banane, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 89,
+    "proteinas": 1.09,
+    "grasas": 0.33,
+    "grasas_saturadas": 0.112,
+    "carbohidratos": 22.84,
+    "azucares": 12.23,
+    "fibra": 2.6,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 173944 (NDB 9040) «Bananas, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13005) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana (18-20 cm)",
+     "gramos": 118
+    },
+    {
+     "nombre": "1 unidad pequeña (15-17 cm)",
+     "gramos": 101
+    },
+    {
+     "nombre": "1 unidad grande (20-23 cm)",
+     "gramos": 136
+    }
+   ]
+  },
+  {
+   "uuid": "7541f91a-6061-5cb9-97f5-731cfa7dc482",
+   "nombre": "Naranja, cruda / Orange (Apfelsine), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 47,
+    "proteinas": 0.94,
+    "grasas": 0.12,
+    "grasas_saturadas": 0.015,
+    "carbohidratos": 11.75,
+    "azucares": 9.35,
+    "fibra": 2.4,
+    "sal": 0,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169097 (NDB 9200) «Oranges, raw, all commercial varieties». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13034) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (6,7 cm de diámetro)",
+     "gramos": 131
+    },
+    {
+     "nombre": "1 unidad pequeña (6 cm de diámetro)",
+     "gramos": 96
+    },
+    {
+     "nombre": "1 unidad grande (7,8 cm de diámetro)",
+     "gramos": 184
+    }
+   ]
+  },
+  {
+   "uuid": "6bd4b7a2-2807-5ec2-b9cd-3dc1ad89deaf",
+   "nombre": "Jugo de naranja natural (recién exprimido) / Orangensaft, frisch gepresst",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 44.8,
+    "proteinas": 0.7,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.024,
+    "carbohidratos": 9.19,
+    "azucares": 8.4,
+    "fibra": 0.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 2013 «Jus d'orange, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,0028). Porciones: pesos de USDA SR Legacy (FDC ID 169098, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Jugo de 1 naranja",
+     "gramos": 86
+    },
+    {
+     "nombre": "1 taza",
+     "gramos": 248
+    }
+   ]
+  },
+  {
+   "uuid": "eddb6aa7-52fe-5aa3-8b9a-0dfac2a5222d",
+   "nombre": "Mandarina, cruda / Mandarine, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 53,
+    "proteinas": 0.81,
+    "grasas": 0.31,
+    "grasas_saturadas": 0.039,
+    "carbohidratos": 13.34,
+    "azucares": 10.58,
+    "fibra": 1.8,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169105 (NDB 9218) «Tangerines, (mandarin oranges), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13024) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 88
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 76
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 120
+    }
+   ]
+  },
+  {
+   "uuid": "5ea28015-c8ba-5067-a0a1-17b0e0b49ac2",
+   "nombre": "Clementina, cruda / Clementine, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 47,
+    "proteinas": 0.85,
+    "grasas": 0.15,
+    "carbohidratos": 12.02,
+    "azucares": 9.18,
+    "fibra": 1.7,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168195 (NDB 9433) «Clementines, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 74
+    }
+   ]
+  },
+  {
+   "uuid": "e3e1f39a-5b25-574b-a493-bcebb23215c6",
+   "nombre": "Toronja (pomelo), cruda / Grapefruit, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 0.63,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.014,
+    "carbohidratos": 8.08,
+    "azucares": 6.98,
+    "fibra": 1.1,
+    "sal": 0,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 173033 (NDB 9111) «Grapefruit, raw, pink and red and white, all areas». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13040) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "½ unidad mediana",
+     "gramos": 128
+    },
+    {
+     "nombre": "½ unidad pequeña",
+     "gramos": 100
+    },
+    {
+     "nombre": "½ unidad grande",
+     "gramos": 166
+    }
+   ]
+  },
+  {
+   "uuid": "28b5be3b-6da2-5147-85d0-91bb8e697e33",
+   "nombre": "Limón amarillo, sin cáscara, crudo / Zitrone, ohne Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 29,
+    "proteinas": 1.1,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.039,
+    "carbohidratos": 9.32,
+    "azucares": 2.5,
+    "fibra": 2.8,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167746 (NDB 9150) «Lemons, raw, without peel». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13009) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (5,4 cm de diámetro)",
+     "gramos": 58
+    },
+    {
+     "nombre": "1 unidad (6 cm de diámetro)",
+     "gramos": 84
+    }
+   ]
+  },
+  {
+   "uuid": "a1bf7b8b-7066-53e9-93e0-f4bceab0defd",
+   "nombre": "Jugo de limón amarillo, hecho en casa / Zitronensaft, selbst gepresst",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 28.6,
+    "proteinas": 0.35,
+    "grasas": 0.24,
+    "grasas_saturadas": 0.04,
+    "carbohidratos": 2.52,
+    "azucares": 2.52,
+    "fibra": 0.3,
+    "sal": 0.0065,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 2007 «Jus de citron, fait maison». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 167747, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Jugo de 1 limón",
+     "gramos": 48
+    }
+   ]
+  },
+  {
+   "uuid": "103f980f-7a81-5bba-9287-0ae6f950ccf2",
+   "nombre": "Lima ácida (limón verde), cruda / Limette, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 30,
+    "proteinas": 0.7,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.022,
+    "carbohidratos": 10.54,
+    "azucares": 1.69,
+    "fibra": 2.8,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168155 (NDB 9159) «Limes, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13067) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (5 cm de diámetro)",
+     "gramos": 67
+    }
+   ]
+  },
+  {
+   "uuid": "9fe41a36-57cd-5e58-b55b-be31f190a2fd",
+   "nombre": "Jugo de lima ácida (limón verde), natural / Limettensaft, frisch gepresst",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 9.87,
+    "proteinas": 0.42,
+    "grasas": 0.07,
+    "grasas_saturadas": 0.008,
+    "carbohidratos": 1.69,
+    "azucares": 1.69,
+    "fibra": 0.4,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 2030 «Jus de citron vert, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168156, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Jugo de 1 lima",
+     "gramos": 44
+    }
+   ]
+  },
+  {
+   "uuid": "fbde12a4-f2e6-5b6b-9109-90bb28dfd286",
+   "nombre": "Uvas, crudas (promedio) / Weintrauben, roh (Durchschnitt)",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 71,
+    "proteinas": 0.7,
+    "grasas": 0.25,
+    "grasas_saturadas": 0.025,
+    "carbohidratos": 16.3,
+    "azucares": 15.4,
+    "fibra": 1.11,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13395 «Raisin cru (aliment moyen)». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,0094). Porciones: pesos de USDA SR Legacy (FDC ID 174683, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "10 uvas",
+     "gramos": 49
+    }
+   ]
+  },
+  {
+   "uuid": "35360c67-b0a7-54e3-8046-f4b56be5b151",
+   "nombre": "Fresas (frutillas), crudas / Erdbeeren, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 0.67,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.015,
+    "carbohidratos": 7.68,
+    "azucares": 4.89,
+    "fibra": 2,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167762 (NDB 9316) «Strawberries, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13014) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 fresa mediana",
+     "gramos": 12
+    },
+    {
+     "nombre": "1 fresa grande",
+     "gramos": 18
+    }
+   ]
+  },
+  {
+   "uuid": "b134a9b7-5b2a-53d7-99fe-711063ab5ae6",
+   "nombre": "Arándanos, crudos / Heidelbeeren (Blaubeeren), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 57.7,
+    "proteinas": 0.87,
+    "grasas": 0.33,
+    "grasas_saturadas": 0.028,
+    "carbohidratos": 10.6,
+    "azucares": 9.96,
+    "fibra": 2.4,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13028 «Myrtille, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 171711, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "50 arándanos",
+     "gramos": 68
+    }
+   ]
+  },
+  {
+   "uuid": "ede8d0e1-946e-502c-bb68-3a54ccdcdbb1",
+   "nombre": "Frambuesas, crudas / Himbeeren, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 47.9,
+    "proteinas": 1.19,
+    "grasas": 0.8,
+    "grasas_saturadas": 0.13,
+    "carbohidratos": 5.83,
+    "azucares": 5.4,
+    "fibra": 4.3,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13015 «Framboise, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 167755, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "10 frambuesas",
+     "gramos": 19
+    }
+   ]
+  },
+  {
+   "uuid": "aec7f4d4-3621-52bf-840e-e33e68743d0e",
+   "nombre": "Moras (zarzamoras), crudas / Brombeeren, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 46,
+    "proteinas": 1.13,
+    "grasas": 0.7,
+    "grasas_saturadas": 0.07,
+    "carbohidratos": 6.53,
+    "azucares": 6.1,
+    "fibra": 5.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13029 «Mûre (de ronce), crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013)."
+  },
+  {
+   "uuid": "fe1d99d6-3447-5ea2-8cbc-96a3d4bbce0a",
+   "nombre": "Grosellas rojas, crudas / Rote Johannisbeeren, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 67.2,
+    "proteinas": 1.56,
+    "grasas": 0.7,
+    "grasas_saturadas": 0.21,
+    "carbohidratos": 7.06,
+    "azucares": 6.63,
+    "fibra": 4.6,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13019 «Groseille, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013)."
+  },
+  {
+   "uuid": "17ceeac4-9969-5021-b9c5-8c622082bc75",
+   "nombre": "Grosellas negras (casis), crudas / Schwarze Johannisbeeren, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 70.2,
+    "proteinas": 1.4,
+    "grasas": 0.41,
+    "grasas_saturadas": 0.034,
+    "carbohidratos": 9.68,
+    "azucares": 9.68,
+    "fibra": 7.13,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13007 «Cassis, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "75be391d-c09f-5ddb-9be5-e3887a5d1042",
+   "nombre": "Grosellas espinosas (uva espina), crudas / Stachelbeeren, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 39.4,
+    "proteinas": 0.88,
+    "grasas": 0.58,
+    "grasas_saturadas": 0.038,
+    "carbohidratos": 4.45,
+    "fibra": 4.3,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13020 «Groseille à maquereau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (sin dato)."
+  },
+  {
+   "uuid": "e79ac222-e6ee-5224-8cbe-0681ad7b6e83",
+   "nombre": "Cerezas dulces, crudas / Süßkirschen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 63,
+    "proteinas": 1.06,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.038,
+    "carbohidratos": 16.01,
+    "azucares": 12.82,
+    "fibra": 2.1,
+    "sal": 0,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 171719 (NDB 9070) «Cherries, sweet, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13008) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "1 cereza",
+     "gramos": 8.2
+    }
+   ]
+  },
+  {
+   "uuid": "ad4f150a-02ec-5296-a010-80acbc7528d3",
+   "nombre": "Guindas (cerezas ácidas), crudas / Sauerkirschen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 50,
+    "proteinas": 1,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.068,
+    "carbohidratos": 12.18,
+    "azucares": 8.49,
+    "fibra": 1.6,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 173954 (NDB 9063) «Cherries, sour, red, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 13110) no da cifra de kcal (sin dato)."
+  },
+  {
+   "uuid": "029820f3-f2b8-5ea6-9e46-59a01e936ac2",
+   "nombre": "Ciruelas, crudas / Pflaumen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 51.6,
+    "proteinas": 0.7,
+    "grasas": 0.28,
+    "grasas_saturadas": 0.017,
+    "carbohidratos": 9.92,
+    "azucares": 9.92,
+    "fibra": 1.4,
+    "sal": 0,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13100 «Prune, sans noyau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169949, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (5,4 cm de diámetro)",
+     "gramos": 66
+    }
+   ]
+  },
+  {
+   "uuid": "ee55e987-6ad9-504e-93b9-28e39963b24b",
+   "nombre": "Albaricoques (damascos), crudos / Aprikosen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 48,
+    "proteinas": 1.4,
+    "grasas": 0.39,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 11.12,
+    "azucares": 9.24,
+    "fibra": 2,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 171697 (NDB 9021) «Apricots, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13000) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 35
+    }
+   ]
+  },
+  {
+   "uuid": "9fab6cec-8573-528f-954a-2b3ba9684d29",
+   "nombre": "Durazno (melocotón) con piel, crudo / Pfirsich mit Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 37.9,
+    "proteinas": 0.91,
+    "grasas": 0.25,
+    "grasas_saturadas": 0.019,
+    "carbohidratos": 7.55,
+    "azucares": 6.83,
+    "fibra": 1.5,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13043 «Pêche, chair et peau, sans noyau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,0028). Porciones: pesos de USDA SR Legacy (FDC ID 169928, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 150
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 130
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 175
+    }
+   ]
+  },
+  {
+   "uuid": "19c53e40-f0f4-5d0f-b1eb-c13921813c30",
+   "nombre": "Nectarina, cruda / Nektarine, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 44,
+    "proteinas": 1.06,
+    "grasas": 0.32,
+    "grasas_saturadas": 0.025,
+    "carbohidratos": 10.55,
+    "azucares": 7.89,
+    "fibra": 1.7,
+    "sal": 0,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169914 (NDB 9191) «Nectarines, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13399) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 142
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 129
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 156
+    }
+   ]
+  },
+  {
+   "uuid": "2c783c99-c446-5d35-934b-726055e85bac",
+   "nombre": "Higos, crudos / Feigen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 74,
+    "proteinas": 0.75,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.06,
+    "carbohidratos": 19.18,
+    "azucares": 16.26,
+    "fibra": 2.9,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 173021 (NDB 9089) «Figs, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13012) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 50
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 40
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 64
+    }
+   ]
+  },
+  {
+   "uuid": "815b8591-ca9e-51f0-b915-a41968b1744a",
+   "nombre": "Granada, granos con semillas, cruda / Granatapfelkerne, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 81,
+    "proteinas": 1.44,
+    "grasas": 1.2,
+    "grasas_saturadas": 0.07,
+    "carbohidratos": 14.3,
+    "azucares": 13.3,
+    "fibra": 2.3,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13018 «Grenade, chair sans peau, avec pépins, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 169134, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (10 cm de diámetro)",
+     "gramos": 282
+    }
+   ]
+  },
+  {
+   "uuid": "71b8004d-ad4e-5f7c-aa2d-90fd0396825f",
+   "nombre": "Caqui (kaki, persimón), crudo / Kaki (Persimone), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 70,
+    "proteinas": 0.58,
+    "grasas": 0.19,
+    "grasas_saturadas": 0.02,
+    "carbohidratos": 18.59,
+    "azucares": 12.53,
+    "fibra": 3.6,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169941 (NDB 9263) «Persimmons, japanese, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13066) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (6,4 cm de diámetro)",
+     "gramos": 168
+    }
+   ]
+  },
+  {
+   "uuid": "35b415bf-ce9a-5426-92ef-22558f4fc676",
+   "nombre": "Membrillo, crudo / Quitte, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 59,
+    "proteinas": 0.4,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.01,
+    "carbohidratos": 12.5,
+    "azucares": 6.3,
+    "fibra": 1.9,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13010 «Coing, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168163, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 92
+    }
+   ]
+  },
+  {
+   "uuid": "9b2bfbe7-91e0-5daa-97c2-8784528dd3c0",
+   "nombre": "Kiwi, crudo / Kiwi, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 60.9,
+    "proteinas": 0.88,
+    "grasas": 0.6,
+    "grasas_saturadas": 0.13,
+    "carbohidratos": 11,
+    "azucares": 8.9,
+    "fibra": 2.4,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13021 «Kiwi, chair sans peau, avec pépins, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 168153, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (5 cm de diámetro)",
+     "gramos": 69
+    }
+   ]
+  },
+  {
+   "uuid": "937d6b80-1d17-5a38-8291-0802dd206c70",
+   "nombre": "Ruibarbo (tallo), crudo / Rhabarber (Stiel), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 18.1,
+    "proteinas": 0.73,
+    "grasas": 0.16,
+    "grasas_saturadas": 0.041,
+    "carbohidratos": 1.12,
+    "azucares": 1.1,
+    "fibra": 1.8,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13047 «Rhubarbe, tige, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 167758, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 tallo",
+     "gramos": 51
+    }
+   ]
+  },
+  {
+   "uuid": "6a05bf6e-6b07-5664-8e89-530ced28ce5a",
+   "nombre": "Patilla (sandía), cruda / Wassermelone, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 30,
+    "proteinas": 0.61,
+    "grasas": 0.15,
+    "grasas_saturadas": 0.016,
+    "carbohidratos": 7.55,
+    "azucares": 6.2,
+    "fibra": 0.4,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167765 (NDB 9326) «Watermelon, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13036) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 tajada (1/16 de patilla)",
+     "gramos": 286
+    }
+   ]
+  },
+  {
+   "uuid": "be66d61d-2f84-59c3-a47f-1e67f880bea7",
+   "nombre": "Melón cantalupo, crudo / Cantaloupe-Melone, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 34,
+    "proteinas": 0.84,
+    "grasas": 0.19,
+    "grasas_saturadas": 0.051,
+    "carbohidratos": 8.16,
+    "azucares": 7.86,
+    "fibra": 0.9,
+    "sal": 0.04,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169092 (NDB 9181) «Melons, cantaloupe, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13026) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 tajada (1/8 de melón mediano)",
+     "gramos": 69
+    }
+   ]
+  },
+  {
+   "uuid": "8f30a168-c300-549b-a755-abe52a139f85",
+   "nombre": "Melón verde (honeydew), crudo / Honigmelone, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22.2,
+    "proteinas": 0.54,
+    "grasas": 0.14,
+    "grasas_saturadas": 0.038,
+    "carbohidratos": 4.3,
+    "azucares": 4.25,
+    "fibra": 0.8,
+    "sal": 0.045,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13742 «Melon miel ou melon honeydew, chair sans peau, sans pépins, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169911, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 tajada (1/8 de melón de 13 cm)",
+     "gramos": 125
+    }
+   ]
+  },
+  {
+   "uuid": "5595c4ce-f0f3-572c-8543-c4895ed500e3",
+   "nombre": "Piña (ananá), cruda / Ananas, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 50,
+    "proteinas": 0.54,
+    "grasas": 0.12,
+    "grasas_saturadas": 0.009,
+    "carbohidratos": 13.12,
+    "azucares": 9.85,
+    "fibra": 1.4,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169124 (NDB 9266) «Pineapple, raw, all varieties». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13002) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 rodaja (9 cm de diámetro, 2 cm de grosor)",
+     "gramos": 84
+    }
+   ]
+  },
+  {
+   "uuid": "1ed08b58-a59d-5f71-be0c-97eb1b8e93b3",
+   "nombre": "Mango, crudo / Mango, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 60,
+    "proteinas": 0.82,
+    "grasas": 0.38,
+    "grasas_saturadas": 0.092,
+    "carbohidratos": 14.98,
+    "azucares": 13.66,
+    "fibra": 1.6,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169910 (NDB 9176) «Mangos, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13025) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 336
+    }
+   ]
+  },
+  {
+   "uuid": "5ced63d6-c741-5193-b921-9f501859a428",
+   "nombre": "Lechoza (papaya), cruda / Papaya, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 43,
+    "proteinas": 0.47,
+    "grasas": 0.26,
+    "grasas_saturadas": 0.081,
+    "carbohidratos": 10.82,
+    "azucares": 7.82,
+    "fibra": 1.7,
+    "sal": 0.02,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169926 (NDB 9226) «Papayas, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13035) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 157
+    }
+   ]
+  },
+  {
+   "uuid": "7ed4544c-ce60-59fd-8c51-d3dc0826c1e5",
+   "nombre": "Aguacate (palta), crudo, promedio de variedades comerciales / Avocado, roh, Durchschnitt der Handelssorten",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 160,
+    "proteinas": 2,
+    "grasas": 14.66,
+    "grasas_saturadas": 2.126,
+    "carbohidratos": 8.53,
+    "azucares": 0.66,
+    "fibra": 6.7,
+    "sal": 0.0175,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 171705 (NDB 9037) «Avocados, raw, all commercial varieties». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13004) no da cifra de carbohidratos (trazas).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 201
+    }
+   ]
+  },
+  {
+   "uuid": "48569a06-416b-53ee-9610-4f9874a2f3bc",
+   "nombre": "Aguacate de California (palta), crudo / Avocado aus Kalifornien, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 167,
+    "proteinas": 1.96,
+    "grasas": 15.41,
+    "grasas_saturadas": 2.126,
+    "carbohidratos": 8.64,
+    "azucares": 0.3,
+    "fibra": 6.8,
+    "sal": 0.02,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 171706 (NDB 9038) «Avocados, raw, California». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 136
+    }
+   ]
+  },
+  {
+   "uuid": "2c86a17e-22b9-5be7-9d12-a68f7377d764",
+   "nombre": "Aguacate de Florida (palta), crudo / Avocado aus Florida, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 120,
+    "proteinas": 2.23,
+    "grasas": 10.06,
+    "grasas_saturadas": 1.96,
+    "carbohidratos": 7.82,
+    "azucares": 2.42,
+    "fibra": 5.6,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 171707 (NDB 9039) «Avocados, raw, Florida». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 304
+    }
+   ]
+  },
+  {
+   "uuid": "8f3e0ed1-1fac-5cd5-a0d3-870697c76271",
+   "nombre": "Coco, pulpa fresca / Kokosnuss, Fruchtfleisch, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 369,
+    "proteinas": 4.09,
+    "grasas": 34.7,
+    "grasas_saturadas": 30.3,
+    "carbohidratos": 4.69,
+    "azucares": 4.69,
+    "fibra": 10.6,
+    "sal": 0.048,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 15006 «Noix de coco, chair, fraîche». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170169, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 trozo (5 × 5 × 1,3 cm)",
+     "gramos": 45
+    }
+   ]
+  },
+  {
+   "uuid": "45441127-93f3-5c7d-b253-7075334a1144",
+   "nombre": "Agua de coco / Kokoswasser",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 19,
+    "proteinas": 0.72,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.176,
+    "carbohidratos": 3.71,
+    "azucares": 2.61,
+    "fibra": 1.1,
+    "sal": 0.2625,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170174 (NDB 12119) «Nuts, coconut water (liquid from coconuts)». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 18011) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "Agua de 1 coco",
+     "gramos": 206
+    },
+    {
+     "nombre": "1 taza",
+     "gramos": 240
+    }
+   ]
+  },
+  {
+   "uuid": "b14b5fc6-9733-5c4a-a7cf-ac7f57530aa5",
+   "nombre": "Guayaba sin piel, cruda / Guave ohne Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 68.3,
+    "proteinas": 2.55,
+    "grasas": 0.95,
+    "grasas_saturadas": 0.27,
+    "carbohidratos": 9.02,
+    "azucares": 8.92,
+    "fibra": 5.4,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13083 «Goyave, chair sans peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 173044, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 55
+    }
+   ]
+  },
+  {
+   "uuid": "53a419bd-9752-593f-bd9a-5f932da6eca8",
+   "nombre": "Guanábana, cruda / Stachelannone (Guanábana), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 66,
+    "proteinas": 1,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.051,
+    "carbohidratos": 16.84,
+    "azucares": 13.54,
+    "fibra": 3.3,
+    "sal": 0.035,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167761 (NDB 9315) «Soursop, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (18 × 13 cm)",
+     "gramos": 625
+    }
+   ]
+  },
+  {
+   "uuid": "29a98c93-86a5-5625-ba95-c480b17714c1",
+   "nombre": "Chirimoya, cruda / Cherimoya, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 80,
+    "proteinas": 1.57,
+    "grasas": 0.68,
+    "grasas_saturadas": 0.23,
+    "carbohidratos": 15.4,
+    "azucares": 12.9,
+    "fibra": 3,
+    "sal": 0.018,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13056 «Anone ou chérimole, chair sans peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 173953, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 235
+    }
+   ]
+  },
+  {
+   "uuid": "0d574d59-1b37-583f-8957-c17faed4952a",
+   "nombre": "Anón (saramuyo), crudo / Zimtapfel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 94,
+    "proteinas": 2.06,
+    "grasas": 0.29,
+    "grasas_saturadas": 0.048,
+    "carbohidratos": 23.64,
+    "fibra": 4.4,
+    "sal": 0.0225,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168175 (NDB 9321) «Sugar-apples, (sweetsop), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13435) no da cifra de kcal (sin dato), carbohidratos (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (7,3 cm de diámetro)",
+     "gramos": 155
+    }
+   ]
+  },
+  {
+   "uuid": "339bb0fe-f533-50aa-82ba-de4c1c8f7fa0",
+   "nombre": "Maracuyá (parchita), pulpa con semillas, cruda / Passionsfrucht (Maracuja), Fruchtfleisch mit Kernen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 102,
+    "proteinas": 2.13,
+    "grasas": 3,
+    "grasas_saturadas": 0.54,
+    "carbohidratos": 10.9,
+    "azucares": 8.5,
+    "fibra": 6.8,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13016 «Fruit de la passion ou maracudja, chair sans peau, avec pépins, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 169108, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 18
+    }
+   ]
+  },
+  {
+   "uuid": "94f2ef8b-024e-5f2d-97d0-cd5d731a051b",
+   "nombre": "Jugo de maracuyá (parchita), natural / Maracujasaft, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 61.7,
+    "proteinas": 0.67,
+    "grasas": 0.18,
+    "grasas_saturadas": 0.015,
+    "carbohidratos": 14.3,
+    "azucares": 14.3,
+    "fibra": 0.2,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 2024 «Jus de fruit de la passion ou maracudja, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169110, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 taza",
+     "gramos": 247
+    }
+   ]
+  },
+  {
+   "uuid": "8cea7966-d225-5211-ae1b-d94854916ad7",
+   "nombre": "Mamey, crudo / Mammiapfel (Mamey), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 51,
+    "proteinas": 0.5,
+    "grasas": 0.5,
+    "grasas_saturadas": 0.136,
+    "carbohidratos": 12.5,
+    "fibra": 3,
+    "sal": 0.0375,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169909 (NDB 9175) «Mammy-apple, (mamey), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13401) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 846
+    }
+   ]
+  },
+  {
+   "uuid": "7089a557-46d9-500c-a030-965ac9196313",
+   "nombre": "Zapote (mamey colorado), crudo / Mamey-Sapote, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 124,
+    "proteinas": 1.45,
+    "grasas": 0.46,
+    "grasas_saturadas": 0.169,
+    "carbohidratos": 32.1,
+    "azucares": 20.14,
+    "fibra": 5.4,
+    "sal": 0.0175,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167760 (NDB 9314) «Sapote, mamey, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 558
+    }
+   ]
+  },
+  {
+   "uuid": "c214d765-8ca7-5a79-b41e-8e0ee2f0798b",
+   "nombre": "Níspero (sapodilla, zapote chico), crudo / Sapotille (Breiapfel), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 83,
+    "proteinas": 0.44,
+    "grasas": 1.1,
+    "grasas_saturadas": 0.194,
+    "carbohidratos": 19.96,
+    "fibra": 5.3,
+    "sal": 0.03,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167759 (NDB 9313) «Sapodilla, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 170
+    }
+   ]
+  },
+  {
+   "uuid": "2cd56b7d-5745-5727-ac6e-c1f3ae5b9eac",
+   "nombre": "Níspero del Japón (níspero de España), crudo / Japanische Wollmispel (Loquat), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 48.1,
+    "proteinas": 0.43,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.04,
+    "carbohidratos": 9.9,
+    "azucares": 6.1,
+    "fibra": 1.7,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13564 «Nèfle du Japon, chair et peau, sans noyau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169908, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 16
+    }
+   ]
+  },
+  {
+   "uuid": "803b8f26-4d04-558a-9313-99e682d21be1",
+   "nombre": "Tamarindo, crudo / Tamarinde, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 239,
+    "proteinas": 2.8,
+    "grasas": 0.6,
+    "grasas_saturadas": 0.272,
+    "carbohidratos": 62.5,
+    "azucares": 38.8,
+    "fibra": 5.1,
+    "sal": 0.07,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167763 (NDB 9322) «Tamarinds, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13080) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 vaina (7,6 × 2,5 cm)",
+     "gramos": 2
+    }
+   ]
+  },
+  {
+   "uuid": "4a120d24-24df-53d4-88e3-fd73ecff6150",
+   "nombre": "Uchuva (aguaymanto, physalis), cruda / Physalis (Kapstachelbeere), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 53,
+    "proteinas": 1.9,
+    "grasas": 0.7,
+    "carbohidratos": 11.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 173043 (NDB 9138) «Groundcherries, (cape-gooseberries or poha), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sin dato en la fuente: grasas saturadas, azúcares, fibra, sodio (sal)."
+  },
+  {
+   "uuid": "f626af5f-8f09-58ed-a07a-54f1a3451858",
+   "nombre": "Lulo (naranjilla), pulpa congelada sin azúcar / Lulo (Naranjilla), Fruchtmark, tiefgekühlt, ungesüßt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 0.44,
+    "grasas": 0.22,
+    "carbohidratos": 5.9,
+    "azucares": 3.74,
+    "fibra": 1.1,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167790 (NDB 9450) «Naranjilla (lulo) pulp, frozen, unsweetened». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas."
+  },
+  {
+   "uuid": "d6fbc271-8fbc-5db7-9e3e-e495c4ef6dc3",
+   "nombre": "Carambola (fruta estrella), cruda / Karambole (Sternfrucht), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 28.4,
+    "proteinas": 1.04,
+    "grasas": 0.33,
+    "grasas_saturadas": 0.019,
+    "carbohidratos": 3.83,
+    "azucares": 3.83,
+    "fibra": 2.8,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13054 «Carambole, chair et peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 171715, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana (9 cm de largo)",
+     "gramos": 91
+    },
+    {
+     "nombre": "1 unidad pequeña (8 cm de largo)",
+     "gramos": 70
+    },
+    {
+     "nombre": "1 unidad grande (11,4 cm de largo)",
+     "gramos": 124
+    }
+   ]
+  },
+  {
+   "uuid": "d033c0b7-fc33-5440-acb3-8c5bc6e71db0",
+   "nombre": "Semeruco (acerola), crudo / Acerola, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 0.4,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.068,
+    "carbohidratos": 7.69,
+    "fibra": 1.1,
+    "sal": 0.0175,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 171686 (NDB 9001) «Acerola, (west indian cherry), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13055) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 4.8
+    }
+   ]
+  },
+  {
+   "uuid": "1558eb46-ba53-5a2f-9ad3-21a360012501",
+   "nombre": "Pomarrosa, cruda / Rosenapfel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 25,
+    "proteinas": 0.6,
+    "grasas": 0.3,
+    "carbohidratos": 5.7,
+    "sal": 0,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168171 (NDB 9312) «Rose-apples, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas, azúcares, fibra."
+  },
+  {
+   "uuid": "bf25b210-406c-54e8-af8e-b00a15b211c0",
+   "nombre": "Feijoa, cruda / Feijoa (Ananasguave), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 61,
+    "proteinas": 0.71,
+    "grasas": 0.42,
+    "grasas_saturadas": 0.104,
+    "carbohidratos": 15.21,
+    "azucares": 8.2,
+    "fibra": 6.4,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168176 (NDB 9334) «Feijoa, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13061) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 42
+    }
+   ]
+  },
+  {
+   "uuid": "298bcfe4-f56d-5098-9f1a-4b7ccac80f3e",
+   "nombre": "Nance (chaparro manteco), congelado sin azúcar / Nance, tiefgekühlt, ungesüßt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 73,
+    "proteinas": 0.66,
+    "grasas": 1.16,
+    "carbohidratos": 16.97,
+    "azucares": 8.31,
+    "fibra": 7.5,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 167789 (NDB 9449) «Nance, frozen, unsweetened». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "3 unidades",
+     "gramos": 9.8
+    }
+   ]
+  },
+  {
+   "uuid": "7a321cce-93ac-59ea-bab4-5631ff275f0c",
+   "nombre": "Tuna (higo chumbo), cruda / Kaktusfeige, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 51.5,
+    "proteinas": 0.12,
+    "grasas": 0.11,
+    "grasas_saturadas": 0.01,
+    "carbohidratos": 9.79,
+    "azucares": 1.02,
+    "fibra": 5.3,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13063 «Figue de Barbarie, chair et peau, avec pépins, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 167750, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 103
+    }
+   ]
+  },
+  {
+   "uuid": "77ea6730-91af-5ba7-8dea-d1b2298763cf",
+   "nombre": "Plátano macho (plátano para cocinar), crudo / Kochbanane, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 132,
+    "proteinas": 1.3,
+    "grasas": 0.37,
+    "grasas_saturadas": 0.14,
+    "carbohidratos": 29.6,
+    "fibra": 2.3,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 53100 «Banane plantain, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (sin dato). Porciones: pesos de USDA SR Legacy (FDC ID 169130, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 270
+    }
+   ]
+  },
+  {
+   "uuid": "02e95236-6c24-5e3e-9885-950dd7edad9e",
+   "nombre": "Plátano macho, cocido / Kochbanane, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 125,
+    "proteinas": 0.79,
+    "grasas": 0.18,
+    "grasas_saturadas": 0.069,
+    "carbohidratos": 28.9,
+    "azucares": 14,
+    "fibra": 2.3,
+    "sal": 0.013,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 53101 «Banane plantain, cuite». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "7d46b687-1af1-575d-9a57-1e26b555c92e",
+   "nombre": "Tostones o patacones (plátano verde frito) / Frittierte grüne Kochbanane (Tostones)",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 309,
+    "proteinas": 1.5,
+    "grasas": 11.81,
+    "grasas_saturadas": 3.69,
+    "carbohidratos": 49.17,
+    "azucares": 3.63,
+    "fibra": 3.5,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168199 (NDB 9446) «Plantains, green, fried». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "10 rodajas (6 mm de grosor)",
+     "gramos": 53
+    }
+   ]
+  },
+  {
+   "uuid": "fcca887c-edcc-50c0-bc99-a0526475fdec",
+   "nombre": "Plátano maduro frito (tajadas), de restaurante latino / Frittierte reife Kochbanane (Latino-Restaurant)",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 236,
+    "proteinas": 1.42,
+    "grasas": 7.51,
+    "grasas_saturadas": 1.816,
+    "carbohidratos": 40.77,
+    "azucares": 21.76,
+    "fibra": 3.2,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168200 (NDB 9447) «Plantains, yellow, fried, Latino restaurant». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "5bdc55d9-8444-588a-8f2e-93ca9a5195d2",
+   "nombre": "Uvas pasas / Rosinen",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 322,
+    "proteinas": 3,
+    "grasas": 0.9,
+    "grasas_saturadas": 0.31,
+    "carbohidratos": 73.2,
+    "azucares": 70.3,
+    "fibra": 4.2,
+    "sal": 0.013,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13046 «Raisin sec». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168165, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "50 pasas",
+     "gramos": 26
+    }
+   ]
+  },
+  {
+   "uuid": "502c188f-ac64-5f29-9c82-c16be01ed7c9",
+   "nombre": "Ciruelas pasas (secas) / Trockenpflaumen",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 229,
+    "proteinas": 1.63,
+    "grasas": 0.4,
+    "grasas_saturadas": 0.16,
+    "carbohidratos": 55.4,
+    "azucares": 38.1,
+    "fibra": 5.1,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13042 «Pruneau, sans noyau, sec». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 168162, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 9.5
+    }
+   ]
+  },
+  {
+   "uuid": "f8e8c426-669d-5ee7-8e94-609d7b7bbf7c",
+   "nombre": "Orejones de albaricoque (secos) / Getrocknete Aprikosen",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 239,
+    "proteinas": 2.88,
+    "grasas": 0.5,
+    "grasas_saturadas": 0.19,
+    "carbohidratos": 59.1,
+    "azucares": 34.3,
+    "fibra": 8.3,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13001 «Abricot, dénoyauté, sec». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 173941, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 mitad",
+     "gramos": 3.5
+    }
+   ]
+  },
+  {
+   "uuid": "3782ba66-1467-5d82-8bdc-91505eac7d69",
+   "nombre": "Higos secos / Getrocknete Feigen",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 261,
+    "proteinas": 2.9,
+    "grasas": 1.22,
+    "grasas_saturadas": 0.57,
+    "carbohidratos": 55,
+    "azucares": 48.4,
+    "fibra": 8.15,
+    "sal": 0.22,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13013 «Figue, sèche». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 174665, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 8.4
+    }
+   ]
+  },
+  {
+   "uuid": "08c07479-099f-543a-a889-8d9ac1a8e71a",
+   "nombre": "Dátiles secos, sin hueso / Datteln, getrocknet, entsteint",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 287,
+    "proteinas": 1.81,
+    "grasas": 0.25,
+    "grasas_saturadas": 0.075,
+    "carbohidratos": 64.7,
+    "azucares": 64.7,
+    "fibra": 7.3,
+    "sal": 0.098,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13011 «Datte, chair et peau, sans noyau, sèche». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "c1641633-c823-53ba-a549-d7651fd43934",
+   "nombre": "Dátiles Medjool / Datteln, Medjool",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 277,
+    "proteinas": 1.81,
+    "grasas": 0.15,
+    "carbohidratos": 74.97,
+    "azucares": 66.47,
+    "fibra": 6.7,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168191 (NDB 9421) «Dates, medjool». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 dátil",
+     "gramos": 24
+    }
+   ]
+  },
+  {
+   "uuid": "fea06079-8492-583e-afbe-4aaefb320d89",
+   "nombre": "Arándanos rojos deshidratados, endulzados / Cranberries, getrocknet, gesüßt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 332,
+    "proteinas": 0.25,
+    "grasas": 1,
+    "grasas_saturadas": 0.2,
+    "carbohidratos": 76.4,
+    "azucares": 72.8,
+    "fibra": 5.7,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13178 «Canneberge ou cranberry, séchée, sucrée». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013)."
+  },
+  {
+   "uuid": "97d2dee8-bb6c-535f-84c4-9c2a0c999b01",
+   "nombre": "Mango deshidratado, endulzado / Mango, getrocknet, gesüßt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 319,
+    "proteinas": 2.45,
+    "grasas": 1.18,
+    "grasas_saturadas": 0.287,
+    "carbohidratos": 78.58,
+    "azucares": 66.27,
+    "fibra": 2.4,
+    "sal": 0.405,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169091 (NDB 9178) «Mango, dried, sweetened». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "8de4e3a4-293f-56ce-8528-8a3546f31b53",
+   "nombre": "Aceitunas negras maduras, en lata / Schwarze Oliven, reif, aus der Dose",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 116,
+    "proteinas": 0.84,
+    "grasas": 10.9,
+    "grasas_saturadas": 2.279,
+    "carbohidratos": 6.04,
+    "azucares": 0,
+    "fibra": 1.6,
+    "sal": 1.8375,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169094 (NDB 9193) «Olives, ripe, canned (small-extra large)». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 13032) no da cifra de carbohidratos (< 0,1).",
+   "porciones": [
+    {
+     "nombre": "1 aceituna grande",
+     "gramos": 4.4
+    },
+    {
+     "nombre": "1 aceituna pequeña",
+     "gramos": 3.2
+    }
+   ]
+  },
+  {
+   "uuid": "073b337c-5c8a-5436-a3c8-7e139b3b85af",
+   "nombre": "Aceitunas verdes en salmuera, escurridas / Grüne Oliven in Salzlake, abgetropft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 164,
+    "proteinas": 1.13,
+    "grasas": 16.6,
+    "grasas_saturadas": 2.25,
+    "carbohidratos": 0.61,
+    "fibra": 3.6,
+    "sal": 2.94,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13033 «Olive verte, en saumure, égouttée». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (trazas). Porciones: pesos de USDA SR Legacy (FDC ID 169096, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 aceituna",
+     "gramos": 2.7
+    }
+   ]
+  },
+  {
+   "uuid": "f5a384fc-b926-569f-8825-2c4b3f15a6e7",
+   "nombre": "Alcaparras, en conserva / Kapern, eingelegt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 23,
+    "proteinas": 2.36,
+    "grasas": 0.86,
+    "grasas_saturadas": 0.233,
+    "carbohidratos": 4.89,
+    "azucares": 0.41,
+    "fibra": 3.2,
+    "sal": 5.87,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 172238 (NDB 2054) «Capers, canned». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 11040) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 cucharada (escurridas)",
+     "gramos": 8.6
+    }
+   ]
+  },
+  {
+   "uuid": "841d9e3f-ee6b-50ea-a0d8-3a7fefb09cf6",
+   "nombre": "Tomate rojo maduro, crudo / Tomate, rot, reif, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 18,
+    "proteinas": 0.88,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.028,
+    "carbohidratos": 3.89,
+    "azucares": 2.63,
+    "fibra": 1.2,
+    "sal": 0.0125,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170457 (NDB 11529) «Tomatoes, red, ripe, raw, year round average». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20385) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana (6,6 cm de diámetro)",
+     "gramos": 123
+    },
+    {
+     "nombre": "1 unidad pequeña (6,1 cm de diámetro)",
+     "gramos": 91
+    },
+    {
+     "nombre": "1 unidad grande (7,6 cm de diámetro)",
+     "gramos": 182
+    },
+    {
+     "nombre": "1 tomate cherry",
+     "gramos": 17
+    },
+    {
+     "nombre": "1 tomate perita",
+     "gramos": 62
+    }
+   ]
+  },
+  {
+   "uuid": "a923c2f8-3c76-529f-8d2e-a4823ff1cc42",
+   "nombre": "Tomate pelado en lata, en su jugo / Geschälte Tomaten aus der Dose, im eigenen Saft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 21.8,
+    "proteinas": 0.79,
+    "grasas": 0.25,
+    "grasas_saturadas": 0.034,
+    "carbohidratos": 3.15,
+    "azucares": 2.55,
+    "fibra": 1.9,
+    "sal": 0.025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20137 «Tomate, pelée, appertisée, au jus, non égouttée». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "c7948182-3982-53fc-a752-1e8d97015969",
+   "nombre": "Tomate triturado, en lata / Tomaten, zerkleinert, aus der Dose",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 1.64,
+    "grasas": 0.28,
+    "grasas_saturadas": 0.04,
+    "carbohidratos": 7.29,
+    "azucares": 4.4,
+    "fibra": 1.9,
+    "sal": 0.465,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170501 (NDB 11693) «Tomatoes, crushed, canned». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20169) no da cifra de grasas (< 0,5)."
+  },
+  {
+   "uuid": "303d66a6-b836-531f-8cb6-a8e99b53e208",
+   "nombre": "Concentrado de tomate (pasta de tomate), en lata / Tomatenmark",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 99.2,
+    "proteinas": 4.4,
+    "grasas": 0.53,
+    "grasas_saturadas": 0.1,
+    "carbohidratos": 17.1,
+    "azucares": 13.3,
+    "fibra": 4.2,
+    "sal": 0.27,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20068 «Tomate, concentré, appertisé». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170459, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 cucharada",
+     "gramos": 16
+    }
+   ]
+  },
+  {
+   "uuid": "9b96d29d-5e4b-54e8-838f-7edfb041d4f0",
+   "nombre": "Puré de tomate, en lata / Tomatenpüree aus der Dose",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 47.6,
+    "proteinas": 1.5,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.052,
+    "carbohidratos": 8.42,
+    "azucares": 3.3,
+    "fibra": 1.6,
+    "sal": 0.42,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20170 «Tomate, purée, appertisée». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "16213b59-79da-5ee0-865a-a6313557097b",
+   "nombre": "Tomates secos (deshidratados) / Getrocknete Tomaten",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 258,
+    "proteinas": 14.11,
+    "grasas": 2.97,
+    "grasas_saturadas": 0.426,
+    "carbohidratos": 55.76,
+    "azucares": 37.59,
+    "fibra": 12.3,
+    "sal": 0.2675,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168567 (NDB 11955) «Tomatoes, sun-dried». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20189) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 pieza",
+     "gramos": 2
+    }
+   ]
+  },
+  {
+   "uuid": "a8c1b25e-c77e-5f4c-a2b6-100efe3bfe6c",
+   "nombre": "Tomates secos en aceite, escurridos / Getrocknete Tomaten in Öl, abgetropft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 213,
+    "proteinas": 5.06,
+    "grasas": 14.08,
+    "grasas_saturadas": 1.893,
+    "carbohidratos": 23.33,
+    "fibra": 5.8,
+    "sal": 0.665,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169384 (NDB 11956) «Tomatoes, sun-dried, packed in oil, drained». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20256) no da cifra de kcal (sin dato).",
+   "porciones": [
+    {
+     "nombre": "1 pieza",
+     "gramos": 3
+    }
+   ]
+  },
+  {
+   "uuid": "cecd5c5f-001a-5189-974a-96345f3e9439",
+   "nombre": "Cebolla, cruda / Zwiebel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 39,
+    "proteinas": 1.1,
+    "grasas": 0.62,
+    "grasas_saturadas": 0.2,
+    "carbohidratos": 6.25,
+    "azucares": 4.8,
+    "fibra": 1.7,
+    "sal": 0.098,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20034 «Oignon, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170000, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana (6,4 cm de diámetro)",
+     "gramos": 110
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 70
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 150
+    },
+    {
+     "nombre": "1 cucharada picada",
+     "gramos": 10
+    }
+   ]
+  },
+  {
+   "uuid": "40da3117-203a-5fb9-86a0-7a0f26204645",
+   "nombre": "Cebolla, cocida / Zwiebel, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 34.6,
+    "proteinas": 1.3,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.024,
+    "carbohidratos": 6.2,
+    "azucares": 4,
+    "fibra": 1.4,
+    "sal": 0.021,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20035 «Oignon, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "ca5def02-e292-5834-b7b9-15991ddaee34",
+   "nombre": "Chalota, cruda / Schalotte, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 72,
+    "proteinas": 2.5,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.017,
+    "carbohidratos": 16.8,
+    "azucares": 7.87,
+    "fibra": 3.2,
+    "sal": 0.03,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170499 (NDB 11677) «Shallots, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20097) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 cucharada picada",
+     "gramos": 10
+    }
+   ]
+  },
+  {
+   "uuid": "a2b98e6e-b43e-59ed-8f24-18620c0f32f5",
+   "nombre": "Cebollín (cebolla larga, cebolleta), crudo / Frühlingszwiebel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 32,
+    "proteinas": 1.83,
+    "grasas": 0.19,
+    "grasas_saturadas": 0.032,
+    "carbohidratos": 7.34,
+    "azucares": 2.33,
+    "fibra": 2.6,
+    "sal": 0.04,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170005 (NDB 11291) «Onions, spring or scallions (includes tops and bulb), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 tallo mediano (10,5 cm)",
+     "gramos": 15
+    },
+    {
+     "nombre": "1 cucharada picada",
+     "gramos": 6
+    }
+   ]
+  },
+  {
+   "uuid": "9ad2547a-d281-53f4-9193-3db4f4b3e740",
+   "nombre": "Cebollino (ciboulette), crudo / Schnittlauch, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 30,
+    "proteinas": 3.27,
+    "grasas": 0.73,
+    "grasas_saturadas": 0.146,
+    "carbohidratos": 4.35,
+    "azucares": 1.85,
+    "fibra": 2.5,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169994 (NDB 11156) «Chives, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 cucharada picada",
+     "gramos": 3
+    }
+   ]
+  },
+  {
+   "uuid": "2d45173b-9748-56d7-996b-7e979e0d34b0",
+   "nombre": "Ajoporro (puerro), crudo / Lauch (Porree), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 30.4,
+    "proteinas": 1.5,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.04,
+    "carbohidratos": 4.55,
+    "azucares": 3.9,
+    "fibra": 1.8,
+    "sal": 0.05,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20039 «Poireau, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169246, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 89
+    }
+   ]
+  },
+  {
+   "uuid": "ea9c457d-dca2-5e72-a3c2-e555b7ed5dcb",
+   "nombre": "Ajoporro (puerro), cocido (hervido, sin sal) / Lauch (Porree), gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 0.81,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 7.62,
+    "azucares": 2.11,
+    "fibra": 1,
+    "sal": 0.025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168426 (NDB 11247) «Leeks, (bulb and lower leaf-portion), cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20327) no da cifra de grasas (< 0,3)."
+  },
+  {
+   "uuid": "a8851376-b822-540f-93ba-b58f12765136",
+   "nombre": "Ajo, crudo / Knoblauch, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 149,
+    "proteinas": 6.36,
+    "grasas": 0.5,
+    "grasas_saturadas": 0.089,
+    "carbohidratos": 33.06,
+    "azucares": 1,
+    "fibra": 2.1,
+    "sal": 0.0425,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169230 (NDB 11215) «Garlic, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 11000) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 diente",
+     "gramos": 3
+    }
+   ]
+  },
+  {
+   "uuid": "9fda34d8-740f-537a-9c3c-e5177d6a0677",
+   "nombre": "Jengibre, raíz fresca / Ingwer, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 33.3,
+    "proteinas": 1.1,
+    "grasas": 1.1,
+    "grasas_saturadas": 0.09,
+    "carbohidratos": 3.4,
+    "azucares": 1,
+    "fibra": 2.7,
+    "sal": 0.016,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11074 «Gingembre, racine fraîche». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169231, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 cucharadita",
+     "gramos": 2
+    }
+   ]
+  },
+  {
+   "uuid": "bc4c4424-90be-5b08-88c8-48038c75c631",
+   "nombre": "Pepino con piel, crudo / Gurke mit Schale, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 16.8,
+    "proteinas": 0.65,
+    "grasas": 0.11,
+    "grasas_saturadas": 0.037,
+    "carbohidratos": 2.87,
+    "azucares": 1.67,
+    "fibra": 0.5,
+    "sal": 0.012,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20019 «Concombre, chair et peau, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168409, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (21 cm)",
+     "gramos": 301
+    }
+   ]
+  },
+  {
+   "uuid": "6283f3fc-4c0f-5472-b7d2-53174b112809",
+   "nombre": "Pepino pelado, crudo / Gurke, geschält, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 10,
+    "proteinas": 0.59,
+    "grasas": 0.16,
+    "grasas_saturadas": 0.078,
+    "carbohidratos": 2.16,
+    "azucares": 1.38,
+    "fibra": 0.7,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169225 (NDB 11206) «Cucumber, peeled, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20210) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 201
+    }
+   ]
+  },
+  {
+   "uuid": "68977d3f-c1c3-5df3-97c5-edf89fe47d01",
+   "nombre": "Pepinillos encurtidos al eneldo / Dillgurken, eingelegt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 12,
+    "proteinas": 0.5,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.079,
+    "carbohidratos": 2.41,
+    "azucares": 1.07,
+    "fibra": 1,
+    "sal": 2.0225,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168558 (NDB 11937) «Pickles, cucumber, dill or kosher dill». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad grande (10 cm)",
+     "gramos": 135
+    }
+   ]
+  },
+  {
+   "uuid": "daaff626-4a21-5576-bb80-6bace1910e5c",
+   "nombre": "Calabacín (zucchini), crudo / Zucchini, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 16.7,
+    "proteinas": 1.21,
+    "grasas": 0.32,
+    "grasas_saturadas": 0.084,
+    "carbohidratos": 1.75,
+    "azucares": 1.74,
+    "fibra": 1,
+    "sal": 0.02,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20020 «Courgette, chair et peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169291, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 196
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 118
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 323
+    }
+   ]
+  },
+  {
+   "uuid": "9aa2bd5d-5449-533e-81c0-5d79fff46595",
+   "nombre": "Calabacín (zucchini), cocido / Zucchini, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 15.5,
+    "proteinas": 0.93,
+    "grasas": 0.36,
+    "grasas_saturadas": 0.1,
+    "carbohidratos": 1.4,
+    "fibra": 1.5,
+    "sal": 0.098,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20021 «Courgette, chair et peau, cuite». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (trazas)."
+  },
+  {
+   "uuid": "7f124e84-7abd-59a3-adce-569d0c0f957b",
+   "nombre": "Berenjena, cruda / Aubergine, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22.9,
+    "proteinas": 0.98,
+    "grasas": 0.18,
+    "grasas_saturadas": 0.034,
+    "carbohidratos": 2.7,
+    "azucares": 2.7,
+    "fibra": 3,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20053 «Aubergine, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169228, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad con piel",
+     "gramos": 548
+    }
+   ]
+  },
+  {
+   "uuid": "f113b9eb-4b2b-5edb-8690-598a3c7697e2",
+   "nombre": "Berenjena, cocida / Aubergine, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 27.1,
+    "proteinas": 0.83,
+    "grasas": 0.23,
+    "grasas_saturadas": 0.044,
+    "carbohidratos": 4.17,
+    "azucares": 3.2,
+    "fibra": 2.5,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20002 «Aubergine, cuite». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "7bc895ad-50e3-5df7-9738-a273e53fc61a",
+   "nombre": "Pimentón verde (pimiento verde), crudo / Grüne Paprika, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 20,
+    "proteinas": 0.86,
+    "grasas": 0.17,
+    "grasas_saturadas": 0.058,
+    "carbohidratos": 4.64,
+    "azucares": 2.4,
+    "fibra": 1.7,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170427 (NDB 11333) «Peppers, sweet, green, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20085) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 119
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 74
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 164
+    }
+   ]
+  },
+  {
+   "uuid": "3d40a59b-618b-51af-bcf5-1b52cffde8bd",
+   "nombre": "Pimentón rojo (pimiento rojo), crudo / Rote Paprika, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 26,
+    "proteinas": 0.99,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.059,
+    "carbohidratos": 6.03,
+    "azucares": 4.2,
+    "fibra": 2.1,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170108 (NDB 11821) «Peppers, sweet, red, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20087) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 119
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 74
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 164
+    }
+   ]
+  },
+  {
+   "uuid": "51456cc5-cd3e-58f5-81c8-5cb5fd4c62d7",
+   "nombre": "Pimentón amarillo (pimiento amarillo), crudo / Gelbe Paprika, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 29.4,
+    "proteinas": 0.94,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.11,
+    "carbohidratos": 4.73,
+    "azucares": 4.3,
+    "fibra": 1.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20168 «Poivron jaune, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 169383, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 186
+    }
+   ]
+  },
+  {
+   "uuid": "24993455-3fa0-5371-b509-a343474c9ee8",
+   "nombre": "Ají picante verde (chile verde), crudo / Grüne Chili, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 40,
+    "proteinas": 2,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.021,
+    "carbohidratos": 9.46,
+    "azucares": 5.1,
+    "fibra": 1.5,
+    "sal": 0.0175,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170497 (NDB 11670) «Peppers, hot chili, green, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 45
+    }
+   ]
+  },
+  {
+   "uuid": "3be052be-0291-58cc-91c3-bab81270262a",
+   "nombre": "Ají picante rojo (chile rojo), crudo / Rote Chili, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 40,
+    "proteinas": 1.87,
+    "grasas": 0.44,
+    "grasas_saturadas": 0.042,
+    "carbohidratos": 8.81,
+    "azucares": 5.3,
+    "fibra": 1.5,
+    "sal": 0.0225,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170106 (NDB 11819) «Peppers, hot chili, red, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 45
+    }
+   ]
+  },
+  {
+   "uuid": "e98dd6a1-b10f-50f5-841a-99669c6ffb6a",
+   "nombre": "Jalapeño, crudo / Jalapeño, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 29,
+    "proteinas": 0.91,
+    "grasas": 0.37,
+    "grasas_saturadas": 0.092,
+    "carbohidratos": 6.5,
+    "azucares": 4.12,
+    "fibra": 2.8,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168576 (NDB 11979) «Peppers, jalapeno, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 14
+    }
+   ]
+  },
+  {
+   "uuid": "d45eac2d-d521-5e20-bb4c-0d9a2d94b7eb",
+   "nombre": "Quimbombó (okra), crudo / Okra, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 1.93,
+    "grasas": 0.19,
+    "grasas_saturadas": 0.026,
+    "carbohidratos": 3.8,
+    "azucares": 1.48,
+    "fibra": 3.2,
+    "sal": 0.018,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 58100 «Gombo, fruit, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169260, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "8 vainas (7,6 cm)",
+     "gramos": 95
+    }
+   ]
+  },
+  {
+   "uuid": "2e669090-8951-5208-903d-fc8c26e08309",
+   "nombre": "Quimbombó (okra), cocido / Okra, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22.4,
+    "proteinas": 1.87,
+    "grasas": 0.21,
+    "grasas_saturadas": 0.045,
+    "carbohidratos": 2.01,
+    "azucares": 2.01,
+    "fibra": 2.5,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 58103 «Gombo, fruit, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169261, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "8 vainas (7,6 cm)",
+     "gramos": 85
+    }
+   ]
+  },
+  {
+   "uuid": "d5580eb6-f79a-5e5a-9cea-5170e12daabb",
+   "nombre": "Auyama (calabaza moscada), cruda / Moschuskürbis, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 23.5,
+    "proteinas": 0.55,
+    "grasas": 0.1,
+    "carbohidratos": 4.6,
+    "fibra": 1,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20128 «Courge musquée, chair sans peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: grasas saturadas (sin dato), azúcares (sin dato), sal (sin dato)."
+  },
+  {
+   "uuid": "be02337f-7090-5d4e-b2ca-0b3dad021905",
+   "nombre": "Auyama (ahuyama, calabaza), cocida (hervida, sin sal) / Kürbis, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 20,
+    "proteinas": 0.72,
+    "grasas": 0.07,
+    "grasas_saturadas": 0.037,
+    "carbohidratos": 4.9,
+    "azucares": 2.08,
+    "fibra": 1.1,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168449 (NDB 11423) «Pumpkin, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20292) no da cifra de grasas (< 0,5)."
+  },
+  {
+   "uuid": "8a080c39-9687-513d-ad50-89f3f164701c",
+   "nombre": "Calabaza butternut, cruda / Butternutkürbis, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 30.5,
+    "proteinas": 1,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.021,
+    "carbohidratos": 5.4,
+    "azucares": 2.2,
+    "fibra": 2,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20138 «Courge butternut (doubeurre), chair sans peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "e1b63701-03cd-5213-a474-c35484a3baa3",
+   "nombre": "Calabaza butternut, hervida / Butternutkürbis, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 28.2,
+    "proteinas": 0.69,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.052,
+    "carbohidratos": 4.56,
+    "azucares": 4.51,
+    "fibra": 2.4,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20141 «Courge butternut (doubeurre), chair sans peau, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "8362a361-383a-561e-80ac-506978e09bea",
+   "nombre": "Chayota (chayote, guatila, cidra), cruda / Chayote, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 19.1,
+    "proteinas": 0.82,
+    "grasas": 0.13,
+    "grasas_saturadas": 0.028,
+    "carbohidratos": 2.8,
+    "azucares": 1.66,
+    "fibra": 1.7,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13128 «Chayote ou christophine ou chouchou, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170402, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (14,6 cm)",
+     "gramos": 203
+    }
+   ]
+  },
+  {
+   "uuid": "6f96046e-b111-566a-b6d2-c299b2a9d2ce",
+   "nombre": "Chayota (chayote), hervida / Chayote, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 21.6,
+    "proteinas": 0.62,
+    "grasas": 0.48,
+    "grasas_saturadas": 0.086,
+    "carbohidratos": 2.29,
+    "fibra": 2.8,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 13177 «Chayote ou christophine ou chouchou, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (sin dato)."
+  },
+  {
+   "uuid": "289510ff-1cb8-5f43-b8c0-a5f67a1fc1e8",
+   "nombre": "Vainitas (judías verdes, habichuelas), crudas / Grüne Bohnen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 31.9,
+    "proteinas": 1.83,
+    "grasas": 0.22,
+    "grasas_saturadas": 0.05,
+    "carbohidratos": 4.14,
+    "azucares": 3.26,
+    "fibra": 2.7,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20061 «Haricot vert, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169961, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "10 vainitas (10 cm)",
+     "gramos": 55
+    }
+   ]
+  },
+  {
+   "uuid": "c3d6d1e7-6284-5c45-8dc6-552df5b0ff20",
+   "nombre": "Vainitas (judías verdes), cocidas (hervidas, sin sal) / Grüne Bohnen, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 35,
+    "proteinas": 1.89,
+    "grasas": 0.28,
+    "grasas_saturadas": 0.064,
+    "carbohidratos": 7.88,
+    "azucares": 3.63,
+    "fibra": 3.2,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169141 (NDB 11053) «Beans, snap, green, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20320) no da cifra de grasas (< 0,3)."
+  },
+  {
+   "uuid": "9a8304c0-db6c-52b0-9a70-26d0a7967332",
+   "nombre": "Arvejas (guisantes), crudas / Grüne Erbsen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 81.2,
+    "proteinas": 5.42,
+    "grasas": 0.4,
+    "grasas_saturadas": 0.071,
+    "carbohidratos": 11.4,
+    "azucares": 5.67,
+    "fibra": 5.1,
+    "sal": 0.013,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20072 «Petits pois, crus». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "6e1f2d22-460c-568a-8cfa-69d9f2584398",
+   "nombre": "Arvejas (guisantes), hervidas / Grüne Erbsen, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 80.7,
+    "proteinas": 6.38,
+    "grasas": 0.6,
+    "grasas_saturadas": 0.15,
+    "carbohidratos": 9.93,
+    "azucares": 1.6,
+    "fibra": 4.8,
+    "sal": 0.023,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20326 «Petits pois, bouillis/cuits à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "3f5667dc-7d99-5e31-ae97-b738ce9f6c99",
+   "nombre": "Arvejas chinas (tirabeques), crudas / Zuckerschoten, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 43,
+    "proteinas": 2.8,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.039,
+    "carbohidratos": 6.2,
+    "azucares": 4,
+    "fibra": 2.6,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20173 «Pois mange-tout ou pois gourmand, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170010, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "10 vainas",
+     "gramos": 34
+    }
+   ]
+  },
+  {
+   "uuid": "e10661bb-2295-5f28-b5e9-53689fde39a8",
+   "nombre": "Habas frescas (para desgranar), crudas / Dicke Bohnen, frisch, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 61.5,
+    "proteinas": 6.76,
+    "grasas": 0.67,
+    "grasas_saturadas": 0.13,
+    "carbohidratos": 4.2,
+    "azucares": 0.37,
+    "fibra": 5.85,
+    "sal": 0.094,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20517 «Fève à écosser, fraîche, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "6043da1f-3594-5988-975e-9ed0c8b068f8",
+   "nombre": "Habas tiernas, cocidas (hervidas, sin sal) / Dicke Bohnen, frisch, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 62,
+    "proteinas": 4.8,
+    "grasas": 0.5,
+    "grasas_saturadas": 0.142,
+    "carbohidratos": 10.1,
+    "fibra": 3.6,
+    "sal": 0.1025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170378 (NDB 11089) «Broadbeans, immature seeds, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares."
+  },
+  {
+   "uuid": "08bb9063-36c7-55a1-9dce-80af057b8ac0",
+   "nombre": "Quinchoncho tierno (guandú), crudo / Straucherbsen (Taubenerbsen), frisch, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 129,
+    "proteinas": 7.2,
+    "grasas": 1.64,
+    "grasas_saturadas": 0.35,
+    "carbohidratos": 18.8,
+    "azucares": 3,
+    "fibra": 5.1,
+    "sal": 0.013,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20527 «Pois d'Angole vert, frais, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "539681c3-3c0a-50e9-a6f2-8d34f06113c7",
+   "nombre": "Quinchoncho tierno (guandú), cocido (hervido, sin sal) / Straucherbsen (Taubenerbsen), frisch, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 5.96,
+    "grasas": 1.36,
+    "grasas_saturadas": 0.365,
+    "carbohidratos": 19.49,
+    "azucares": 2.48,
+    "fibra": 4.2,
+    "sal": 0.0125,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170430 (NDB 11345) «Pigeonpeas, immature seeds, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20833) no da cifra de kcal (sin dato)."
+  },
+  {
+   "uuid": "41b006d0-24b0-530f-bc6e-e48b9a6fad17",
+   "nombre": "Frijol tierno (caupí, ojo negro), crudo / Augenbohnen, frisch, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 90,
+    "proteinas": 2.95,
+    "grasas": 0.35,
+    "grasas_saturadas": 0.09,
+    "carbohidratos": 18.83,
+    "azucares": 3,
+    "fibra": 5,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169220 (NDB 11191) «Cowpeas (blackeyes), immature seeds, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "cf24dad7-4316-5691-9955-f644bd64b4c0",
+   "nombre": "Frijol tierno (caupí, ojo negro), cocido (hervido, sin sal) / Augenbohnen, frisch, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 97,
+    "proteinas": 3.17,
+    "grasas": 0.38,
+    "grasas_saturadas": 0.096,
+    "carbohidratos": 20.32,
+    "azucares": 3.23,
+    "fibra": 5,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168402 (NDB 11192) «Cowpeas (blackeyes), immature seeds, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "f49bbf3c-464d-540b-a259-139c4e9bc2aa",
+   "nombre": "Jojoto amarillo (maíz tierno, mazorca), crudo / Gelber Zuckermais, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 86,
+    "proteinas": 3.27,
+    "grasas": 1.35,
+    "grasas_saturadas": 0.325,
+    "carbohidratos": 18.7,
+    "azucares": 6.26,
+    "fibra": 2,
+    "sal": 0.0375,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169998 (NDB 11167) «Corn, sweet, yellow, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Granos de 1 mazorca mediana",
+     "gramos": 102
+    },
+    {
+     "nombre": "Granos de 1 mazorca grande",
+     "gramos": 143
+    }
+   ]
+  },
+  {
+   "uuid": "22f9702e-237d-5cb4-b24f-70bc1f17d47f",
+   "nombre": "Jojoto (maíz dulce en mazorca), cocido / Zuckermais (Maiskolben), gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 106,
+    "proteinas": 3.41,
+    "grasas": 1.5,
+    "grasas_saturadas": 0.2,
+    "carbohidratos": 18.6,
+    "azucares": 4.54,
+    "fibra": 2.4,
+    "sal": 0.0025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20049 «Maïs doux, en épis, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169999, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Granos de 1 mazorca mediana",
+     "gramos": 103
+    },
+    {
+     "nombre": "Granos de 1 mazorca pequeña",
+     "gramos": 89
+    },
+    {
+     "nombre": "Granos de 1 mazorca grande",
+     "gramos": 118
+    }
+   ]
+  },
+  {
+   "uuid": "5d4c568d-0f99-58b2-846b-1e27c33489ff",
+   "nombre": "Jojoto blanco (maíz tierno, mazorca), crudo / Weißer Zuckermais, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 86,
+    "proteinas": 3.22,
+    "grasas": 1.18,
+    "grasas_saturadas": 0.182,
+    "carbohidratos": 19.02,
+    "azucares": 3.22,
+    "fibra": 2.7,
+    "sal": 0.0375,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168538 (NDB 11900) «Corn, sweet, white, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Granos de 1 mazorca mediana",
+     "gramos": 90
+    },
+    {
+     "nombre": "Granos de 1 mazorca pequeña",
+     "gramos": 73
+    },
+    {
+     "nombre": "Granos de 1 mazorca grande",
+     "gramos": 143
+    }
+   ]
+  },
+  {
+   "uuid": "f78b392b-4311-513c-9652-967d31a3cbb1",
+   "nombre": "Jojoto blanco (maíz tierno), cocido (hervido, sin sal) / Weißer Zuckermais, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 97,
+    "proteinas": 3.34,
+    "grasas": 1.41,
+    "grasas_saturadas": 0.197,
+    "carbohidratos": 21.71,
+    "azucares": 7.73,
+    "fibra": 2.7,
+    "sal": 0.0075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168539 (NDB 11901) «Corn, sweet, white, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "Granos de 1 mazorca mediana",
+     "gramos": 103
+    },
+    {
+     "nombre": "Granos de 1 mazorca pequeña",
+     "gramos": 89
+    },
+    {
+     "nombre": "Granos de 1 mazorca grande",
+     "gramos": 116
+    }
+   ]
+  },
+  {
+   "uuid": "de47cca6-5e7f-5c5b-8938-4038a2d2e2ad",
+   "nombre": "Maíz dulce en lata, escurrido / Zuckermais aus der Dose, abgetropft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 105,
+    "proteinas": 2.66,
+    "grasas": 1.68,
+    "grasas_saturadas": 0.26,
+    "carbohidratos": 18.3,
+    "azucares": 2.37,
+    "fibra": 3.1,
+    "sal": 0.59,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20066 «Maïs doux, appertisé, égoutté». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "b9132438-cc5e-56fb-a75f-bb3ade18a320",
+   "nombre": "Brócoli, crudo / Brokkoli, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 31.9,
+    "proteinas": 2.9,
+    "grasas": 0.36,
+    "grasas_saturadas": 0.047,
+    "carbohidratos": 2.15,
+    "azucares": 1.7,
+    "fibra": 2.6,
+    "sal": 0.075,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20057 «Brocoli, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170379, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 rama (13 cm)",
+     "gramos": 31
+    }
+   ]
+  },
+  {
+   "uuid": "e11669b2-959e-5454-98f4-9a9deaf74f1c",
+   "nombre": "Brócoli, hervido / Brokkoli, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 21.8,
+    "proteinas": 2.19,
+    "grasas": 0.5,
+    "grasas_saturadas": 0.14,
+    "carbohidratos": 1.03,
+    "azucares": 0.6,
+    "fibra": 3,
+    "sal": 0.033,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20350 «Brocoli, bouilli/cuit à l'eau (aliment moyen)». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169967, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 rama (13 cm)",
+     "gramos": 37
+    }
+   ]
+  },
+  {
+   "uuid": "67aed72c-8c70-5a50-91b0-8a1991d4a576",
+   "nombre": "Coliflor, cruda / Blumenkohl, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 24.9,
+    "proteinas": 1.81,
+    "grasas": 0.7,
+    "grasas_saturadas": 0.24,
+    "carbohidratos": 2.13,
+    "azucares": 1.7,
+    "fibra": 2.2,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20016 «Chou-fleur, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169986, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 ramillete",
+     "gramos": 13
+    },
+    {
+     "nombre": "1 cabeza mediana (13-15 cm)",
+     "gramos": 588
+    }
+   ]
+  },
+  {
+   "uuid": "ba766283-e278-5906-9b8d-e7e00caf8f6b",
+   "nombre": "Coliflor, hervida / Blumenkohl, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 20.9,
+    "proteinas": 1.6,
+    "grasas": 0.46,
+    "grasas_saturadas": 0.097,
+    "carbohidratos": 1.6,
+    "fibra": 2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20017 «Chou-fleur, bouilli/cuit à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (trazas), sal (< 0,098). Porciones: pesos de USDA SR Legacy (FDC ID 170397, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "3 ramilletes",
+     "gramos": 54
+    }
+   ]
+  },
+  {
+   "uuid": "e8f616c9-6a0a-51d7-b2b9-899c3511a315",
+   "nombre": "Repollitos de Bruselas, crudos / Rosenkohl, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 43.9,
+    "proteinas": 3.38,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.062,
+    "carbohidratos": 4.59,
+    "azucares": 2.2,
+    "fibra": 3.8,
+    "sal": 0.063,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20058 «Chou de Bruxelles, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170383, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 19
+    }
+   ]
+  },
+  {
+   "uuid": "7ae88591-dbba-5ee7-8faa-0d1505730fe1",
+   "nombre": "Repollitos de Bruselas, cocidos (hervidos, sin sal) / Rosenkohl, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 36,
+    "proteinas": 2.55,
+    "grasas": 0.5,
+    "grasas_saturadas": 0.102,
+    "carbohidratos": 7.1,
+    "azucares": 1.74,
+    "fibra": 2.6,
+    "sal": 0.0525,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169971 (NDB 11099) «Brussels sprouts, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20309) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 21
+    }
+   ]
+  },
+  {
+   "uuid": "4c612cb5-2628-51c4-b1c3-06e5e231fa45",
+   "nombre": "Repollo blanco (col), crudo / Weißkohl, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 35.2,
+    "proteinas": 1.38,
+    "grasas": 0.6,
+    "grasas_saturadas": 0.27,
+    "carbohidratos": 4.63,
+    "azucares": 4.2,
+    "fibra": 3.5,
+    "sal": 0.033,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20116 «Chou blanc, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169975, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja mediana",
+     "gramos": 23
+    },
+    {
+     "nombre": "1 cabeza mediana (14,6 cm)",
+     "gramos": 908
+    }
+   ]
+  },
+  {
+   "uuid": "79cf4ef1-e120-563b-955f-a27c7df29b4a",
+   "nombre": "Repollo blanco (col), cocido (hervido, sin sal) / Weißkohl, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 23,
+    "proteinas": 1.27,
+    "grasas": 0.06,
+    "grasas_saturadas": 0,
+    "carbohidratos": 5.51,
+    "azucares": 2.79,
+    "fibra": 1.9,
+    "sal": 0.02,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169976 (NDB 11110) «Cabbage, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20308) no da cifra de grasas (< 0,3)."
+  },
+  {
+   "uuid": "e33d6acd-58fb-5bea-9b44-0fa3b11fd649",
+   "nombre": "Repollo morado (lombarda), crudo / Rotkohl, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 1.43,
+    "grasas": 0.16,
+    "grasas_saturadas": 0.021,
+    "carbohidratos": 7.37,
+    "azucares": 3.83,
+    "fibra": 2.1,
+    "sal": 0.0675,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169977 (NDB 11112) «Cabbage, red, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20014) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 23
+    },
+    {
+     "nombre": "1 cabeza mediana (12,7 cm)",
+     "gramos": 839
+    }
+   ]
+  },
+  {
+   "uuid": "07f90c7f-e04e-5217-b1c1-e9a7df8bb296",
+   "nombre": "Repollo morado (lombarda), hervido / Rotkohl, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 25.3,
+    "proteinas": 1.51,
+    "grasas": 0.09,
+    "grasas_saturadas": 0.011,
+    "carbohidratos": 3.32,
+    "azucares": 3.32,
+    "fibra": 2.6,
+    "sal": 0.07,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20095 «Chou rouge, bouilli/cuit à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169978, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 22
+    }
+   ]
+  },
+  {
+   "uuid": "46075567-805f-5e7d-bce4-3d3a37283d6e",
+   "nombre": "Col de Milán (repollo crespo), cruda / Wirsing, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 27,
+    "proteinas": 2,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.013,
+    "carbohidratos": 6.1,
+    "azucares": 2.27,
+    "fibra": 3.1,
+    "sal": 0.07,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170388 (NDB 11114) «Cabbage, savoy, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "30075b36-2ab9-5c0c-a8ea-cd25c2abe4f7",
+   "nombre": "Col de Milán, cocida (hervida, sin sal) / Wirsing, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 24,
+    "proteinas": 1.8,
+    "grasas": 0.09,
+    "grasas_saturadas": 0.012,
+    "carbohidratos": 5.41,
+    "fibra": 2.8,
+    "sal": 0.06,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170389 (NDB 11115) «Cabbage, savoy, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares."
+  },
+  {
+   "uuid": "f97a0f30-dc29-5f96-8a5f-3495e1ff4737",
+   "nombre": "Col rizada (kale), cruda / Grünkohl, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 49.5,
+    "proteinas": 4.28,
+    "grasas": 0.93,
+    "grasas_saturadas": 0.091,
+    "carbohidratos": 4.2,
+    "azucares": 2.26,
+    "fibra": 3.6,
+    "sal": 0.095,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20218 «Chou frisé, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "66de22b0-86fb-5713-ab5a-42e86cf74aec",
+   "nombre": "Col rizada (kale), cocida / Grünkohl, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 29.7,
+    "proteinas": 1.9,
+    "grasas": 0.4,
+    "grasas_saturadas": 0.052,
+    "carbohidratos": 3.63,
+    "azucares": 1.25,
+    "fibra": 2,
+    "sal": 0.058,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20219 «Chou frisé, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "1e72450a-b4f2-51c4-a1db-663820edffdc",
+   "nombre": "Col china (repollo chino), cruda / Chinakohl, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 16.4,
+    "proteinas": 1.25,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.042,
+    "carbohidratos": 2.1,
+    "azucares": 0.82,
+    "fibra": 0.73,
+    "sal": 0.023,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20167 «Chou chinois pé-tsaï, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "db1ec41e-ce56-5bab-af21-cd46ecd5ff0f",
+   "nombre": "Pak choi (bok choy), crudo / Pak Choi, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 14.6,
+    "proteinas": 1.5,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 1.2,
+    "azucares": 1.18,
+    "fibra": 1,
+    "sal": 0.16,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20340 «Chou chinois pak choï ou pak choy (feuilles vertes ressemblant à des blettes), cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170390, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 14
+    }
+   ]
+  },
+  {
+   "uuid": "f8670e0e-351f-5625-b23a-1e38abd9287d",
+   "nombre": "Colinabo, crudo / Kohlrabi, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 25.1,
+    "proteinas": 1.7,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.013,
+    "carbohidratos": 2.44,
+    "azucares": 2.44,
+    "fibra": 3.6,
+    "sal": 0.05,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20065 «Chou-rave, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168424, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 rodaja",
+     "gramos": 16
+    }
+   ]
+  },
+  {
+   "uuid": "d89d1c2c-f13b-55b6-8493-6238492ff0c6",
+   "nombre": "Colinabo, hervido / Kohlrabi, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 28,
+    "proteinas": 1.8,
+    "grasas": 0.11,
+    "grasas_saturadas": 0.014,
+    "carbohidratos": 4.4,
+    "azucares": 2.8,
+    "fibra": 1.1,
+    "sal": 0.053,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20094 «Chou-rave, bouilli/cuit à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "ff4f235e-720e-5ee5-9edb-aebeb6e58df8",
+   "nombre": "Chucrut, en conserva / Sauerkraut, aus der Dose",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 19,
+    "proteinas": 0.91,
+    "grasas": 0.14,
+    "grasas_saturadas": 0.034,
+    "carbohidratos": 4.28,
+    "azucares": 1.78,
+    "fibra": 2.9,
+    "sal": 1.6525,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169279 (NDB 11439) «Sauerkraut, canned, solids and liquids». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "a7f7b439-3c73-5e02-acdd-68b3b8d53450",
+   "nombre": "Zanahoria, cruda / Karotte (Möhre), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 41,
+    "proteinas": 0.93,
+    "grasas": 0.24,
+    "grasas_saturadas": 0.032,
+    "carbohidratos": 9.58,
+    "azucares": 4.74,
+    "fibra": 2.8,
+    "sal": 0.1725,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170393 (NDB 11124) «Carrots, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20009) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 61
+    },
+    {
+     "nombre": "1 unidad pequeña (14 cm)",
+     "gramos": 50
+    },
+    {
+     "nombre": "1 unidad grande (18-21,5 cm)",
+     "gramos": 72
+    }
+   ]
+  },
+  {
+   "uuid": "eba630d8-2ef8-5372-94c3-2c4549bd48c6",
+   "nombre": "Zanahoria, cocida (hervida, sin sal) / Karotte (Möhre), gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 35,
+    "proteinas": 0.76,
+    "grasas": 0.18,
+    "grasas_saturadas": 0.03,
+    "carbohidratos": 8.22,
+    "azucares": 3.45,
+    "fibra": 3,
+    "sal": 0.145,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170394 (NDB 11125) «Carrots, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20352) no da cifra de grasas (< 0,3).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 46
+    }
+   ]
+  },
+  {
+   "uuid": "7501bc65-53ed-5ae0-a8d8-778e269fa4a4",
+   "nombre": "Remolacha (betabel), cruda / Rote Bete, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 40.2,
+    "proteinas": 1.61,
+    "grasas": 0.17,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 6.34,
+    "azucares": 6.34,
+    "fibra": 2.8,
+    "sal": 0.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20091 «Betterave rouge, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169145, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (5 cm de diámetro)",
+     "gramos": 82
+    }
+   ]
+  },
+  {
+   "uuid": "3c7b93c6-5bed-547d-9815-78ebac1f8602",
+   "nombre": "Remolacha (betabel), cocida / Rote Bete, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 41.5,
+    "proteinas": 1.44,
+    "grasas": 0.4,
+    "grasas_saturadas": 0.15,
+    "carbohidratos": 7.13,
+    "azucares": 6.7,
+    "fibra": 2.5,
+    "sal": 0.23,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20003 «Betterave rouge, cuite». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169146, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "2 unidades (5 cm de diámetro)",
+     "gramos": 100
+    }
+   ]
+  },
+  {
+   "uuid": "f12ad8f3-4d96-5eb5-9f4c-2cba0f76e5b7",
+   "nombre": "Nabo sueco (rutabaga), crudo / Steckrübe, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 33.2,
+    "proteinas": 1.08,
+    "grasas": 0.16,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 5.7,
+    "azucares": 4.46,
+    "fibra": 2.3,
+    "sal": 0.03,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20201 «Rutabaga, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168454, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 386
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 192
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 772
+    }
+   ]
+  },
+  {
+   "uuid": "d643109e-d02b-5afe-8da7-f3291317c5e5",
+   "nombre": "Nabo sueco (rutabaga), cocido / Steckrübe, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 26,
+    "proteinas": 0.93,
+    "grasas": 0.18,
+    "grasas_saturadas": 0.029,
+    "carbohidratos": 4.26,
+    "azucares": 3.95,
+    "fibra": 1.8,
+    "sal": 0.013,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20165 «Rutabaga, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "133f1034-fd3e-5733-9a56-c24fff95f151",
+   "nombre": "Nabo, pelado, crudo / Weiße Rübe (Speiserübe), geschält, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 25.6,
+    "proteinas": 0.9,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.011,
+    "carbohidratos": 4.39,
+    "azucares": 3.71,
+    "fibra": 1.8,
+    "sal": 0.17,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20064 «Navet, pelé, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170465, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 122
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 61
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 183
+    }
+   ]
+  },
+  {
+   "uuid": "a4cd3ecd-db0b-518d-98af-90a7e0dae01f",
+   "nombre": "Nabo, cocido (hervido, sin sal) / Weiße Rübe (Speiserübe), gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22,
+    "proteinas": 0.71,
+    "grasas": 0.08,
+    "grasas_saturadas": 0.008,
+    "carbohidratos": 5.06,
+    "azucares": 2.99,
+    "fibra": 2,
+    "sal": 0.04,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170058 (NDB 11565) «Turnips, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20321) no da cifra de grasas (< 0,3)."
+  },
+  {
+   "uuid": "b9c60f55-81e4-529e-ac0b-25af9ec5a2e2",
+   "nombre": "Chirivía (pastinaca), cruda / Pastinake, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 67.9,
+    "proteinas": 1.2,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.05,
+    "carbohidratos": 12.6,
+    "azucares": 4.8,
+    "fibra": 4.9,
+    "sal": 0.025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20181 «Panais, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "d81100bc-ede6-5c76-bd80-06299579e17a",
+   "nombre": "Chirivía (pastinaca), cocida (hervida, sin sal) / Pastinake, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 71,
+    "proteinas": 1.32,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.05,
+    "carbohidratos": 17.01,
+    "azucares": 4.8,
+    "fibra": 3.6,
+    "sal": 0.025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170009 (NDB 11299) «Parsnips, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (23 cm)",
+     "gramos": 160
+    }
+   ]
+  },
+  {
+   "uuid": "a0408b21-2c39-56db-8e8b-ef66328fd798",
+   "nombre": "Apionabo, crudo / Knollensellerie, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 42,
+    "proteinas": 1.5,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.079,
+    "carbohidratos": 9.2,
+    "azucares": 1.6,
+    "fibra": 1.8,
+    "sal": 0.25,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170400 (NDB 11141) «Celeriac, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20055) no da cifra de grasas (< 0,5)."
+  },
+  {
+   "uuid": "b4173eb7-55b9-5f0d-b64a-eca3d9d5736a",
+   "nombre": "Apionabo, hervido / Knollensellerie, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 26.2,
+    "proteinas": 0.94,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.09,
+    "carbohidratos": 4.32,
+    "azucares": 1.2,
+    "fibra": 2.6,
+    "sal": 0.093,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20315 «Céleri rave, bouilli/cuit à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "b9780dd6-97ee-557d-bf66-19e4da67fd3d",
+   "nombre": "Apio España (apio de tallo), crudo / Staudensellerie, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 14,
+    "proteinas": 0.69,
+    "grasas": 0.17,
+    "grasas_saturadas": 0.042,
+    "carbohidratos": 2.97,
+    "azucares": 1.34,
+    "fibra": 1.6,
+    "sal": 0.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169988 (NDB 11143) «Celery, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20023) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 tallo mediano (19-20 cm)",
+     "gramos": 40
+    },
+    {
+     "nombre": "1 tallo grande (28-30 cm)",
+     "gramos": 64
+    }
+   ]
+  },
+  {
+   "uuid": "4008a920-caee-5bf7-aa8d-5ee96b70625a",
+   "nombre": "Rábano (rabanito), crudo / Radieschen, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 16,
+    "proteinas": 0.68,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.032,
+    "carbohidratos": 3.4,
+    "azucares": 1.86,
+    "fibra": 1.6,
+    "sal": 0.0975,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169276 (NDB 11429) «Radishes, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20045) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 4.5
+    }
+   ]
+  },
+  {
+   "uuid": "60119dce-5b85-57dc-a752-79666957b7ac",
+   "nombre": "Rábano blanco (daikon), crudo / Rettich (Daikon), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 18,
+    "proteinas": 0.6,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.03,
+    "carbohidratos": 4.1,
+    "azucares": 2.5,
+    "fibra": 1.6,
+    "sal": 0.0525,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168451 (NDB 11430) «Radishes, oriental, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (18 cm)",
+     "gramos": 338
+    }
+   ]
+  },
+  {
+   "uuid": "b1ab1a4e-0501-51ca-9fdc-e7bf68313566",
+   "nombre": "Tupinambo, crudo / Topinambur, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 74.7,
+    "proteinas": 2,
+    "grasas": 0.01,
+    "grasas_saturadas": 0,
+    "carbohidratos": 15.8,
+    "azucares": 9.6,
+    "fibra": 1.6,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20196 «Topinambour, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "23e2ebff-2d1b-5fbe-a0c1-45d55af2599c",
+   "nombre": "Hinojo (bulbo), crudo / Fenchel (Knolle), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 31,
+    "proteinas": 1.24,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.09,
+    "carbohidratos": 7.3,
+    "azucares": 3.93,
+    "fibra": 3.1,
+    "sal": 0.13,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169385 (NDB 11957) «Fennel, bulb, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20028) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 bulbo",
+     "gramos": 234
+    }
+   ]
+  },
+  {
+   "uuid": "ee847f1d-7082-5ae2-8b4b-7b04dd0b7430",
+   "nombre": "Alcachofa, cruda / Artischocke, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 45.4,
+    "proteinas": 3.27,
+    "grasas": 0.15,
+    "grasas_saturadas": 0.036,
+    "carbohidratos": 4.84,
+    "azucares": 0.99,
+    "fibra": 5.4,
+    "sal": 0.24,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20052 «Artichaut, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169205, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 128
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 162
+    }
+   ]
+  },
+  {
+   "uuid": "b24546c4-d9cc-581a-a5ba-01e845f568a6",
+   "nombre": "Alcachofa, cocida / Artischocke, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 33.2,
+    "proteinas": 2.53,
+    "grasas": 0.28,
+    "grasas_saturadas": 0.069,
+    "carbohidratos": 0.99,
+    "azucares": 0.99,
+    "fibra": 8.3,
+    "sal": 0.15,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20000 «Artichaut, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168386, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 120
+    }
+   ]
+  },
+  {
+   "uuid": "9e76a9fe-9a92-53d5-933c-d416de337986",
+   "nombre": "Espárrago verde, crudo / Grüner Spargel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 24.7,
+    "proteinas": 2.46,
+    "grasas": 0.27,
+    "grasas_saturadas": 0.069,
+    "carbohidratos": 2.03,
+    "azucares": 1.5,
+    "fibra": 2.15,
+    "sal": 0.014,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20279 «Asperge, verte, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168389, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 espárrago mediano (13-18 cm)",
+     "gramos": 16
+    },
+    {
+     "nombre": "1 espárrago grande (18-21,5 cm)",
+     "gramos": 20
+    }
+   ]
+  },
+  {
+   "uuid": "49564284-1289-5c91-a0b2-60f3154cc43a",
+   "nombre": "Espárrago verde, hervido / Grüner Spargel, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 25.3,
+    "proteinas": 2.69,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.07,
+    "carbohidratos": 1.73,
+    "azucares": 1.3,
+    "fibra": 2.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20299 «Asperge verte, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013). Porciones: pesos de USDA SR Legacy (FDC ID 168390, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "4 espárragos",
+     "gramos": 60
+    }
+   ]
+  },
+  {
+   "uuid": "47fce8ba-1d31-5598-bbe3-2c4ef1e9b5a2",
+   "nombre": "Espárragos en lata, escurridos / Spargel aus der Dose, abgetropft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 20.3,
+    "proteinas": 1.57,
+    "grasas": 0.65,
+    "grasas_saturadas": 0.15,
+    "carbohidratos": 1.2,
+    "azucares": 1.03,
+    "fibra": 1.55,
+    "sal": 0.72,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20076 «Asperge, appertisée, égouttée». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169207, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 espárrago (13 cm)",
+     "gramos": 18
+    }
+   ]
+  },
+  {
+   "uuid": "16f7a9f6-c416-5aa5-bf19-d91eba9fa3b8",
+   "nombre": "Palmito en lata, escurrido / Palmherzen aus der Dose, abgetropft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 41.5,
+    "proteinas": 2.51,
+    "grasas": 0.56,
+    "grasas_saturadas": 0.13,
+    "carbohidratos": 5.5,
+    "azucares": 1.5,
+    "fibra": 2.2,
+    "sal": 0.81,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20018 «Coeur de palmier, appertisé, égoutté». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168569, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 pieza",
+     "gramos": 33
+    }
+   ]
+  },
+  {
+   "uuid": "e6f61370-1154-5058-bf6c-903f9acb5a85",
+   "nombre": "Hojas de parra en conserva / Weinblätter, eingelegt",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 69,
+    "proteinas": 4.27,
+    "grasas": 1.97,
+    "grasas_saturadas": 0.312,
+    "carbohidratos": 11.71,
+    "fibra": 9.9,
+    "sal": 7.1325,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169393 (NDB 11975) «Grape leaves, canned». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 4
+    }
+   ]
+  },
+  {
+   "uuid": "31c8dcf4-9fe2-5971-8bb4-012b3e3bfe91",
+   "nombre": "Nopal, crudo / Nopal (Kaktusblatt), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 16,
+    "proteinas": 1.32,
+    "grasas": 0.09,
+    "grasas_saturadas": 0.016,
+    "carbohidratos": 3.33,
+    "azucares": 1.15,
+    "fibra": 2.2,
+    "sal": 0.0525,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168571 (NDB 11963) «Nopales, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5."
+  },
+  {
+   "uuid": "b52a474e-568d-531e-a4e2-0758bf5c36f3",
+   "nombre": "Nopal, cocido (sin sal) / Nopal (Kaktusblatt), gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 15,
+    "proteinas": 1.35,
+    "grasas": 0.05,
+    "grasas_saturadas": 0.006,
+    "carbohidratos": 3.28,
+    "azucares": 1.12,
+    "fibra": 2,
+    "sal": 0.05,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169388 (NDB 11964) «Nopales, cooked, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 penca",
+     "gramos": 29
+    }
+   ]
+  },
+  {
+   "uuid": "5d0f9f49-168b-5489-9458-451e31b02c74",
+   "nombre": "Espinaca, cruda / Spinat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 33.3,
+    "proteinas": 2.68,
+    "grasas": 0.39,
+    "grasas_saturadas": 0.063,
+    "carbohidratos": 3.06,
+    "azucares": 0.46,
+    "fibra": 2.6,
+    "sal": 0.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20059 «Épinard, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168462, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 10
+    }
+   ]
+  },
+  {
+   "uuid": "bae13bd4-ce87-52b7-aa86-7e20f6e51059",
+   "nombre": "Espinaca, cocida (hervida, sin sal) / Spinat, gekocht, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 23,
+    "proteinas": 2.97,
+    "grasas": 0.26,
+    "grasas_saturadas": 0.043,
+    "carbohidratos": 3.75,
+    "azucares": 0.43,
+    "fibra": 2.4,
+    "sal": 0.175,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168463 (NDB 11458) «Spinach, cooked, boiled, drained, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20336) no da cifra de carbohidratos (trazas)."
+  },
+  {
+   "uuid": "242c8151-5a6d-589c-883a-960d13da52af",
+   "nombre": "Acelga, cruda / Mangold, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 19,
+    "proteinas": 1.8,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.03,
+    "carbohidratos": 3.74,
+    "azucares": 1.1,
+    "fibra": 1.6,
+    "sal": 0.5325,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169991 (NDB 11147) «Chard, swiss, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 48
+    }
+   ]
+  },
+  {
+   "uuid": "e54db567-696a-5412-b234-7adb5d1c5448",
+   "nombre": "Acelga (hoja y penca), hervida / Mangold, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 15.6,
+    "proteinas": 0.88,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.1,
+    "carbohidratos": 1.43,
+    "azucares": 1,
+    "fibra": 2.5,
+    "sal": 0.19,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20301 «Bette ou blette, côte et feuille, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "ffffa03b-bfc2-5c72-9ddf-eb8990a61727",
+   "nombre": "Lechuga iceberg (americana), cruda / Eisbergsalat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 17.3,
+    "proteinas": 0.95,
+    "grasas": 0.14,
+    "grasas_saturadas": 0.018,
+    "carbohidratos": 2.5,
+    "azucares": 1.24,
+    "fibra": 1.1,
+    "sal": 0.016,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20200 «Laitue iceberg, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169248, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja mediana",
+     "gramos": 8
+    },
+    {
+     "nombre": "1 cabeza mediana (15 cm)",
+     "gramos": 539
+    }
+   ]
+  },
+  {
+   "uuid": "9269a5b6-f630-5d78-a44f-4fbec155495b",
+   "nombre": "Lechuga romana, cruda / Römersalat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 17.2,
+    "proteinas": 1.23,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.039,
+    "carbohidratos": 1.35,
+    "azucares": 1.19,
+    "fibra": 2.1,
+    "sal": 0.02,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20171 «Laitue romaine, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169247, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja exterior",
+     "gramos": 28
+    },
+    {
+     "nombre": "1 hoja interior",
+     "gramos": 6
+    }
+   ]
+  },
+  {
+   "uuid": "34041c3f-318d-51e1-ae28-994773723850",
+   "nombre": "Lechuga, cruda / Kopfsalat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 14.7,
+    "proteinas": 1.35,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.022,
+    "carbohidratos": 1.22,
+    "azucares": 0.73,
+    "fibra": 1.1,
+    "sal": 0.021,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20031 «Laitue, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168429, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja mediana",
+     "gramos": 7.5
+    },
+    {
+     "nombre": "1 cabeza (12,7 cm)",
+     "gramos": 163
+    }
+   ]
+  },
+  {
+   "uuid": "78edaa0b-ce33-5821-ba9f-ff4c0a51333e",
+   "nombre": "Lechuga de hoja verde, cruda / Grüner Blattsalat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 15,
+    "proteinas": 1.36,
+    "grasas": 0.15,
+    "grasas_saturadas": 0.02,
+    "carbohidratos": 2.87,
+    "azucares": 0.78,
+    "fibra": 1.3,
+    "sal": 0.07,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169249 (NDB 11253) «Lettuce, green leaf, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja exterior",
+     "gramos": 24
+    }
+   ]
+  },
+  {
+   "uuid": "20e9620a-b34e-5f7a-b320-2994b1c19604",
+   "nombre": "Lechuga de hoja roja, cruda / Roter Blattsalat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 13,
+    "proteinas": 1.33,
+    "grasas": 0.22,
+    "grasas_saturadas": 0.028,
+    "carbohidratos": 2.26,
+    "azucares": 0.48,
+    "fibra": 0.9,
+    "sal": 0.0625,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168431 (NDB 11257) «Lettuce, red leaf, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja exterior",
+     "gramos": 17
+    }
+   ]
+  },
+  {
+   "uuid": "a1c37996-4bcf-5044-9898-92fca499ea66",
+   "nombre": "Rúcula (rúgula), cruda / Rucola, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 27.9,
+    "proteinas": 2.58,
+    "grasas": 0.66,
+    "grasas_saturadas": 0.086,
+    "carbohidratos": 2.1,
+    "azucares": 2.05,
+    "fibra": 1.6,
+    "sal": 0.068,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20217 «Roquette, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169387, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 2
+    }
+   ]
+  },
+  {
+   "uuid": "4fb413e4-c995-50ad-b43d-7153bf713d99",
+   "nombre": "Canónigos, crudos / Feldsalat, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 21,
+    "proteinas": 2,
+    "grasas": 0.4,
+    "carbohidratos": 3.6,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169219 (NDB 11190) «Cornsalad, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas, azúcares, fibra. Se usa USDA porque CIQUAL 2025 (código 20099) no da cifra de grasas (< 0,5)."
+  },
+  {
+   "uuid": "36968ccd-b0eb-581e-8edd-034f73a8ce6e",
+   "nombre": "Escarola, cruda / Endivie (Escariol), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 20.5,
+    "proteinas": 1.44,
+    "grasas": 0.23,
+    "grasas_saturadas": 0.049,
+    "carbohidratos": 2,
+    "azucares": 0.7,
+    "fibra": 2.3,
+    "sal": 0.036,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20090 «Scarole, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "da3a5b6f-aedf-5937-971e-162a36f7d7e9",
+   "nombre": "Endibia belga, cruda / Chicorée, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 17,
+    "proteinas": 0.9,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.024,
+    "carbohidratos": 4,
+    "fibra": 3.1,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170404 (NDB 11151) «Chicory, witloof, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible). Se usa USDA porque CIQUAL 2025 (código 20026) no da cifra de grasas (< 0,5).",
+   "porciones": [
+    {
+     "nombre": "1 cabeza",
+     "gramos": 53
+    }
+   ]
+  },
+  {
+   "uuid": "2d253a21-faa6-5750-b931-e903ad990d55",
+   "nombre": "Radicchio (achicoria roja), crudo / Radicchio, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 18.9,
+    "proteinas": 1.4,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.02,
+    "carbohidratos": 1.6,
+    "azucares": 1.6,
+    "fibra": 3,
+    "sal": 0.018,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20162 «Chicorée rouge, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168564, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 hoja",
+     "gramos": 8
+    }
+   ]
+  },
+  {
+   "uuid": "46534e01-ae5f-55bf-8821-d8af9964f482",
+   "nombre": "Berro, crudo / Brunnenkresse, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 15.5,
+    "proteinas": 2.3,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 1.11,
+    "azucares": 0.2,
+    "fibra": 0.5,
+    "sal": 0.1,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20022 «Cresson de fontaine, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170068, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "10 ramitas",
+     "gramos": 25
+    }
+   ]
+  },
+  {
+   "uuid": "22e15b6d-cdb1-56f1-baf1-62df59365c61",
+   "nombre": "Mastuerzo (berro de jardín), crudo / Gartenkresse, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 23.8,
+    "proteinas": 2.6,
+    "grasas": 0.7,
+    "grasas_saturadas": 0.023,
+    "carbohidratos": 1.22,
+    "azucares": 1.22,
+    "fibra": 1.1,
+    "sal": 0.035,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20199 «Cresson alénois, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "40596e49-4c68-5600-b262-44b60d7b3057",
+   "nombre": "Germinados de frijol mungo (brotes de soja), crudos / Mungobohnensprossen (Sojasprossen), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 30,
+    "proteinas": 3.04,
+    "grasas": 0.18,
+    "grasas_saturadas": 0.046,
+    "carbohidratos": 5.94,
+    "azucares": 4.13,
+    "fibra": 1.8,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169957 (NDB 11043) «Mung beans, mature seeds, sprouted, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Se usa USDA porque CIQUAL 2025 (código 20183) no da cifra de grasas (< 0,5)."
+  },
+  {
+   "uuid": "23e18279-a5fd-5ed4-a372-0507c79e7ad3",
+   "nombre": "Cilantro, fresco / Koriander, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22.3,
+    "proteinas": 2.13,
+    "grasas": 0.52,
+    "grasas_saturadas": 0.014,
+    "carbohidratos": 0.87,
+    "azucares": 0.87,
+    "fibra": 2.8,
+    "sal": 0.12,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11094 «Coriandre, fraiche». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169997, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "9 ramitas",
+     "gramos": 20
+    }
+   ]
+  },
+  {
+   "uuid": "53a05fb5-f686-54a8-92fe-648ba596ada6",
+   "nombre": "Perejil, fresco / Petersilie, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 42.5,
+    "proteinas": 2.97,
+    "grasas": 0.63,
+    "grasas_saturadas": 0.1,
+    "carbohidratos": 4.1,
+    "azucares": 0.85,
+    "fibra": 4.3,
+    "sal": 0.59,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11014 «Persil, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170416, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 cucharada",
+     "gramos": 3.8
+    },
+    {
+     "nombre": "10 ramitas",
+     "gramos": 10
+    }
+   ]
+  },
+  {
+   "uuid": "27ddacc9-eb05-55bf-8197-a4c573dac612",
+   "nombre": "Albahaca, fresca / Basilikum, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 35.2,
+    "proteinas": 3.15,
+    "grasas": 0.64,
+    "grasas_saturadas": 0.041,
+    "carbohidratos": 3.4,
+    "azucares": 0.3,
+    "fibra": 1.6,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11033 «Basilic, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 172232, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "5 hojas",
+     "gramos": 2.5
+    },
+    {
+     "nombre": "2 cucharadas, picada",
+     "gramos": 5.3
+    }
+   ]
+  },
+  {
+   "uuid": "136aa276-e921-5aba-a571-981fa6dac0d1",
+   "nombre": "Eneldo, fresco / Dill, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 48.2,
+    "proteinas": 3.93,
+    "grasas": 1.1,
+    "grasas_saturadas": 0.34,
+    "carbohidratos": 3.9,
+    "azucares": 1.2,
+    "fibra": 3.5,
+    "sal": 0.15,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11093 «Aneth, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 172233, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "5 ramitas",
+     "gramos": 1
+    }
+   ]
+  },
+  {
+   "uuid": "fd1e14f3-10ca-57ce-85f6-75c191e1c4b6",
+   "nombre": "Menta (hierbabuena), fresca / Minze, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 57.6,
+    "proteinas": 3.52,
+    "grasas": 0.84,
+    "grasas_saturadas": 0.22,
+    "carbohidratos": 5.3,
+    "azucares": 5.3,
+    "fibra": 7.4,
+    "sal": 0.076,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11027 «Menthe, fraîche». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 173475, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "2 cucharadas",
+     "gramos": 11.4
+    }
+   ]
+  },
+  {
+   "uuid": "345cafdb-f978-596f-942e-373118aa28d8",
+   "nombre": "Menta piperita, fresca / Pfefferminze, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 70,
+    "proteinas": 3.75,
+    "grasas": 0.94,
+    "grasas_saturadas": 0.246,
+    "carbohidratos": 14.89,
+    "fibra": 8,
+    "sal": 0.0775,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 173474 (NDB 2064) «Peppermint, fresh». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "2 cucharadas",
+     "gramos": 3.2
+    }
+   ]
+  },
+  {
+   "uuid": "8a2d8724-a65a-5d1c-9402-8f9465b8863e",
+   "nombre": "Tomillo, fresco / Thymian, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 107,
+    "proteinas": 5.56,
+    "grasas": 1.68,
+    "grasas_saturadas": 0.47,
+    "carbohidratos": 10.5,
+    "fibra": 14,
+    "sal": 0.023,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11070 «Thym, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (sin dato). Porciones: pesos de USDA SR Legacy (FDC ID 173470, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 cucharadita",
+     "gramos": 0.8
+    }
+   ]
+  },
+  {
+   "uuid": "68a8ed92-e4eb-51d3-b2c6-4080f4ab829c",
+   "nombre": "Romero, fresco / Rosmarin, frisch",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 121,
+    "proteinas": 3.31,
+    "grasas": 5.86,
+    "grasas_saturadas": 2.84,
+    "carbohidratos": 6.6,
+    "fibra": 14.1,
+    "sal": 0.065,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11068 «Romarin, frais». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: azúcares (sin dato). Porciones: pesos de USDA SR Legacy (FDC ID 173473, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 cucharadita",
+     "gramos": 0.7
+    },
+    {
+     "nombre": "1 cucharada",
+     "gramos": 1.7
+    }
+   ]
+  },
+  {
+   "uuid": "76da0564-6a75-51dd-985c-42a6c83c6d6c",
+   "nombre": "Champiñones blancos, crudos / Weiße Champignons, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 21,
+    "proteinas": 2.11,
+    "grasas": 0.36,
+    "grasas_saturadas": 0.067,
+    "carbohidratos": 1.83,
+    "azucares": 1.55,
+    "fibra": 1,
+    "sal": 0.098,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20056 «Champignon de Paris ou champignon de couche, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169251, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 18
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 10
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 23
+    }
+   ]
+  },
+  {
+   "uuid": "fb311e5d-d8d7-5a95-b726-5d5afc49edef",
+   "nombre": "Champiñones blancos, hervidos / Weiße Champignons, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 28.7,
+    "proteinas": 2.17,
+    "grasas": 0.47,
+    "grasas_saturadas": 0.061,
+    "carbohidratos": 3,
+    "azucares": 2.34,
+    "fibra": 2.2,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20102 «Champignon de Paris ou champignon de couche, bouilli/cuit à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169252, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 12
+    }
+   ]
+  },
+  {
+   "uuid": "879dad96-cde0-529c-8d52-1344b6995a7d",
+   "nombre": "Champiñones en lata, escurridos / Champignons aus der Dose, abgetropft",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 18.3,
+    "proteinas": 2,
+    "grasas": 0.37,
+    "grasas_saturadas": 0.065,
+    "carbohidratos": 0.64,
+    "azucares": 0,
+    "fibra": 2.5,
+    "sal": 0.63,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20079 «Champignon de Paris ou champignon de couche, appertisé, égoutté». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169254, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 12
+    }
+   ]
+  },
+  {
+   "uuid": "a5ce6d34-8b27-51b7-8225-5fe401f722a9",
+   "nombre": "Champiñones marrones (crimini), crudos / Braune Champignons, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22,
+    "proteinas": 2.5,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.014,
+    "carbohidratos": 4.3,
+    "azucares": 1.72,
+    "fibra": 0.6,
+    "sal": 0.015,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168434 (NDB 11266) «Mushrooms, brown, italian, or crimini, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 20
+    }
+   ]
+  },
+  {
+   "uuid": "545da183-0c34-5b46-8cd7-08726339548b",
+   "nombre": "Portobello, crudo / Portobello (Riesenchampignon), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22,
+    "proteinas": 2.11,
+    "grasas": 0.35,
+    "grasas_saturadas": 0.01,
+    "carbohidratos": 3.87,
+    "azucares": 2.5,
+    "fibra": 1.3,
+    "sal": 0.0225,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169255 (NDB 11265) «Mushrooms, portabella, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 84
+    }
+   ]
+  },
+  {
+   "uuid": "f329bb14-1730-56d2-90bb-01c54f0c5b81",
+   "nombre": "Shiitake, crudo / Shiitake, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 34,
+    "proteinas": 2.24,
+    "grasas": 0.49,
+    "carbohidratos": 6.79,
+    "azucares": 2.38,
+    "fibra": 2.5,
+    "sal": 0.0225,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169242 (NDB 11238) «Mushrooms, shiitake, raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: grasas saturadas. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 19
+    }
+   ]
+  },
+  {
+   "uuid": "fa518827-856d-5ebd-8833-371ff81f99e2",
+   "nombre": "Setas de ostra (gírgolas), crudas / Austernpilze, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 26.8,
+    "proteinas": 3.31,
+    "grasas": 0.41,
+    "grasas_saturadas": 0.062,
+    "carbohidratos": 1.5,
+    "azucares": 1.07,
+    "fibra": 2.3,
+    "sal": 0.045,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20114 «Champignon, pleurote, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168580, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 15
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 148
+    }
+   ]
+  },
+  {
+   "uuid": "6741d992-52b5-5677-a436-fab7b943db6f",
+   "nombre": "Rebozuelos, crudos / Pfifferlinge, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 24.7,
+    "proteinas": 1.49,
+    "grasas": 0.53,
+    "grasas_saturadas": 0.5,
+    "carbohidratos": 1.77,
+    "azucares": 1.16,
+    "fibra": 3.8,
+    "sal": 0.023,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20103 «Champignon, chanterelle ou girolle, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168422, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad",
+     "gramos": 5.4
+    }
+   ]
+  },
+  {
+   "uuid": "495bb062-6a25-5736-9fd6-b652b765bc56",
+   "nombre": "Papa (patata) pelada, cruda / Kartoffel, geschält, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 80,
+    "proteinas": 2.02,
+    "grasas": 0.09,
+    "grasas_saturadas": 0.026,
+    "carbohidratos": 16.2,
+    "azucares": 0.78,
+    "fibra": 2.2,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 4008 «Pomme de terre, sans peau, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,0011)."
+  },
+  {
+   "uuid": "fe7cbd93-8085-5676-9dfd-64d3a385d529",
+   "nombre": "Papa (patata), hervida / Kartoffel, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 81,
+    "proteinas": 1.8,
+    "grasas": 0.34,
+    "grasas_saturadas": 0.094,
+    "carbohidratos": 16.8,
+    "azucares": 0.86,
+    "fibra": 1.8,
+    "sal": 0.051,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 4003 «Pomme de terre, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 170440, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana (5,7-8,3 cm)",
+     "gramos": 167
+    },
+    {
+     "nombre": "1 unidad pequeña (4,4-6,4 cm)",
+     "gramos": 125
+    },
+    {
+     "nombre": "1 unidad grande (7,6-10,8 cm)",
+     "gramos": 300
+    }
+   ]
+  },
+  {
+   "uuid": "a77a5d7f-676b-575f-ac56-9ab8e6dc8d3e",
+   "nombre": "Papa (patata) hervida con piel, solo pulpa, sin sal / Pellkartoffel, nur Fruchtfleisch, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 87,
+    "proteinas": 1.87,
+    "grasas": 0.1,
+    "grasas_saturadas": 0.026,
+    "carbohidratos": 20.13,
+    "azucares": 0.91,
+    "fibra": 1.8,
+    "sal": 0.01,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170438 (NDB 11365) «Potatoes, boiled, cooked in skin, flesh, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (6,4 cm de diámetro)",
+     "gramos": 136
+    }
+   ]
+  },
+  {
+   "uuid": "e3acdd59-fd88-57ab-acfb-f3bae0adcc9a",
+   "nombre": "Papa (patata) asada al horno, con piel, sin sal / Ofenkartoffel mit Schale, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 93,
+    "proteinas": 2.5,
+    "grasas": 0.13,
+    "grasas_saturadas": 0.034,
+    "carbohidratos": 21.15,
+    "azucares": 1.18,
+    "fibra": 2.2,
+    "sal": 0.025,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 170093 (NDB 11674) «Potatoes, baked, flesh and skin, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 173
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 138
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 299
+    }
+   ]
+  },
+  {
+   "uuid": "d87b3794-d0e7-5bc5-927d-f1311e89e67c",
+   "nombre": "Batata (boniato, camote), cruda / Süßkartoffel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 81.2,
+    "proteinas": 1.57,
+    "grasas": 0.05,
+    "grasas_saturadas": 0.018,
+    "carbohidratos": 17.1,
+    "azucares": 4.18,
+    "fibra": 3,
+    "sal": 0.14,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 4101 «Patate douce, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168482, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad (13 cm de largo)",
+     "gramos": 130
+    }
+   ]
+  },
+  {
+   "uuid": "92a08cd2-5f6c-570c-ae88-64118390f3e4",
+   "nombre": "Batata (boniato, camote), cocida / Süßkartoffel, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 79.1,
+    "proteinas": 1.69,
+    "grasas": 0.15,
+    "grasas_saturadas": 0.042,
+    "carbohidratos": 16.3,
+    "azucares": 6.11,
+    "fibra": 2.9,
+    "sal": 0.079,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 4102 «Patate douce, cuite». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 168484, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 151
+    }
+   ]
+  },
+  {
+   "uuid": "a9848a3e-5909-52ee-afde-fe103c2af80d",
+   "nombre": "Batata (boniato, camote), asada al horno, pulpa, sin sal / Süßkartoffel, im Ofen gebacken, Fruchtfleisch, ohne Salz",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 90,
+    "proteinas": 2.01,
+    "grasas": 0.15,
+    "grasas_saturadas": 0.052,
+    "carbohidratos": 20.71,
+    "azucares": 6.48,
+    "fibra": 3.3,
+    "sal": 0.09,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 168483 (NDB 11508) «Sweet potato, cooked, baked in skin, flesh, without salt». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 unidad mediana",
+     "gramos": 114
+    },
+    {
+     "nombre": "1 unidad pequeña",
+     "gramos": 60
+    },
+    {
+     "nombre": "1 unidad grande",
+     "gramos": 180
+    }
+   ]
+  },
+  {
+   "uuid": "1d07dc78-ccad-59be-af04-89fe93dd001e",
+   "nombre": "Yuca (mandioca), cruda / Maniok (Cassava), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 157,
+    "proteinas": 1.36,
+    "grasas": 0.28,
+    "grasas_saturadas": 0.074,
+    "carbohidratos": 36.3,
+    "azucares": 1.7,
+    "fibra": 1.8,
+    "sal": 0.035,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 54031 «Manioc, racine crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Porciones: pesos de USDA SR Legacy (FDC ID 169985, parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 raíz",
+     "gramos": 408
+    }
+   ]
+  },
+  {
+   "uuid": "b1f6b527-e6c0-501a-908b-849e4d700ee5",
+   "nombre": "Ñame, pelado, crudo / Yamswurzel, geschält, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 111,
+    "proteinas": 1.53,
+    "grasas": 0.17,
+    "grasas_saturadas": 0.037,
+    "carbohidratos": 23.7,
+    "azucares": 0.5,
+    "fibra": 4.1,
+    "sal": 0.023,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 53502 «Igname, pelée, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "6a75e0d4-31ce-5f09-acb7-77e4cbd38e96",
+   "nombre": "Ñame, pelado, hervido / Yamswurzel, geschält, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 109,
+    "proteinas": 1.49,
+    "grasas": 0.14,
+    "grasas_saturadas": 0.029,
+    "carbohidratos": 23.6,
+    "azucares": 0.49,
+    "fibra": 3.9,
+    "sal": 0.02,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 53503 «Igname, épluchée, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "6ca7e448-4536-5981-9df8-cf1088cfb0e9",
+   "nombre": "Ocumo (yautía, malanga), crudo / Tannia (Malanga), roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 98,
+    "proteinas": 1.46,
+    "grasas": 0.4,
+    "grasas_saturadas": 0.082,
+    "carbohidratos": 23.63,
+    "fibra": 1.5,
+    "sal": 0.0525,
+    "origen": "importado"
+   },
+   "notas": "Fuente: USDA FoodData Central, SR Legacy, FDC ID 169401 (NDB 11991) «Yautia (tannier), raw». Valores por 100 g de parte comestible. Carbohidratos totales (por diferencia, incluyen la fibra). Sal = sodio × 2,5. Sin dato en la fuente: azúcares. Porciones: pesos de USDA (parte comestible).",
+   "porciones": [
+    {
+     "nombre": "1 raíz",
+     "gramos": 305
+    }
+   ]
+  },
+  {
+   "uuid": "f9558d5a-f20b-53af-9ec6-e24ba10f54f1",
+   "nombre": "Ocumo chino (taro), crudo / Taro, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 105,
+    "proteinas": 1.5,
+    "grasas": 0.2,
+    "grasas_saturadas": 0.041,
+    "carbohidratos": 22.4,
+    "azucares": 0.4,
+    "fibra": 4.1,
+    "sal": 0.028,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 53200 «Taro, tubercule, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "11387c6a-a403-5a7f-9132-0d1d7c098a94",
+   "nombre": "Ocumo chino (taro), cocido / Taro, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 131,
+    "proteinas": 0.52,
+    "grasas": 0.11,
+    "grasas_saturadas": 0.023,
+    "carbohidratos": 29.5,
+    "azucares": 0.49,
+    "fibra": 5.1,
+    "sal": 0.038,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 53201 «Taro, tubercule, cuit». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "12bd7e18-f822-57c4-b6b4-82fbb9d75a53",
+   "nombre": "Cebolla morada, cruda / Rote Zwiebel, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 35,
+    "proteinas": 1.31,
+    "grasas": 0.4,
+    "grasas_saturadas": 0.14,
+    "carbohidratos": 5.63,
+    "azucares": 5.2,
+    "fibra": 2.5,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20238 «Oignon rouge, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013)."
+  },
+  {
+   "uuid": "e5c67505-b970-58a6-97d6-61eab79f8dff",
+   "nombre": "Pepinillos agridulces / Gewürzgurken, süß-sauer",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Despensa",
+   "nutricion": {
+    "kcal": 36,
+    "proteinas": 1.25,
+    "grasas": 0.35,
+    "grasas_saturadas": 0,
+    "carbohidratos": 5,
+    "azucares": 4,
+    "fibra": 1.5,
+    "sal": 0.94,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 11097 «Cornichon, aigre-doux». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "0cb557d5-91ad-5ff5-abf6-49efd9096f3a",
+   "nombre": "Calabaza Hokkaido (potimarrón), cruda / Hokkaido-Kürbis, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 22.1,
+    "proteinas": 0.95,
+    "grasas": 0.28,
+    "grasas_saturadas": 0.027,
+    "carbohidratos": 3.1,
+    "azucares": 1.69,
+    "fibra": 1.7,
+    "sal": 0.074,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20132 «Potimarron, chair sans peau, cru». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "9eb91a55-7fac-56b6-b846-4cb9b4dec191",
+   "nombre": "Calabaza Hokkaido (potimarrón), hervida / Hokkaido-Kürbis, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 38.6,
+    "proteinas": 1.06,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.08,
+    "carbohidratos": 6.88,
+    "azucares": 3.5,
+    "fibra": 1.8,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20331 «Potimarron, chair sans peau, bouilli/cuit à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: sal (< 0,013)."
+  },
+  {
+   "uuid": "0a43b8e5-bef0-552b-9dac-62804d3ab26f",
+   "nombre": "Espárrago blanco, pelado, crudo / Weißer Spargel, geschält, roh",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 21,
+    "proteinas": 2.2,
+    "grasas": 0.12,
+    "grasas_saturadas": 0.04,
+    "carbohidratos": 1.62,
+    "azucares": 1.62,
+    "fibra": 2.1,
+    "sal": 0.005,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20282 «Asperge, blanche ou violette, pelée, crue». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "e10eb6ef-75e6-563a-8a68-201a0b39ae2b",
+   "nombre": "Espárrago blanco, hervido / Weißer Spargel, gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 17.3,
+    "proteinas": 1.44,
+    "grasas": 0.3,
+    "grasas_saturadas": 0.1,
+    "carbohidratos": 1.63,
+    "azucares": 1.2,
+    "fibra": 1.3,
+    "sal": 0.013,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 20277 «Asperge blanche, bouillie/cuite à l'eau». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE."
+  },
+  {
+   "uuid": "ecc18116-624b-574a-8028-60e15f97c2b4",
+   "nombre": "Yuca (mandioca), cocida / Maniok (Cassava), gekocht",
+   "tipo": "generico",
+   "unidad": "g",
+   "categoria": "Frutas y verduras",
+   "nutricion": {
+    "kcal": 135,
+    "proteinas": 0.69,
+    "grasas": 0.043,
+    "carbohidratos": 32.8,
+    "fibra": 0.4,
+    "origen": "importado"
+   },
+   "notas": "Fuente: Anses. 2025. Ciqual French food composition table (doi:10.5281/zenodo.17550133), código 54034 «Manioc, racine cuite». Valores por 100 g de parte comestible. Carbohidratos disponibles (sin la fibra) y proteína bruta (N × 6,25), como en las etiquetas de la UE. Sin cifra en la fuente: grasas saturadas (sin dato), azúcares (sin dato), sal (sin dato)."
+  }
+ ]
+}

@@ -58,7 +58,8 @@ final seedCatalogProvider = FutureProvider<Repertoire>((ref) async {
   return RepertoireCodec.decode(json);
 });
 
-/// Frutas, verduras y hortalizas con la tabla de USDA (222 alimentos).
+/// Frutas, verduras y hortalizas con la tabla de CIQUAL 2025 o USDA SR Legacy
+/// (229 alimentos).
 final produceCatalogProvider = FutureProvider<Repertoire>((ref) async {
   final json = await rootBundle.loadString(AppConstants.produceCatalogAsset);
   return RepertoireCodec.decode(json);

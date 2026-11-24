@@ -1,84 +1,109 @@
 #!/usr/bin/env python3
-"""Genera assets/semilla/frutas_verduras_usda.json desde USDA SR28.
-
-Fuente de los datos: USDA, Agricultural Research Service, Nutrient Data
-Laboratory. "USDA National Nutrient Database for Standard Reference,
-Release 28" (2015, revisado en 2016). Dominio público.
+"""Genera assets/semilla/frutas_verduras.json desde CIQUAL 2025 y USDA SR Legacy.
 
 Ningún valor nutricional ni peso de porción se escribe a mano: todos se leen
-de los archivos oficiales por su número NDB. Este script solo decide QUÉ
-alimentos entran, CÓMO se llaman en español y qué porciones de USDA se usan.
+de los archivos oficiales. Este script solo decide QUÉ alimentos entran, CÓMO
+se llaman (español / alemán) y de qué fuente sale cada uno.
 
-Los servidores de USDA no eran accesibles desde el entorno donde se creó, así
-que el script usa dos redistribuciones independientes de los archivos
-oficiales de SR28 y exige que coincidan valor por valor:
+Fuentes:
 
-  - PyPI `django-usda-nutrition` 0.2.0: archivos ASCII completos de SR28
-    (FOOD_DES, NUT_DATA, WEIGHT...).
-  - npm `fda-nutrient-database` 1.0.2: archivo abreviado ABBREV de SR28.
+  1. CIQUAL 2025 (fuente preferida). "Anses. 2025. Ciqual French food
+     composition table", https://doi.org/10.5281/zenodo.17550133, Licence
+     Ouverte. Mismo criterio que las etiquetas de la UE: carbohidratos
+     disponibles (sin la fibra), proteína bruta (N × 6,25), energía según el
+     Reglamento (UE) 1169/2011 y sal publicada directamente.
+  2. USDA SR Legacy. U.S. Department of Agriculture, Agricultural Research
+     Service. FoodData Central, "SR Legacy" (abril de 2018), la edición final
+     de la National Nutrient Database for Standard Reference. Dominio
+     público. Carbohidratos totales por diferencia (incluyen la fibra).
 
-Si alguna descarga no coincide con su sha256, si las descripciones difieren o
-si un solo valor de los 8 nutrientes usados difiere entre las dos copias, el
-script se detiene sin escribir nada.
+Regla: un alimento usa CIQUAL si tiene equivalente (mismo alimento y misma
+preparación) y CIQUAL publica una cifra para kcal, proteínas, grasas y
+carbohidratos. Si alguno de esos cuatro es "traces", "< x" o falta, el
+alimento entero sale de USDA, que sí los publica. Los nutrientes opcionales
+sin cifra en la fuente quedan vacíos (nunca 0). Nunca se mezclan fuentes en la
+tabla de un mismo alimento; las porciones (pesos de piezas) son de USDA.
+
+Integridad: los archivos se descargan de las fuentes oficiales y se
+comprueban con un sha256 fijado: CIQUAL de Zenodo (ANSES, que además publica
+su md5) y SR Legacy de FoodData Central (USDA).
 
 Uso:
     python3 tool/semilla/generar_frutas_verduras.py [--cache DIR]
 """
 
 import argparse
+import csv
 import hashlib
 import io
 import json
 import os
+import re
 import sys
-import tarfile
 import tempfile
+import urllib.parse
 import urllib.request
 import uuid
+import xml.etree.ElementTree as ET
+import zipfile
 from decimal import Decimal
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SALIDA = os.path.join(RAIZ, 'assets', 'semilla', 'frutas_verduras_usda.json')
-DOC = os.path.join(RAIZ, 'docs', 'FRUTAS_VERDURAS_USDA.md')
+SALIDA = os.path.join(RAIZ, 'assets', 'semilla', 'frutas_verduras.json')
+DOC = os.path.join(RAIZ, 'docs', 'FRUTAS_VERDURAS.md')
 
-FUENTES = {
-    'pypi': {
-        'url': 'https://files.pythonhosted.org/packages/83/d2/'
-               '7e0720862f3e8f27cfc524b9bf4fd18f7aad7bd5ccd71c6f80dedf1b9243/'
-               'django-usda-nutrition-0.2.0.tar.gz',
-        'sha256': '3ed660b9e097eb97e2f063c3b18226b03aeed954d25e03847bff96967fd63c25',
-        'prefijo': 'django-usda-nutrition-0.2.0/usda_nutrition/data/sr28/',
-    },
-    'npm': {
-        'url': 'https://registry.npmjs.org/fda-nutrient-database/-/'
-               'fda-nutrient-database-1.0.2.tgz',
-        'sha256': '45434edd1024cba5ab7177a7171ba654281a6d363a1ec0da00594c7b19adb7cb',
-        'prefijo': 'package/data/',
-    },
+USDA_URL = ('https://fdc.nal.usda.gov/fdc-datasets/'
+            'FoodData_Central_sr_legacy_food_csv_2018-04.zip')
+USDA_SHA256 = 'b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0'
+USDA_PREFIJO = 'FoodData_Central_sr_legacy_food_csv_2018-04/'
+
+CIQUAL_DOI = '10.5281/zenodo.17550133'
+CIQUAL_URL = 'https://zenodo.org/api/records/17550133/files/{}/content'
+CIQUAL_ARCHIVOS = {
+    'alim_2025_11_03.xml': (
+        '8e1171d63cee4b6010cfce25dd29243d',
+        'e0b1de25b3039028205e9d54a96892e403e1b313c2efeb41180fabe132627478'),
+    'compo_2025_11_03.xml': (
+        '2da725585946434df320d8041631998b',
+        '8c46a9032ece4eab4ffccc9dfcb0c490ec2f416aa664cc1ee013b241c6bdd4af'),
+    'const_2025_11_03.xml': (
+        'd8f2f25fdacb887bc993a6eeaf80f203',
+        '3a231ea3e9836e4ac0b6ff94511e010210b2523d1b8b486c6b29e211066ba3f3'),
 }
 
-# Identificadores de nutriente de SR28 (NUTR_DEF.txt) → clave del repertorio.
+# Componentes de CIQUAL → clave del repertorio, con el nombre inglés que debe
+# tener cada código en const_2025_11_03.xml (se comprueba).
+CIQUAL_COMPONENTES = {
+    '328': ('kcal', 'Energy, Regulation EU No 1169/2011 (kcal/100g)'),
+    '25003': ('proteinas', 'Protein, crude, N x 6.25 (g/100g)'),
+    '40000': ('grasas', 'Fat (g/100g)'),
+    '40302': ('grasas_saturadas', 'FA saturated (g/100g)'),
+    '31000': ('carbohidratos', 'Carbohydrate (g/100g)'),
+    '32000': ('azucares', 'Sugars (g/100g)'),
+    '34100': ('fibra', 'Fibres (g/100g)'),
+    '10004': ('sal', 'Salt (g/100g)'),
+}
+
+# Identificadores de nutriente de FoodData Central (nutrient.csv) → clave.
 NUTRIENTES = {
-    '208': 'kcal',              # Energy (kcal)
-    '203': 'proteinas',         # Protein
-    '204': 'grasas',            # Total lipid (fat)
-    '606': 'grasas_saturadas',  # Fatty acids, total saturated
-    '205': 'carbohidratos',     # Carbohydrate, by difference
-    '269': 'azucares',          # Sugars, total
-    '291': 'fibra',             # Fiber, total dietary
-    '307': 'sodio_mg',          # Sodium, Na (mg)
+    '1008': 'kcal',              # Energy (KCAL)
+    '1003': 'proteinas',         # Protein
+    '1004': 'grasas',            # Total lipid (fat)
+    '1258': 'grasas_saturadas',  # Fatty acids, total saturated
+    '1005': 'carbohidratos',     # Carbohydrate, by difference
+    '2000': 'azucares',          # Sugars, Total
+    '1079': 'fibra',             # Fiber, total dietary
+    '1093': 'sodio_mg',          # Sodium, Na (MG)
 }
 
-# Columnas del archivo ABBREV (sr28_doc.pdf, p. 44) para los mismos nutrientes.
-COLUMNAS_ABBREV = {
-    'kcal': 3, 'proteinas': 4, 'grasas': 5, 'carbohidratos': 7,
-    'fibra': 8, 'azucares': 9, 'sodio_mg': 15, 'grasas_saturadas': 44,
-}
-
+ESENCIALES = ('kcal', 'proteinas', 'grasas', 'carbohidratos')
+ORDEN = ('kcal', 'proteinas', 'grasas', 'grasas_saturadas', 'carbohidratos',
+         'azucares', 'fibra', 'sal')
 ETIQUETAS = {
     'kcal': 'kcal', 'proteinas': 'proteínas', 'grasas': 'grasas',
     'grasas_saturadas': 'grasas saturadas', 'carbohidratos': 'carbohidratos',
     'azucares': 'azúcares', 'fibra': 'fibra', 'sodio_mg': 'sodio (sal)',
+    'sal': 'sal',
 }
 
 FV = 'Frutas y verduras'
@@ -335,8 +360,8 @@ SELECCION = [
     ('11519', 'Ocumo chino (taro), cocido (sin sal)', 'Taro, gekocht, ohne Salz', FV),
 ]
 
-# Porciones tomadas de WEIGHT.txt de SR28: NDB → [(Seq, nombre en español,
-# descripción USDA esperada)]. El generador comprueba que la medida con ese
+# Porciones tomadas de food_portion.csv de SR Legacy: NDB → [(seq_num, nombre
+# en español, "cantidad modificador" esperados en la fuente)]. El generador comprueba que la medida con ese
 # número de secuencia tiene exactamente esa descripción y cantidad, y toma los
 # gramos de la fuente. Las pulgadas se pasan a centímetros (1" = 2,54 cm).
 PORCIONES = {
@@ -361,9 +386,9 @@ PORCIONES = {
               (2, '1 unidad pequeña', '1 small (2-1/4" dia)'),
               (4, '1 unidad grande', '1 large (2-3/4" dia)')],
     '09433': [(1, '1 unidad', '1 fruit')],
-    '09111': [(3, '½ unidad mediana', '.5 medium (approx 4" dia)'),
-              (4, '½ unidad pequeña', '.5 small (approx 3-1/2" dia)'),
-              (2, '½ unidad grande', '.5 large (approx 4-1/2" dia)')],
+    '09111': [(3, '½ unidad mediana', '0.5 medium (approx 4" dia)'),
+              (4, '½ unidad pequeña', '0.5 small (approx 3-1/2" dia)'),
+              (2, '½ unidad grande', '0.5 large (approx 4-1/2" dia)')],
     '09150': [(2, '1 unidad (5,4 cm de diámetro)', '1 fruit (2-1/8" dia)'),
               (3, '1 unidad (6 cm de diámetro)', '1 fruit (2-3/8" dia)')],
     '09152': [(3, 'Jugo de 1 limón', '1 lemon yields')],
@@ -421,7 +446,7 @@ PORCIONES = {
     '09334': [(2, '1 unidad', '1 fruit without peel')],
     '09449': [(2, '3 unidades', '3 fruit without pits, thawed')],
     '09287': [(2, '1 unidad', '1 fruit without refuse')],
-    '09277': [(2, '1 unidad mediana', '1 medium')],
+    '09277': [(1, '1 unidad', '1 plantain')],
     '09446': [(2, '10 rodajas (6 mm de grosor)', '10 slices (1/4" thick)')],
     '09298': [(5, '50 pasas', '50 raisins')],
     '09291': [(2, '1 unidad', '1 prune, pitted')],
@@ -583,34 +608,231 @@ PORCIONES = {
 }
 
 
-def descargar(nombre, cache):
-    f = FUENTES[nombre]
-    ruta = os.path.join(cache, os.path.basename(f['url']))
+# Equivalencias USDA → CIQUAL 2025: NDB → código CIQUAL, o (código, nombre en
+# español, nombre en alemán) cuando la descripción de CIQUAL difiere de la de
+# USDA (otra preparación, con o sin piel...). Se usa CIQUAL solo si publica
+# cifra para los cuatro nutrientes esenciales; si no, se queda el de USDA.
+MAPA_CIQUAL = {
+    # Frutas
+    '09003': '13039',
+    '09004': '13396',
+    '09252': ('13037', 'Pera con piel, cruda', 'Birne mit Schale, roh'),
+    '09040': '13005',
+    '09200': '13034',
+    '09206': '2013',
+    '09218': '13024',
+    '09111': '13040',
+    '09150': '13009',
+    '09152': ('2007', 'Jugo de limón amarillo, hecho en casa', 'Zitronensaft, selbst gepresst'),
+    '09159': '13067',
+    '09160': '2030',
+    '09132': ('13395', 'Uvas, crudas (promedio)', 'Weintrauben, roh (Durchschnitt)'),
+    '09316': '13014',
+    '09050': '13028',
+    '09302': '13015',
+    '09042': '13029',
+    '09084': ('13019', 'Grosellas rojas, crudas', 'Rote Johannisbeeren, roh'),
+    '09083': '13007',
+    '09107': '13020',
+    '09070': '13008',
+    '09063': '13110',
+    '09279': '13100',
+    '09021': '13000',
+    '09236': ('13043', 'Durazno (melocotón) con piel, crudo', 'Pfirsich mit Schale, roh'),
+    '09191': '13399',
+    '09089': '13012',
+    '09286': ('13018', 'Granada, granos con semillas, cruda', 'Granatapfelkerne, roh'),
+    '09263': '13066',
+    '09296': '13010',
+    '09148': ('13021', 'Kiwi, crudo', 'Kiwi, roh'),
+    '09307': ('13047', 'Ruibarbo (tallo), crudo', 'Rhabarber (Stiel), roh'),
+    '09326': '13036',
+    '09181': '13026',
+    '09184': '13742',
+    '09266': '13002',
+    '09176': '13025',
+    '09226': '13035',
+    '09037': '13004',
+    '12104': ('15006', 'Coco, pulpa fresca', 'Kokosnuss, Fruchtfleisch, frisch'),
+    '12119': '18011',
+    '09139': ('13083', 'Guayaba sin piel, cruda', 'Guave ohne Schale, roh'),
+    '09062': '13056',
+    '09321': '13435',
+    '09231': ('13016', 'Maracuyá (parchita), pulpa con semillas, cruda',
+              'Passionsfrucht (Maracuja), Fruchtfleisch mit Kernen, roh'),
+    '09233': ('2024', 'Jugo de maracuyá (parchita), natural', 'Maracujasaft, frisch'),
+    '09175': '13401',
+    '09174': '13564',
+    '09322': '13080',
+    '09060': '13054',
+    '09001': '13055',
+    '09334': '13061',
+    '09287': '13063',
+    '09277': '53100',
+    '09278': '53101',
+    # Frutas secas y conservas
+    '09298': ('13046', 'Uvas pasas', 'Rosinen'),
+    '09291': '13042',
+    '09032': '13001',
+    '09094': '13013',
+    '09087': ('13011', 'Dátiles secos, sin hueso', 'Datteln, getrocknet, entsteint'),
+    '09079': '13178',
+    '09193': '13032',
+    '09195': ('13033', 'Aceitunas verdes en salmuera, escurridas',
+              'Grüne Oliven in Salzlake, abgetropft'),
+    '02054': '11040',
+    # Tomate, cebollas y aromáticos
+    '11529': '20385',
+    '11531': ('20137', 'Tomate pelado en lata, en su jugo',
+              'Geschälte Tomaten aus der Dose, im eigenen Saft'),
+    '11693': '20169',
+    '11546': ('20068', 'Concentrado de tomate (pasta de tomate), en lata', 'Tomatenmark'),
+    '11547': ('20170', 'Puré de tomate, en lata', 'Tomatenpüree aus der Dose'),
+    '11955': '20189',
+    '11956': '20256',
+    '11282': '20034',
+    '11283': ('20035', 'Cebolla, cocida', 'Zwiebel, gekocht'),
+    '11677': '20097',
+    '11246': '20039',
+    '11247': '20327',
+    '11215': '11000',
+    '11216': ('11074', 'Jengibre, raíz fresca', 'Ingwer, frisch'),
+    # Hortalizas de fruto
+    '11205': '20019',
+    '11206': '20210',
+    '11477': '20020',
+    '11478': ('20021', 'Calabacín (zucchini), cocido', 'Zucchini, gekocht'),
+    '11209': '20053',
+    '11210': ('20002', 'Berenjena, cocida', 'Aubergine, gekocht'),
+    '11333': '20085',
+    '11821': '20087',
+    '11951': '20168',
+    '11278': '58100',
+    '11279': ('58103', 'Quimbombó (okra), cocido', 'Okra, gekocht'),
+    '11422': ('20128', 'Auyama (calabaza moscada), cruda', 'Moschuskürbis, roh'),
+    '11423': '20292',
+    '11485': '20138',
+    '11486': ('20141', 'Calabaza butternut, hervida', 'Butternutkürbis, gekocht'),
+    '11149': '13128',
+    '11150': ('13177', 'Chayota (chayote), hervida', 'Chayote, gekocht'),
+    # Legumbres frescas y maíz tierno
+    '11052': '20061',
+    '11053': '20320',
+    '11304': '20072',
+    '11305': ('20326', 'Arvejas (guisantes), hervidas', 'Grüne Erbsen, gekocht'),
+    '11300': '20173',
+    '11088': ('20517', 'Habas frescas (para desgranar), crudas', 'Dicke Bohnen, frisch, roh'),
+    '11344': '20527',
+    '11345': '20833',
+    '11168': ('20049', 'Jojoto (maíz dulce en mazorca), cocido',
+              'Zuckermais (Maiskolben), gekocht'),
+    '11172': '20066',
+    # Coles y crucíferas
+    '11090': '20057',
+    '11091': ('20350', 'Brócoli, hervido', 'Brokkoli, gekocht'),
+    '11135': '20016',
+    '11136': ('20017', 'Coliflor, hervida', 'Blumenkohl, gekocht'),
+    '11098': '20058',
+    '11099': '20309',
+    '11109': '20116',
+    '11110': '20308',
+    '11112': '20014',
+    '11113': ('20095', 'Repollo morado (lombarda), hervido', 'Rotkohl, gekocht'),
+    '11233': '20218',
+    '11234': ('20219', 'Col rizada (kale), cocida', 'Grünkohl, gekocht'),
+    '11119': '20167',
+    '11116': '20340',
+    '11241': '20065',
+    '11242': ('20094', 'Colinabo, hervido', 'Kohlrabi, gekocht'),
+    # Raíces, bulbos y tallos
+    '11124': '20009',
+    '11125': '20352',
+    '11080': '20091',
+    '11081': ('20003', 'Remolacha (betabel), cocida', 'Rote Bete, gekocht'),
+    '11435': '20201',
+    '11436': ('20165', 'Nabo sueco (rutabaga), cocido', 'Steckrübe, gekocht'),
+    '11564': ('20064', 'Nabo, pelado, crudo', 'Weiße Rübe (Speiserübe), geschält, roh'),
+    '11565': '20321',
+    '11298': '20181',
+    '11141': '20055',
+    '11142': ('20315', 'Apionabo, hervido', 'Knollensellerie, gekocht'),
+    '11143': '20023',
+    '11429': '20045',
+    '11226': '20196',
+    '11957': '20028',
+    '11007': '20052',
+    '11008': ('20000', 'Alcachofa, cocida', 'Artischocke, gekocht'),
+    '11011': ('20279', 'Espárrago verde, crudo', 'Grüner Spargel, roh'),
+    '11012': ('20299', 'Espárrago verde, hervido', 'Grüner Spargel, gekocht'),
+    '11015': '20076',
+    '11961': ('20018', 'Palmito en lata, escurrido', 'Palmherzen aus der Dose, abgetropft'),
+    # Hojas verdes y ensalada
+    '11457': '20059',
+    '11458': '20336',
+    '11148': ('20301', 'Acelga (hoja y penca), hervida', 'Mangold, gekocht'),
+    '11252': '20200',
+    '11251': '20171',
+    '11250': ('20031', 'Lechuga, cruda', 'Kopfsalat, roh'),
+    '11959': '20217',
+    '11190': '20099',
+    '11213': ('20090', 'Escarola, cruda', 'Endivie (Escariol), roh'),
+    '11151': '20026',
+    '11952': '20162',
+    '11591': '20022',
+    '11203': '20199',
+    '11043': '20183',
+    # Hierbas frescas
+    '11165': ('11094', 'Cilantro, fresco', 'Koriander, frisch'),
+    '11297': '11014',
+    '02044': '11033',
+    '02045': '11093',
+    '02065': ('11027', 'Menta (hierbabuena), fresca', 'Minze, frisch'),
+    '02049': '11070',
+    '02063': '11068',
+    # Setas
+    '11260': '20056',
+    '11261': ('20102', 'Champiñones blancos, hervidos', 'Weiße Champignons, gekocht'),
+    '11264': '20079',
+    '11987': '20114',
+    '11239': '20103',
+    # Raíces y tubérculos
+    '11352': ('4008', 'Papa (patata) pelada, cruda', 'Kartoffel, geschält, roh'),
+    '11367': ('4003', 'Papa (patata), hervida', 'Kartoffel, gekocht'),
+    '11507': '4101',
+    '11510': ('4102', 'Batata (boniato, camote), cocida', 'Süßkartoffel, gekocht'),
+    '11134': '54031',
+    '11601': ('53502', 'Ñame, pelado, crudo', 'Yamswurzel, geschält, roh'),
+    '11602': ('53503', 'Ñame, pelado, hervido', 'Yamswurzel, geschält, gekocht'),
+    '11518': '53200',
+    '11519': ('53201', 'Ocumo chino (taro), cocido', 'Taro, gekocht'),
+}
+
+# Las porciones de USDA no se pasan al alimento de CIQUAL cuando la pieza no es
+# la misma (papa cruda con piel → pelada; dátil Deglet Noor → dátil genérico).
+SIN_PORCIONES_EN_CIQUAL = {'11352', '09087'}
+
+# Alimentos que solo están en CIQUAL: (código, español, alemán, categoría).
+# Deben tener cifra para los cuatro esenciales.
+NUEVOS_CIQUAL = [
+    ('20238', 'Cebolla morada, cruda', 'Rote Zwiebel, roh', FV),
+    ('11097', 'Pepinillos agridulces', 'Gewürzgurken, süß-sauer', DESP),
+    ('20132', 'Calabaza Hokkaido (potimarrón), cruda', 'Hokkaido-Kürbis, roh', FV),
+    ('20331', 'Calabaza Hokkaido (potimarrón), hervida', 'Hokkaido-Kürbis, gekocht', FV),
+    ('20282', 'Espárrago blanco, pelado, crudo', 'Weißer Spargel, geschält, roh', FV),
+    ('20277', 'Espárrago blanco, hervido', 'Weißer Spargel, gekocht', FV),
+    ('54034', 'Yuca (mandioca), cocida', 'Maniok (Cassava), gekocht', FV),
+]
+
+
+# ─── Descargas y lectura de las fuentes ─────────────────────────────────────
+
+def descargar_url(url, ruta):
     if not os.path.exists(ruta):
-        print(f'Descargando {f["url"]}', file=sys.stderr)
-        with urllib.request.urlopen(f['url'], timeout=300) as r, open(ruta, 'wb') as out:
+        print(f'Descargando {url}', file=sys.stderr)
+        with urllib.request.urlopen(url, timeout=600) as r, open(ruta, 'wb') as out:
             out.write(r.read())
-    datos = open(ruta, 'rb').read()
-    digest = hashlib.sha256(datos).hexdigest()
-    if digest != f['sha256']:
-        sys.exit(f'ERROR: sha256 de {ruta} = {digest}, se esperaba {f["sha256"]}')
-    return datos
-
-
-def leer_archivos(nombre, datos, archivos):
-    prefijo = FUENTES[nombre]['prefijo']
-    out = {}
-    with tarfile.open(fileobj=io.BytesIO(datos), mode='r:gz') as tar:
-        for a in archivos:
-            out[a] = tar.extractfile(prefijo + a).read()
-    return out
-
-
-def filas(contenido):
-    """Formato ASCII de SR28: campos separados por ^, texto entre ~."""
-    for linea in contenido.decode('latin-1').splitlines():
-        if linea:
-            yield [c.strip('~') for c in linea.split('^')]
+    with open(ruta, 'rb') as f:
+        return f.read()
 
 
 def numero(texto):
@@ -620,113 +842,244 @@ def numero(texto):
     return float(d.normalize())
 
 
-def cargar(cache):
-    pypi = leer_archivos('pypi', descargar('pypi', cache),
-                         ['FOOD_DES.txt', 'NUT_DATA.txt', 'WEIGHT.txt'])
-    npm = leer_archivos('npm', descargar('npm', cache),
-                        ['FOOD_DES.txt', 'ABBREV.txt'])
+def cargar_usda(cache):
+    """SR Legacy (CSV de FoodData Central). Devuelve, por NDB de 5 cifras:
+    descripción y FDC ID, nutrientes y porciones (seq_num → (cantidad,
+    modificador, gramos))."""
+    datos = descargar_url(USDA_URL, os.path.join(cache, os.path.basename(USDA_URL)))
+    digest = hashlib.sha256(datos).hexdigest()
+    if digest != USDA_SHA256:
+        sys.exit(f'ERROR: sha256 de {USDA_URL} = {digest}, se esperaba {USDA_SHA256}')
 
-    if pypi['FOOD_DES.txt'] != npm['FOOD_DES.txt']:
-        sys.exit('ERROR: FOOD_DES.txt difiere entre las dos copias de SR28')
+    def tabla(nombre):
+        with zipfile.ZipFile(io.BytesIO(datos)) as z:
+            texto = z.read(USDA_PREFIJO + nombre).decode('utf-8')
+        return csv.DictReader(io.StringIO(texto))
 
-    desc = {r[0]: r for r in filas(pypi['FOOD_DES.txt'])}
+    fdc_de = {f'{int(r["NDB_number"]):05d}': r['fdc_id']
+              for r in tabla('sr_legacy_food.csv')}
+    ndb_de = {f: n for n, f in fdc_de.items()}
+    desc = {}
+    for r in tabla('food.csv'):
+        if r['fdc_id'] in ndb_de:
+            desc[ndb_de[r['fdc_id']]] = {'fdc': r['fdc_id'], 'desc': r['description']}
     nut = {}
-    for r in filas(pypi['NUT_DATA.txt']):
-        if r[1] in NUTRIENTES:
-            nut.setdefault(r[0], {})[NUTRIENTES[r[1]]] = r[2]
+    for r in tabla('food_nutrient.csv'):
+        if r['nutrient_id'] in NUTRIENTES and r['fdc_id'] in ndb_de:
+            nut.setdefault(ndb_de[r['fdc_id']], {})[NUTRIENTES[r['nutrient_id']]] = r['amount']
     pesos = {}
-    for r in filas(pypi['WEIGHT.txt']):
-        pesos.setdefault(r[0], {})[int(r[1])] = (r[2], r[3], r[4])
-
-    # Verificación cruzada de los 8 nutrientes en TODOS los alimentos.
-    comprobados = 0
-    for r in filas(npm['ABBREV.txt']):
-        ndb = r[0]
-        for clave, col in COLUMNAS_ABBREV.items():
-            a = r[col]
-            b = nut.get(ndb, {}).get(clave)
-            if a == '' and b is None:
-                continue
-            if a == '' or b is None or Decimal(a) != Decimal(b):
-                sys.exit(f'ERROR: {ndb} {clave}: ABBREV={a!r} NUT_DATA={b!r}')
-            comprobados += 1
-    print(f'Verificación cruzada: {comprobados} valores idénticos '
-          f'en {len(desc)} alimentos.', file=sys.stderr)
+    for r in tabla('food_portion.csv'):
+        if r['fdc_id'] in ndb_de:
+            pesos.setdefault(ndb_de[r['fdc_id']], {})[int(r['seq_num'])] = (
+                r['amount'], r['modifier'], r['gram_weight'])
+    print(f'USDA SR Legacy: {len(desc)} alimentos, sha256 correcto.', file=sys.stderr)
     return desc, nut, pesos
 
 
-def nombre_app(sel):
+def _xml(e, tag):
+    x = e.find(tag)
+    if x is None or x.get('missing') is not None:
+        return None
+    return (x.text or '').strip()
+
+
+def cargar_ciqual(cache):
+    datos = {}
+    for nombre, (md5, sha) in CIQUAL_ARCHIVOS.items():
+        url = CIQUAL_URL.format(urllib.parse.quote(nombre))
+        b = descargar_url(url, os.path.join(cache, nombre))
+        if hashlib.md5(b).hexdigest() != md5 or hashlib.sha256(b).hexdigest() != sha:
+            sys.exit(f'ERROR: {nombre} no coincide con el md5/sha256 esperado')
+        datos[nombre] = b
+
+    const = {_xml(c, 'const_code'): _xml(c, 'const_nom_eng')
+             for c in ET.fromstring(datos['const_2025_11_03.xml'])}
+    for cod, (_, nombre) in CIQUAL_COMPONENTES.items():
+        if const.get(cod) != nombre:
+            sys.exit(f'ERROR: componente CIQUAL {cod} = {const.get(cod)!r}, '
+                     f'se esperaba {nombre!r}')
+
+    alim = {_xml(a, 'alim_code'): {'fr': _xml(a, 'alim_nom_fr'),
+                                   'eng': _xml(a, 'alim_nom_eng')}
+            for a in ET.fromstring(datos['alim_2025_11_03.xml'])}
+    compo = {}
+    for _, e in ET.iterparse(io.BytesIO(datos['compo_2025_11_03.xml'])):
+        if e.tag != 'COMPO':
+            continue
+        cod = _xml(e, 'const_code')
+        if cod in CIQUAL_COMPONENTES:
+            clave = CIQUAL_COMPONENTES[cod][0]
+            compo.setdefault(_xml(e, 'alim_code'), {})[clave] = _xml(e, 'teneur')
+        e.clear()
+    print(f'CIQUAL 2025: {len(alim)} alimentos, md5 y sha256 correctos.',
+          file=sys.stderr)
+    return alim, compo
+
+
+# ─── Construcción del repertorio ────────────────────────────────────────────
+
+CIFRA_CIQUAL = re.compile(r'^\d+(,\d+)?$')
+
+
+def valores_ciqual(compo, codigo):
+    """(cifras, sin_cifra): las cifras publicadas y, para el resto de los
+    8 nutrientes, el texto de la fuente ("-", "traces", "< 0,5"...)."""
+    v = compo.get(codigo, {})
+    cifras, sin_cifra = {}, {}
+    for clave in ORDEN:
+        texto = v.get(clave)
+        if texto is not None and CIFRA_CIQUAL.match(texto):
+            cifras[clave] = numero(texto.replace(',', '.'))
+        else:
+            sin_cifra[clave] = texto or '-'
+    return cifras, sin_cifra
+
+
+def completo_ciqual(compo, codigo):
+    cifras, _ = valores_ciqual(compo, codigo)
+    return all(c in cifras for c in ESENCIALES)
+
+
+def texto_fuente(t):
+    return {'-': 'sin dato', 'traces': 'trazas'}.get(t, t)
+
+
+def nombre_app(es, de):
     """Nombre que ve la app: "español / alemán" (se busca en los dos)."""
-    _, es, de, _ = sel
-    assert ' / ' not in es and ' / ' not in de, sel
+    assert ' / ' not in es and ' / ' not in de, (es, de)
     return f'{es} / {de}'
 
 
-def construir(desc, nut, pesos):
+def porciones_usda(ndb, pesos):
+    out = []
+    for seq, nombre_es, esperado in PORCIONES.get(ndb, []):
+        amount, msre, gm = pesos[ndb][seq]
+        real = f'{amount} {msre}'
+        if real != esperado:
+            sys.exit(f'ERROR: porción {ndb}/{seq}: {real!r} != {esperado!r}')
+        out.append({'nombre': nombre_es, 'gramos': numero(gm)})
+    return out
+
+
+def alimento_ciqual(codigo, es, de, cat, alim, compo, porciones, fdc_porciones):
+    cifras, sin_cifra = valores_ciqual(compo, codigo)
+    assert all(c in cifras for c in ESENCIALES), codigo
+    fr = alim[codigo]['fr']
+    notas = (f'Fuente: Anses. 2025. Ciqual French food composition table '
+             f'(doi:{CIQUAL_DOI}), código {codigo} «{fr}». Valores por 100 g '
+             'de parte comestible. Carbohidratos disponibles (sin la fibra) y '
+             'proteína bruta (N × 6,25), como en las etiquetas de la UE.')
+    if sin_cifra:
+        notas += ' Sin cifra en la fuente: ' + ', '.join(
+            f'{ETIQUETAS[c]} ({texto_fuente(t)})' for c, t in sin_cifra.items()) + '.'
+    if porciones:
+        notas += (f' Porciones: pesos de USDA SR Legacy (FDC ID {fdc_porciones}, '
+                  'parte comestible).')
+    a = {
+        'uuid': str(uuid.uuid5(uuid.NAMESPACE_URL, f'cal_counter/ciqual-2025/{codigo}')),
+        'nombre': nombre_app(es, de),
+        'tipo': 'generico',
+        'unidad': 'g',
+        'categoria': cat,
+        'nutricion': {**cifras, 'origen': 'importado'},
+        'notas': notas,
+    }
+    if porciones:
+        a['porciones'] = porciones
+    fila = {'fuente': f'CIQUAL {codigo}', 'descripcion': fr}
+    return a, fila
+
+
+def alimento_usda(ndb, es, de, cat, desc, nut, pesos, motivo):
+    valores = nut[ndb]
+    nutricion = {}
+    for clave in ('kcal', 'proteinas', 'grasas', 'grasas_saturadas',
+                  'carbohidratos', 'azucares', 'fibra'):
+        if clave in valores:
+            nutricion[clave] = numero(valores[clave])
+    if 'sodio_mg' in valores:
+        # Sal = sodio × 2,5 (Reglamento (UE) 1169/2011, anexo I).
+        sal = Decimal(valores['sodio_mg']) * Decimal('2.5') / Decimal(1000)
+        nutricion['sal'] = float(sal.normalize()) if sal else 0
+    for esencial in ESENCIALES:
+        assert esencial in nutricion, f'{ndb} sin {esencial}'
+    nutricion['origen'] = 'importado'
+
+    faltan = [ETIQUETAS[c] for c in NUTRIENTES.values() if c not in valores]
+    notas = (f'Fuente: USDA FoodData Central, SR Legacy, FDC ID {desc[ndb]["fdc"]} '
+             f'(NDB {int(ndb)}) «{desc[ndb]["desc"]}». '
+             'Valores por 100 g de parte comestible. Carbohidratos totales '
+             '(por diferencia, incluyen la fibra).')
+    if 'sodio_mg' in valores:
+        notas += ' Sal = sodio × 2,5.'
+    if faltan:
+        notas += f' Sin dato en la fuente: {", ".join(faltan)}.'
+    porciones = porciones_usda(ndb, pesos)
+    if porciones:
+        notas += ' Porciones: pesos de USDA (parte comestible).'
+    if motivo:
+        codigo, sin_cifra = motivo
+        campos = ', '.join(f'{ETIQUETAS[c]} ({texto_fuente(t)})'
+                           for c, t in sin_cifra.items() if c in ESENCIALES)
+        notas += (f' Se usa USDA porque CIQUAL 2025 (código {codigo}) no da '
+                  f'cifra de {campos}.')
+    a = {
+        'uuid': str(uuid.uuid5(uuid.NAMESPACE_URL, f'cal_counter/usda-sr-legacy/{ndb}')),
+        'nombre': nombre_app(es, de),
+        'tipo': 'generico',
+        'unidad': 'g',
+        'categoria': cat,
+        'nutricion': nutricion,
+        'notas': notas,
+    }
+    if porciones:
+        a['porciones'] = porciones
+    fila = {'fuente': f'USDA {desc[ndb]["fdc"]}', 'descripcion': desc[ndb]['desc']}
+    return a, fila
+
+
+def construir(desc, nut, pesos, alim, compo):
     ndbs = [s[0] for s in SELECCION]
-    nombres = [nombre_app(s).lower() for s in SELECCION]
     assert len(set(ndbs)) == len(ndbs), 'NDB repetido'
-    assert len(set(nombres)) == len(nombres), 'nombre repetido'
     assert set(PORCIONES) <= set(ndbs), set(PORCIONES) - set(ndbs)
+    assert set(MAPA_CIQUAL) <= set(ndbs), set(MAPA_CIQUAL) - set(ndbs)
+    codigos = [m if isinstance(m, str) else m[0] for m in MAPA_CIQUAL.values()]
+    codigos += [n[0] for n in NUEVOS_CIQUAL]
+    assert len(set(codigos)) == len(codigos), 'código CIQUAL repetido'
 
-    alimentos = []
-    for sel in SELECCION:
-        ndb, _, _, categoria = sel
-        nombre = nombre_app(sel)
-        d = desc[ndb]
-        valores = nut[ndb]
-        nutricion = {}
-        for clave in ('kcal', 'proteinas', 'grasas', 'grasas_saturadas',
-                      'carbohidratos', 'azucares', 'fibra'):
-            if clave in valores:
-                nutricion[clave] = numero(valores[clave])
-        if 'sodio_mg' in valores:
-            # Sal = sodio × 2,5 (Reglamento (UE) 1169/2011, anexo I).
-            sal = Decimal(valores['sodio_mg']) * Decimal('2.5') / Decimal(1000)
-            nutricion['sal'] = float(sal.normalize()) if sal else 0
-        for esencial in ('kcal', 'proteinas', 'grasas', 'carbohidratos'):
-            assert esencial in nutricion, f'{ndb} sin {esencial}'
-        nutricion['origen'] = 'importado'
-
-        faltan = [ETIQUETAS[c] for c in NUTRIENTES.values() if c not in valores]
-        notas = (f'Fuente: USDA SR28, NDB {ndb} «{d[2]}». '
-                 'Valores por 100 g de parte comestible. Carbohidratos totales '
-                 '(por diferencia, incluyen la fibra).')
-        if 'sodio_mg' in valores:
-            notas += ' Sal = sodio × 2,5.'
-        if faltan:
-            notas += f' Sin dato en la fuente: {", ".join(faltan)}.'
-
-        porciones = []
-        for seq, nombre_es, esperado in PORCIONES.get(ndb, []):
-            amount, msre, gm = pesos[ndb][seq]
-            real = f'{amount} {msre}'
-            if real != esperado:
-                sys.exit(f'ERROR: porción {ndb}/{seq}: {real!r} != {esperado!r}')
-            porciones.append({'nombre': nombre_es, 'gramos': numero(gm)})
-        if porciones:
-            notas += ' Porciones: pesos de USDA (parte comestible).'
-
-        a = {
-            'uuid': str(uuid.uuid5(uuid.NAMESPACE_URL,
-                                   f'cal_counter/usda-sr28/{ndb}')),
-            'nombre': nombre,
-            'tipo': 'generico',
-            'unidad': 'g',
-            'categoria': categoria,
-            'nutricion': nutricion,
-            'notas': notas,
-        }
-        if porciones:
-            a['porciones'] = porciones
+    alimentos, filas_doc = [], []
+    for ndb, es, de, cat in SELECCION:
+        m = MAPA_CIQUAL.get(ndb)
+        codigo, es_c, de_c = (m, None, None) if isinstance(m, str) else (m or (None, None, None))
+        if codigo and completo_ciqual(compo, codigo):
+            porciones = [] if ndb in SIN_PORCIONES_EN_CIQUAL else porciones_usda(ndb, pesos)
+            a, fila = alimento_ciqual(codigo, es_c or es, de_c or de, cat, alim,
+                                      compo, porciones, desc[ndb]['fdc'])
+        else:
+            motivo = (codigo, valores_ciqual(compo, codigo)[1]) if codigo else None
+            a, fila = alimento_usda(ndb, es, de, cat, desc, nut, pesos, motivo)
         alimentos.append(a)
-    return {
+        filas_doc.append(fila)
+    for codigo, es, de, cat in NUEVOS_CIQUAL:
+        if not completo_ciqual(compo, codigo):
+            sys.exit(f'ERROR: {codigo} no tiene los cuatro nutrientes esenciales')
+        a, fila = alimento_ciqual(codigo, es, de, cat, alim, compo, [], None)
+        alimentos.append(a)
+        filas_doc.append(fila)
+
+    nombres = [a['nombre'].lower() for a in alimentos]
+    assert len(set(nombres)) == len(nombres), 'nombre repetido'
+    assert len({a['uuid'] for a in alimentos}) == len(alimentos), 'uuid repetido'
+    rep = {
         'formato': 'cal_counter/repertorio',
         'version': 1,
         'exportado': '2026-11-24T00:00:00Z',
         'alimentos': alimentos,
     }
+    return rep, filas_doc
 
+
+# ─── Documentación ──────────────────────────────────────────────────────────
 
 def fmt(v):
     if v is None:
@@ -734,112 +1087,115 @@ def fmt(v):
     return str(v).replace('.', ',')
 
 
-def escribir_doc(rep, desc):
-    ndb_de = {nombre_app(s): s[0] for s in SELECCION}
+def escribir_doc(rep, filas_doc):
+    total = len(rep['alimentos'])
+    n_ciqual = sum(1 for f in filas_doc if f['fuente'].startswith('CIQUAL'))
     lineas = [
-        '# Frutas, verduras y hortalizas (USDA SR28)',
+        '# Frutas, verduras y hortalizas (CIQUAL 2025 y USDA SR Legacy)',
         '',
         '> Archivo generado por `tool/semilla/generar_frutas_verduras.py`. '
         'No editar a mano.',
         '',
-        f'`assets/semilla/frutas_verduras_usda.json` contiene '
-        f'**{len(rep["alimentos"])} alimentos** en formato '
-        '`cal_counter/repertorio` v1. Se carga junto al catálogo base en la '
-        'bienvenida y se puede añadir en cualquier momento desde *Datos y '
+        f'`assets/semilla/frutas_verduras.json` contiene **{total} alimentos** '
+        f'({n_ciqual} de CIQUAL 2025 y {total - n_ciqual} de USDA SR Legacy) en '
+        'formato `cal_counter/repertorio` v1. Se carga junto al catálogo base '
+        'en la bienvenida y se puede añadir en cualquier momento desde *Datos y '
         'respaldos → Catálogos incluidos → Añadir frutas y verduras* (o '
         'importando el archivo). Importarlo de nuevo no duplica nada: cada '
-        'alimento tiene un uuid v5 fijo derivado de su número NDB '
-        '(`uuid5(NAMESPACE_URL, "cal_counter/usda-sr28/<NDB>")`).',
+        'alimento tiene un uuid v5 fijo derivado de su código en la fuente.',
         '',
-        '## Fuente',
+        '## Fuentes',
         '',
-        'U.S. Department of Agriculture, Agricultural Research Service, '
-        'Nutrient Data Laboratory. *USDA National Nutrient Database for '
-        'Standard Reference, Release 28* (septiembre de 2015, revisado en '
-        'mayo de 2016). Dominio público.',
-        '',
-        '- **Ningún valor se ha escrito a mano ni estimado.** El script lee '
-        'cada nutriente y cada peso de porción de los archivos oficiales por '
-        'su número NDB. Si la fuente no publica un dato, el campo queda '
-        '**vacío** (nunca 0) y la nota del alimento lo dice («Sin dato en la '
-        'fuente: …»).',
-        '- Los servidores de USDA no eran accesibles desde el entorno en que '
-        'se generó, así que el script usa dos redistribuciones independientes '
-        'de los archivos de SR28 (PyPI `django-usda-nutrition` 0.2.0 con los '
-        'ASCII completos y npm `fda-nutrient-database` 1.0.2 con ABBREV), con '
-        'sha256 fijado, y exige que coincidan: los 67.454 valores de los 8 '
-        'nutrientes usados son idénticos en ambas copias para los 8.789 '
-        'alimentos de SR28.',
-        '- **Cómo contrastar un valor**: buscar el número NDB (o la '
-        'descripción en inglés) en [FoodData Central](https://fdc.nal.usda.gov/) '
-        '(tipo de datos *SR Legacy*, que es la edición final de SR, de 2018). '
-        'Cada alimento lleva en su nota el NDB y la descripción original.',
+        '1. **CIQUAL 2025 (fuente preferida).** Anses. 2025. *Ciqual French '
+        'food composition table*. https://doi.org/10.5281/zenodo.17550133. '
+        'Reutilización libre con cita de la fuente (Licence Ouverte). Mismo '
+        'criterio que las etiquetas de la UE: **carbohidratos disponibles (sin '
+        'la fibra)**, **proteína bruta (N × 6,25)**, energía según el Reglamento '
+        '(UE) 1169/2011 y sal publicada directamente. Los archivos se '
+        'descargan de Zenodo y se comprueban con el md5 publicado allí y con '
+        'un sha256 fijado.',
+        '2. **USDA SR Legacy.** U.S. Department of Agriculture, Agricultural '
+        'Research Service. *FoodData Central: SR Legacy* (abril de 2018), la '
+        'edición final de la *National Nutrient Database for Standard '
+        'Reference*. Dominio público. **Carbohidratos totales por diferencia '
+        '(incluyen la fibra)**; sal = sodio × 2,5 (Reglamento (UE) 1169/2011, '
+        'anexo I). El archivo CSV oficial se descarga de FoodData Central y se '
+        'comprueba con un sha256 fijado.',
         '',
         '## Criterios',
         '',
-        '- **Valores por 100 g de parte comestible**, unidad `g`.',
-        '- **Carbohidratos totales por diferencia: incluyen la fibra** (criterio '
-        'de USDA). Las etiquetas de la UE declaran los carbohidratos *sin* la '
-        'fibra, así que estos valores son mayores que los de una etiqueta '
-        'europea del mismo alimento en la cantidad de fibra. No se ha restado '
-        'la fibra para no publicar un número que no está en la fuente.',
-        '- **Sal = sodio × 2,5** (Reglamento (UE) 1169/2011, anexo I). Es la '
-        'única conversión aplicada; si la fuente no da sodio, la sal queda '
-        'vacía.',
-        '- Energía: kcal publicadas por USDA. Grasas saturadas, azúcares '
-        'totales y fibra dietética total, tal cual.',
-        '- **Porciones**: medidas caseras de USDA (`WEIGHT.txt`), solo las de '
-        'unidades (pieza, diente, tallo, hoja, mazorca, cucharada…). Los gramos '
-        'son de la parte comestible; las pulgadas se han pasado a centímetros '
-        '(1" = 2,54 cm) en el nombre. El script comprueba que cada porción '
-        'elegida tiene exactamente la descripción esperada en la fuente.',
+        '- **Ningún valor se ha escrito a mano ni estimado.** El script lee '
+        'cada nutriente y cada peso de porción de los archivos oficiales.',
+        '- **Qué fuente se usa**: CIQUAL si tiene el mismo alimento con la '
+        'misma preparación **y** publica una cifra para kcal, proteínas, '
+        'grasas y carbohidratos. Si alguno de esos cuatro aparece como '
+        '«traces», «< x» o falta, el alimento entero sale de USDA, que sí los '
+        'publica, y su nota explica por qué. Nunca se mezclan fuentes en la '
+        'tabla nutricional de un mismo alimento.',
+        '- **Datos sin cifra**: si la fuente no da una cifra (CIQUAL: «-», '
+        '«traces» o «< x»; USDA: sin dato), el campo queda **vacío**, nunca '
+        'en 0, y la nota lo indica con el texto original de la fuente.',
+        '- **Atención al comparar**: los alimentos de USDA tienen los '
+        'carbohidratos con la fibra incluida; los de CIQUAL, sin ella. La nota '
+        'de cada alimento dice cuál es su caso.',
+        '- **Porciones**: medidas caseras de USDA (`food_portion.csv`), solo de '
+        'unidades (pieza, diente, tallo, hoja, mazorca, cucharada…), en gramos '
+        'de parte comestible. Se ponen también en el alimento de CIQUAL '
+        'equivalente cuando la pieza es la misma, indicando el FDC ID. Las '
+        'pulgadas se han pasado a centímetros (1" = 2,54 cm) en el nombre.',
         '- **Nombre en español y en alemán** en el mismo campo («Manzana con '
         'piel, cruda / Apfel mit Schale, roh»), para buscar en cualquiera de '
         'los dos idiomas. La búsqueda ignora tildes y diéresis, y trata «ß» '
         'como «ss» («Weißkohl» = «Weisskohl»).',
         '- Categorías: *Frutas y verduras* (frescos) y *Despensa* (conservas, '
         'frutas secas y deshidratados).',
+        '- **Cómo contrastar un valor**: CIQUAL en https://ciqual.anses.fr '
+        '(buscar el código o el nombre francés); USDA en '
+        '`https://fdc.nal.usda.gov/food-details/<FDC ID>/nutrients` (el FDC ID '
+        'va en la nota de cada alimento y en la tabla).',
         '',
-        '## No incluidos por no estar en la fuente',
+        '## No incluidos por no estar en ninguna de las dos fuentes',
         '',
-        'SR28 no tiene datos de estos alimentos (o solo en forma de néctar, '
-        'almíbar o mezcla), así que no se incluyen: ají dulce, tomate de árbol, '
-        'curuba, granadilla dulce, arracacha (apio criollo), mapuey, mamón, '
-        'merey (fruto), pitahaya, borojó, mangostino fresco, espárrago blanco '
-        'como entrada propia y calabaza Hokkaido. Se pueden añadir a mano con '
-        'los datos de una etiqueta o de otra tabla oficial.',
+        'Ají dulce, tomate de árbol, curuba, granadilla dulce, arracacha (apio '
+        'criollo), mapuey, mamón, pitahaya y borojó no están en SR Legacy ni en '
+        'CIQUAL 2025. El merey (pomme cajou), el caimito y el chou caraïbe '
+        'están en CIQUAL pero sin cifra de kcal ni de carbohidratos. Se pueden '
+        'añadir a mano con los datos de una etiqueta o de otra tabla oficial.',
         '',
         '## Lista',
         '',
-        '| Alimento | NDB | Descripción USDA | kcal | Prot. | Grasas | Carb. | Fibra | Categoría |',
+        '| Alimento | Fuente | Descripción en la fuente | kcal | Prot. | Grasas | Carb. | Fibra | Categoría |',
         '|---|---|---|---:|---:|---:|---:|---:|---|',
     ]
-    for a in rep['alimentos']:
+    for a, f in zip(rep['alimentos'], filas_doc):
         n = a['nutricion']
-        ndb = ndb_de[a['nombre']]
         lineas.append(
-            f"| {a['nombre']} | {ndb} | {desc[ndb][2]} | {fmt(n.get('kcal'))} "
-            f"| {fmt(n.get('proteinas'))} | {fmt(n.get('grasas'))} "
-            f"| {fmt(n.get('carbohidratos'))} | {fmt(n.get('fibra'))} "
-            f"| {a['categoria']} |")
-    with open(DOC, 'w', encoding='utf-8', newline='\n') as f:
-        f.write('\n'.join(lineas) + '\n')
+            f"| {a['nombre']} | {f['fuente']} | {f['descripcion']} "
+            f"| {fmt(n.get('kcal'))} | {fmt(n.get('proteinas'))} "
+            f"| {fmt(n.get('grasas'))} | {fmt(n.get('carbohidratos'))} "
+            f"| {fmt(n.get('fibra'))} | {a['categoria']} |")
+    with open(DOC, 'w', encoding='utf-8', newline='\n') as fh:
+        fh.write('\n'.join(lineas) + '\n')
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     p.add_argument('--cache', help='carpeta para guardar las descargas')
     args = p.parse_args()
-    cache = args.cache or tempfile.mkdtemp(prefix='sr28_')
+    cache = args.cache or tempfile.mkdtemp(prefix='frutas_verduras_')
     os.makedirs(cache, exist_ok=True)
-    desc, nut, pesos = cargar(cache)
-    rep = construir(desc, nut, pesos)
+    desc, nut, pesos = cargar_usda(cache)
+    alim, compo = cargar_ciqual(cache)
+    rep, filas_doc = construir(desc, nut, pesos, alim, compo)
     with open(SALIDA, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(rep, f, ensure_ascii=False, indent=1)
         f.write('\n')
-    escribir_doc(rep, desc)
-    print(f'{len(rep["alimentos"])} alimentos → {os.path.relpath(SALIDA, RAIZ)}'
-          f' y {os.path.relpath(DOC, RAIZ)}', file=sys.stderr)
+    escribir_doc(rep, filas_doc)
+    n_ciqual = sum(1 for f in filas_doc if f['fuente'].startswith('CIQUAL'))
+    print(f'{len(rep["alimentos"])} alimentos ({n_ciqual} CIQUAL, '
+          f'{len(rep["alimentos"]) - n_ciqual} USDA) → '
+          f'{os.path.relpath(SALIDA, RAIZ)} y {os.path.relpath(DOC, RAIZ)}',
+          file=sys.stderr)
 
 
 if __name__ == '__main__':

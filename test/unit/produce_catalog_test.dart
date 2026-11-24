@@ -18,22 +18,28 @@ Repertoire _leer(String ruta) =>
     RepertoireCodec.decode(File(ruta).readAsStringSync());
 
 void main() {
-  final frutas = _leer('assets/semilla/frutas_verduras_usda.json');
+  final frutas = _leer('assets/semilla/frutas_verduras.json');
   final base = _leer('assets/semilla/alimentos_base.json');
 
   RepertoireFood buscar(String nombre) =>
       frutas.alimentos.firstWhere((f) => f.alimento.nombre == nombre);
 
-  group('catálogo de frutas y verduras (USDA SR28)', () {
-    test('222 alimentos completos, con uuid, categoría y fuente', () {
-      expect(frutas.alimentos.length, 222);
+  group('catálogo de frutas y verduras (CIQUAL 2025 y USDA SR Legacy)', () {
+    test('229 alimentos completos, con uuid, categoría y fuente', () {
+      expect(frutas.alimentos.length, 229);
       for (final rf in frutas.alimentos) {
         final f = rf.alimento;
         expect(f.uuid, isNotNull, reason: f.nombre);
         expect(f.pendiente, isFalse, reason: f.nombre);
         expect(f.origenNutricion, NutritionSource.importado);
         expect(rf.categoria, anyOf('Frutas y verduras', 'Despensa'));
-        expect(f.notas, startsWith('Fuente: USDA SR28, NDB '));
+        expect(
+          f.notas,
+          anyOf(
+            startsWith('Fuente: Anses. 2025. Ciqual French food composition '),
+            startsWith('Fuente: USDA FoodData Central, SR Legacy, FDC ID '),
+          ),
+        );
         for (final p in rf.porciones) {
           expect(p.gramos, greaterThan(0), reason: '${f.nombre}: ${p.nombre}');
         }
@@ -42,19 +48,46 @@ void main() {
 
     test('uuid y nombres únicos, sin chocar con el catálogo base', () {
       final uuids = frutas.alimentos.map((f) => f.alimento.uuid).toSet();
-      expect(uuids.length, 222);
+      expect(uuids.length, 229);
       final nombres = {
         for (final f in frutas.alimentos) normalizeText(f.alimento.nombre),
       };
-      expect(nombres.length, 222);
+      expect(nombres.length, 229);
       for (final f in base.alimentos) {
         expect(uuids.contains(f.alimento.uuid), isFalse);
         expect(nombres.contains(normalizeText(f.alimento.nombre)), isFalse);
       }
     });
 
+    test('130 de CIQUAL y 99 de USDA', () {
+      final ciqual = frutas.alimentos.where(
+        (f) => f.alimento.notas!.startsWith('Fuente: Anses.'),
+      );
+      expect(ciqual.length, 130);
+      expect(frutas.alimentos.length - ciqual.length, 99);
+    });
+
     test('valores de control idénticos a la fuente', () {
-      // USDA SR28, NDB 09040 «Bananas, raw».
+      // CIQUAL 2025, código 13039 «Pomme, chair et peau, crue», con las
+      // porciones de USDA SR Legacy (NDB 9003).
+      final manzana = buscar('Manzana con piel, cruda / Apfel mit Schale, roh');
+      final m = manzana.alimento.nutricion;
+      expect(m.kcal, 54);
+      expect(m.proteinas, 0.25); // proteína bruta (N × 6,25)
+      expect(m.grasas, 0.25);
+      expect(m.grasasSaturadas, 0.052);
+      expect(m.carbohidratos, 11.6); // sin la fibra
+      expect(m.azucares, 10.6);
+      expect(m.fibra, 1.4);
+      expect(m.sal, 0.0037);
+      expect(manzana.alimento.notas, contains('código 13039'));
+      expect(
+        manzana.porciones.map((p) => p.gramos),
+        containsAll([182.0, 149.0, 223.0]),
+      );
+
+      // USDA SR Legacy, NDB 9040 «Bananas, raw»: CIQUAL da las grasas como
+      // «< 0,5», así que el cambur sale entero de USDA.
       final cambur = buscar('Cambur (banano, banana), crudo / Banane, roh');
       expect(cambur.alimento.nutricion.kcal, 89);
       expect(cambur.alimento.nutricion.proteinas, 1.09);
@@ -66,6 +99,10 @@ void main() {
       expect(
         cambur.porciones.map((p) => p.gramos),
         containsAll([118.0, 101.0, 136.0]),
+      );
+      expect(
+        cambur.alimento.notas,
+        contains('Se usa USDA porque CIQUAL 2025 (código 13005)'),
       );
       // NDB 09037 «Avocados, raw, all commercial varieties».
       final aguacate = buscar(
@@ -86,7 +123,7 @@ void main() {
     });
 
     test('un dato ausente en la fuente queda vacío, nunca en 0', () {
-      // NDB 09138: USDA no publica fibra, azúcares, saturadas ni sodio.
+      // NDB 9138: USDA no publica fibra, azúcares, saturadas ni sodio.
       final uchuva = buscar(
         'Uchuva (aguaymanto, physalis), cruda / Physalis (Kapstachelbeere), roh',
       );
@@ -96,6 +133,15 @@ void main() {
       expect(n.grasasSaturadas, isNull);
       expect(n.sal, isNull);
       expect(uchuva.alimento.notas, contains('Sin dato en la fuente'));
+
+      // CIQUAL 20128: «-» en saturadas, azúcares y sal.
+      final auyama = buscar(
+        'Auyama (calabaza moscada), cruda / Moschuskürbis, roh',
+      );
+      expect(auyama.alimento.nutricion.grasasSaturadas, isNull);
+      expect(auyama.alimento.nutricion.azucares, isNull);
+      expect(auyama.alimento.nutricion.sal, isNull);
+      expect(auyama.alimento.notas, contains('Sin cifra en la fuente'));
     });
 
     test('se importa junto al catálogo base y sin duplicar', () async {
@@ -110,9 +156,9 @@ void main() {
           cats,
         );
         expect((await importar(base)).nuevos, 678);
-        expect((await importar(frutas)).nuevos, 222);
+        expect((await importar(frutas)).nuevos, 229);
         expect((await importar(frutas)).nuevos, 0);
-        expect((await foods.search('', limit: 2000)).length, 900);
+        expect((await foods.search('', limit: 2000)).length, 678 + 229);
 
         final kale = (await foods.search('grünkohl')).firstWhere(
           (f) => f.nombre == 'Col rizada (kale), cruda / Grünkohl, roh',
