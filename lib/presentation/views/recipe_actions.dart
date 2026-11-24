@@ -28,9 +28,7 @@ class RecipeActions {
   ) async {
     final list = [...receta.ingredientes];
     list[indice] = ing;
-    await ref
-        .read(recipeRepositoryProvider)
-        .save(receta.copyWith(ingredientes: list));
+    await ref.read(saveRecipeProvider)(receta.copyWith(ingredientes: list));
   }
 
   /// Vincula la línea [indice] a un alimento elegido (o creado), proponiendo
@@ -100,6 +98,7 @@ class RecipeActions {
     switch (issue.tipo) {
       case IngredientIssueKind.sinVincular:
       case IngredientIssueKind.alimentoNoEncontrado:
+      case IngredientIssueKind.circular:
         await link(context, ref, receta, issue.indice);
       case IngredientIssueKind.alimentoPendiente:
         if (food != null) {

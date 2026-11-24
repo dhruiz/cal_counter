@@ -19,7 +19,11 @@ enum IngredientIssueKind {
   unidadSinEquivalencia('Falta el peso de la porción'),
 
   /// El alimento no tiene la tabla nutricional completa.
-  alimentoPendiente('Sin tabla nutricional');
+  alimentoPendiente('Sin tabla nutricional'),
+
+  /// Es el alimento de una receta que, a su vez, contiene esta receta: no se
+  /// cuenta para no entrar en un bucle.
+  circular('Es una receta que contiene esta misma');
 
   final String descripcion;
 
@@ -60,12 +64,17 @@ class RecipeNutrition {
   final int? porciones;
   final List<IngredientIssue> issues;
 
+  /// La receta tiene el peso final de la preparación (si no, [peso] es la
+  /// suma de los ingredientes en crudo).
+  final bool pesoFinalConocido;
+
   const RecipeNutrition({
     required this.total,
     required this.pesoIngredientes,
     required this.peso,
     required this.porciones,
     required this.issues,
+    this.pesoFinalConocido = false,
   });
 
   /// Todos los ingredientes necesarios están vinculados, cuantificados y con
@@ -74,6 +83,14 @@ class RecipeNutrition {
 
   /// Algo se pudo calcular.
   bool get tieneDatos => pesoIngredientes > 0;
+
+  /// Ingredientes completos y peso final conocido: el valor por 100 g es el
+  /// real de la preparación.
+  bool get exacta => completa && pesoFinalConocido;
+
+  /// Hay datos, pero el valor es una aproximación (falta el peso final o
+  /// algún dato de los ingredientes).
+  bool get aproximada => tieneDatos && !exacta;
 
   /// Por 100 g de preparación.
   NutritionFacts? get por100 =>
@@ -101,11 +118,13 @@ const Set<String> _sinCalorias = {'sal', 'pimienta', 'agua'};
 /// Calcula la nutrición de una receta con los alimentos vinculados.
 ///
 /// [alimentos] contiene los alimentos de los ingredientes (por id) y
-/// [porciones] sus equivalencias caseras (por id de alimento).
+/// [porciones] sus equivalencias caseras (por id de alimento). Los alimentos
+/// de [excluidos] (recetas que contienen esta) no se cuentan.
 RecipeNutrition calculateRecipeNutrition(
   Recipe receta, {
   required Map<int, Food> alimentos,
   Map<int, List<FoodPortion>> porciones = const {},
+  Set<int> excluidos = const {},
 }) {
   var total = NutritionFacts.vacia;
   var peso = 0.0;
@@ -123,6 +142,17 @@ RecipeNutrition calculateRecipeNutrition(
           indice: i,
           ingrediente: ing,
           tipo: IngredientIssueKind.sinVincular,
+        ),
+      );
+      continue;
+    }
+    if (excluidos.contains(id)) {
+      issues.add(
+        IngredientIssue(
+          indice: i,
+          ingrediente: ing,
+          tipo: IngredientIssueKind.circular,
+          alimento: alimentos[id],
         ),
       );
       continue;
@@ -172,12 +202,14 @@ RecipeNutrition calculateRecipeNutrition(
   }
 
   final pesoFinal = receta.pesoFinalG;
+  final conPesoFinal = pesoFinal != null && pesoFinal > 0;
   return RecipeNutrition(
     total: total,
     pesoIngredientes: peso,
-    peso: (pesoFinal != null && pesoFinal > 0) ? pesoFinal : peso,
+    peso: conPesoFinal ? pesoFinal : peso,
     porciones: receta.porciones,
     issues: issues,
+    pesoFinalConocido: conPesoFinal,
   );
 }
 

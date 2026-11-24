@@ -321,7 +321,14 @@ void main() {
     await tester.tap(find.text('Vincular 3 ingredientes'));
     await tester.pumpAndSettle();
     expect(find.text('Para calcular las calorías faltan:'), findsNothing);
-    expect(find.text('Registrar porción'), findsOneWidget);
+    // Sin peso final la tabla es aproximada, pero ya es un alimento más.
+    expect(find.text('Nutrición (aproximada)'), findsOneWidget);
+    expect(find.textContaining('falta el peso final'), findsOneWidget);
+    expect(
+      find.text('En tus alimentos como «Tortilla de patatas · Receta»'),
+      findsOneWidget,
+    );
+    expect(find.text('Registrar en el día'), findsOneWidget);
     expect(find.textContaining('Por porción'), findsOneWidget);
     await tester.pageBack();
     await tester.pumpAndSettle();

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/data_provider.dart';
 import '../providers/foods_provider.dart';
 import '../providers/purchases_provider.dart';
+import '../providers/recipes_provider.dart';
 import 'foods_view.dart';
 import 'home_view.dart';
 import 'recipes_view.dart';
@@ -34,6 +35,8 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     // Al abrir la app se purga el historial de precios de más de 3 meses.
     ref.watch(purgeOnStartupProvider);
+    // Los alimentos de las recetas se mantienen al día solos.
+    ref.watch(recipeFoodSyncProvider);
     // Y se incorpora, una vez por versión, la lista de frutas y verduras.
     ref.listen<AsyncValue<int>>(autoImportProduceProvider, (_, next) {
       // Al recargarlo (tras restaurar un respaldo), el estado de carga conserva

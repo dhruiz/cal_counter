@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/styles.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/meal.dart';
@@ -9,7 +10,9 @@ import '../../domain/services/meal_naming.dart';
 import '../../domain/services/money.dart';
 import '../providers/foods_provider.dart';
 import '../providers/home_provider.dart';
+import '../providers/recipes_provider.dart';
 import '../providers/settings_provider.dart';
+import 'food_widgets.dart';
 
 /// Diálogo para registrar una cantidad de un alimento (con la tabla
 /// completa) en una comida del día. Devuelve true si se agregó.
@@ -184,6 +187,10 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (widget.food.aproximado) ...[
+                _AvisoAproximado(food: widget.food),
+                const SizedBox(height: 8),
+              ],
               TextFormField(
                 controller: _quantityController,
                 autofocus: true,
@@ -265,6 +272,26 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
           child: const Text('Ok'),
         ),
       ],
+    );
+  }
+}
+
+/// Por qué la tabla de un alimento de receta es aproximada.
+class _AvisoAproximado extends ConsumerWidget {
+  final Food food;
+
+  const _AvisoAproximado({required this.food});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final id = food.id;
+    final receta = id == null
+        ? null
+        : ref.watch(recipeByFoodProvider(id)).valueOrNull;
+    return InfoBanner(
+      color: AppStyles.semaphBlue,
+      icon: Icons.info_outline,
+      text: aproximadoMotivo(receta),
     );
   }
 }

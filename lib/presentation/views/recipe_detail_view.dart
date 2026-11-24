@@ -39,7 +39,10 @@ class RecipeDetailView extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Eliminar receta'),
-        content: Text('¿Eliminar "${r.nombre}"?'),
+        content: Text(
+          '¿Eliminar "${r.nombre}"?'
+          '${r.alimentoId == null ? '' : ' Su alimento se queda en tus alimentos y se puede seguir registrando en el día.'}',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

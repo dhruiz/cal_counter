@@ -220,8 +220,9 @@ void main() {
     await tester.tap(find.text('Añadir al carrito'));
     await tester.pumpAndSettle();
 
-    final item = (await tester.runAsync(() => shopping.getItems(listaId)))!
-        .firstWhere((i) => i.texto == 'Pollo');
+    final item = (await tester.runAsync(
+      () => shopping.getItems(listaId),
+    ))!.firstWhere((i) => i.texto == 'Pollo');
     expect(item.comprado, isTrue);
     expect(item.pesoG, 1770);
     expect(item.subtotalCent, 1267 + 1372); // 0,92 kg × 14,91 €/kg
@@ -261,8 +262,9 @@ void main() {
       scrollable: find.byType(Scrollable).last,
     );
     expect(find.text('Mascotas'), findsOneWidget);
-    final nombres = (await tester.runAsync(cats.getCategories))!
-        .map((c) => c.nombre);
+    final nombres = (await tester.runAsync(
+      cats.getCategories,
+    ))!.map((c) => c.nombre);
     expect(nombres.last, 'Mascotas');
     await unmount(tester);
   });

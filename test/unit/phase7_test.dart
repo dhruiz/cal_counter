@@ -52,7 +52,10 @@ void main() {
       expect(guessCategoryName('Yogur de fresa'), 'Lácteos y huevos');
       expect(guessCategoryName('Queso curado'), 'Charcutería y quesos');
       expect(guessCategoryName('Queso fresco'), 'Lácteos y huevos');
-      expect(guessCategoryName('Pasta de dientes'), 'Higiene y cuidado personal');
+      expect(
+        guessCategoryName('Pasta de dientes'),
+        'Higiene y cuidado personal',
+      );
       expect(guessCategoryName('Helado de chocolate'), 'Congelados');
       expect(guessCategoryName('Detergente líquido'), 'Limpieza');
       expect(guessCategoryName('Cosa rara'), isNull);
@@ -91,9 +94,7 @@ void main() {
             "INSERT INTO presentaciones (uuid, alimento_id, codigo_barras, "
             "creado, actualizado) VALUES ('p1', 1, '8410000000001', 'x', 'x')",
           );
-          raw.execute(
-            "INSERT INTO establecimientos (nombre) VALUES ('Súper')",
-          );
+          raw.execute("INSERT INTO establecimientos (nombre) VALUES ('Súper')");
           raw.execute(
             "INSERT INTO compras (presentacion_id, establecimiento_id, fecha, "
             "precio_cent) VALUES (1, 1, '2026-11-01', 450)",
@@ -111,13 +112,15 @@ void main() {
         (c) => c.nombre == 'Carnicería',
       );
       expect(pollo.categoriaId, carne.id);
-      expect((await foods.findByNameAndBrand('Cosa rara', ''))!.categoriaId,
-          isNull);
+      expect(
+        (await foods.findByNameAndBrand('Cosa rara', ''))!.categoriaId,
+        isNull,
+      );
       // FTS, compras y claves foráneas siguen funcionando.
       expect((await foods.search('pollo')).single.id, pollo.id);
-      final compras = await PurchaseRepositoryImpl(db).getPurchasesForFood(
-        pollo.id!,
-      );
+      final compras = await PurchaseRepositoryImpl(
+        db,
+      ).getPurchasesForFood(pollo.id!);
       expect(compras.single.compra.precioCent, 450);
       expect(compras.single.compra.pesoG, isNull);
       final fk = await db.customSelect('PRAGMA foreign_keys').getSingle();
@@ -128,12 +131,13 @@ void main() {
 
       // Mismas tablas e índices que una instalación nueva.
       Future<Set<String>> esquema(AppDatabase d) async => {
-        for (final r in await d
-            .customSelect(
-              "SELECT type || ':' || name AS n FROM sqlite_master "
-              "WHERE name NOT LIKE 'sqlite_%'",
-            )
-            .get())
+        for (final r
+            in await d
+                .customSelect(
+                  "SELECT type || ':' || name AS n FROM sqlite_master "
+                  "WHERE name NOT LIKE 'sqlite_%'",
+                )
+                .get())
           r.read<String>('n'),
       };
       final nueva = memoryDb();
@@ -184,7 +188,10 @@ void main() {
       // Otra tienda sigue con el general.
       expect((await cats.getCategories(tienda: 'Otra')).first, general.first);
       await cats.resetStoreOrder('Mercado');
-      expect((await cats.getCategories(tienda: 'Mercado')).first, general.first);
+      expect(
+        (await cats.getCategories(tienda: 'Mercado')).first,
+        general.first,
+      );
     });
 
     test('reordenar el general, crear, renombrar y borrar', () async {
@@ -207,9 +214,7 @@ void main() {
     test('lista agrupada por pasillos (vinculados y texto libre)', () async {
       final pollo = await foods.saveFood(const Food(nombre: 'Pollo entero'));
       final lista = await shopping.createList('Semana');
-      await shopping.addItem(
-        ShoppingItem(listaId: lista, texto: 'Detergente'),
-      );
+      await shopping.addItem(ShoppingItem(listaId: lista, texto: 'Detergente'));
       await shopping.addItem(
         ShoppingItem(listaId: lista, texto: 'Pollo', alimentoId: pollo),
       );
@@ -256,7 +261,9 @@ void main() {
         final mascotas = await cats.saveCategory(
           const Category(nombre: 'Mascotas'),
         );
-        await foods.saveFood(Food(nombre: 'Pienso gato', categoriaId: mascotas));
+        await foods.saveFood(
+          Food(nombre: 'Pienso gato', categoriaId: mascotas),
+        );
         final rep = await ExportRepertoire(
           foods,
           RecipeRepositoryImpl(db),
@@ -325,75 +332,89 @@ void main() {
       expect(readScaleLabel(l, ScaleFormat.peso).precioCent, isNull);
     });
 
-    test('aprender producto por tienda y sumar paquetes en el carrito', () async {
-      final db = memoryDb();
-      final foods = FoodRepositoryImpl(db);
-      final scale = ScaleRepositoryImpl(db);
-      final purchases = PurchaseRepositoryImpl(db);
-      final shopping = ShoppingListRepositoryImpl(db);
-      final tx = DriftTransactionRunner(db);
+    test(
+      'aprender producto por tienda y sumar paquetes en el carrito',
+      () async {
+        final db = memoryDb();
+        final foods = FoodRepositoryImpl(db);
+        final scale = ScaleRepositoryImpl(db);
+        final purchases = PurchaseRepositoryImpl(db);
+        final shopping = ShoppingListRepositoryImpl(db);
+        final tx = DriftTransactionRunner(db);
 
-      final tienda = await scale.ensureStore('Mercado');
-      await scale.setScaleFormat(tienda.id!, ScaleFormat.peso);
-      final polloId = await foods.saveFood(const Food(nombre: 'Pechuga de pollo'));
-      final pollo = (await foods.getFood(polloId))!;
-      final l1 = ScaleLabel.parse(scaleCode('211234500850'))!;
-      final m = await LinkScaleCode(foods, scale, tx)(
-        tienda: (await scale.getStore('mercado'))!,
-        clave: l1.clave,
-        alimento: pollo,
-      );
-      expect(m.presentacion.descripcion, kPresentacionAlPeso);
+        final tienda = await scale.ensureStore('Mercado');
+        await scale.setScaleFormat(tienda.id!, ScaleFormat.peso);
+        final polloId = await foods.saveFood(
+          const Food(nombre: 'Pechuga de pollo'),
+        );
+        final pollo = (await foods.getFood(polloId))!;
+        final l1 = ScaleLabel.parse(scaleCode('211234500850'))!;
+        final m = await LinkScaleCode(foods, scale, tx)(
+          tienda: (await scale.getStore('mercado'))!,
+          clave: l1.clave,
+          alimento: pollo,
+        );
+        expect(m.presentacion.descripcion, kPresentacionAlPeso);
 
-      // Otra bandeja: misma clave, otro valor → mismo producto.
-      final l2 = ScaleLabel.parse(scaleCode('211234500920'))!;
-      expect((await scale.findCode(tienda.id!, l2.clave))!.alimento.id, polloId);
-      // En otra tienda la misma clave no significa nada.
-      final otra = await scale.ensureStore('Otra');
-      expect(await scale.findCode(otra.id!, l2.clave), isNull);
-      // En casa se encuentra buscando en todas las tiendas.
-      expect((await scale.findAnyStore(l2.codigo)).single.tienda.nombre,
-          'Mercado');
+        // Otra bandeja: misma clave, otro valor → mismo producto.
+        final l2 = ScaleLabel.parse(scaleCode('211234500920'))!;
+        expect(
+          (await scale.findCode(tienda.id!, l2.clave))!.alimento.id,
+          polloId,
+        );
+        // En otra tienda la misma clave no significa nada.
+        final otra = await scale.ensureStore('Otra');
+        expect(await scale.findCode(otra.id!, l2.clave), isNull);
+        // En casa se encuentra buscando en todas las tiendas.
+        expect(
+          (await scale.findAnyStore(l2.codigo)).single.tienda.nombre,
+          'Mercado',
+        );
 
-      final lista = await shopping.createList('Hoy');
-      final add = AddToCart(shopping, purchases, foods, tx);
-      await add(
-        listaId: lista,
-        alimento: pollo,
-        presentacionId: m.presentacion.id,
-        precioCent: 1267,
-        alPeso: true,
-        pesoG: 850,
-        establecimiento: 'Mercado',
-      );
-      await add(
-        listaId: lista,
-        alimento: pollo,
-        presentacionId: m.presentacion.id,
-        precioCent: 1371,
-        alPeso: true,
-        pesoG: 920,
-        establecimiento: 'Mercado',
-      );
-      final item = (await shopping.getItems(lista)).single;
-      expect(item.unidades, 1);
-      expect(item.subtotalCent, 2638);
-      expect(item.pesoG, 1770);
-      final rec = (await purchases.getPurchasesForFood(polloId)).single;
-      expect(rec.precioPorKiloCent, 1490);
-      expect(
-        await scale.lastPricePerKiloCent(m.presentacion.id!, storeId: tienda.id),
-        1490,
-      );
+        final lista = await shopping.createList('Hoy');
+        final add = AddToCart(shopping, purchases, foods, tx);
+        await add(
+          listaId: lista,
+          alimento: pollo,
+          presentacionId: m.presentacion.id,
+          precioCent: 1267,
+          alPeso: true,
+          pesoG: 850,
+          establecimiento: 'Mercado',
+        );
+        await add(
+          listaId: lista,
+          alimento: pollo,
+          presentacionId: m.presentacion.id,
+          precioCent: 1371,
+          alPeso: true,
+          pesoG: 920,
+          establecimiento: 'Mercado',
+        );
+        final item = (await shopping.getItems(lista)).single;
+        expect(item.unidades, 1);
+        expect(item.subtotalCent, 2638);
+        expect(item.pesoG, 1770);
+        final rec = (await purchases.getPurchasesForFood(polloId)).single;
+        expect(rec.precioPorKiloCent, 1490);
+        expect(
+          await scale.lastPricePerKiloCent(
+            m.presentacion.id!,
+            storeId: tienda.id,
+          ),
+          1490,
+        );
 
-      // Tiendas con dígito de control del precio: clave de 6.
-      expect(
-        (await scale.findByShortKey(tienda.id!, l1.claveCorta)).single
-            .alimento
-            .id,
-        polloId,
-      );
-      await db.close();
-    });
+        // Tiendas con dígito de control del precio: clave de 6.
+        expect(
+          (await scale.findByShortKey(
+            tienda.id!,
+            l1.claveCorta,
+          )).single.alimento.id,
+          polloId,
+        );
+        await db.close();
+      },
+    );
   });
 }

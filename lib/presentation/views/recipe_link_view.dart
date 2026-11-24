@@ -110,9 +110,9 @@ class _RecipeLinkViewState extends ConsumerState<RecipeLinkView> {
           );
         }(),
     ];
-    await ref
-        .read(recipeRepositoryProvider)
-        .save(widget.receta.copyWith(ingredientes: list));
+    await ref.read(saveRecipeProvider)(
+      widget.receta.copyWith(ingredientes: list),
+    );
     if (mounted) Navigator.pop(context);
   }
 

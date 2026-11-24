@@ -4,6 +4,7 @@ import '../../core/styles.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/nutrition_facts.dart';
+import '../../domain/entities/recipe.dart';
 
 /// Distintivo "Pendiente" para alimentos sin tabla nutricional completa.
 class PendingChip extends StatelessWidget {
@@ -34,9 +35,72 @@ class PendingChip extends StatelessWidget {
   }
 }
 
+/// Distintivo pequeño con texto y color ("Aproximado", "No alimentario").
+class TagChip extends StatelessWidget {
+  final String texto;
+  final Color color;
+
+  const TagChip(this.texto, {super.key, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.6)),
+      ),
+      child: Text(
+        texto,
+        style: TextStyle(
+          fontSize: 11,
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+/// Distintivo "Aproximado": tabla de una receta sin peso final o con
+/// ingredientes sin datos.
+class ApproxChip extends StatelessWidget {
+  const ApproxChip({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const TagChip('Aproximado', color: AppStyles.semaphBlue);
+}
+
+/// Distintivo de un artículo que no es un alimento (limpieza, higiene...).
+class NonFoodChip extends StatelessWidget {
+  const NonFoodChip({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const TagChip('No alimentario', color: AppStyles.neutral);
+}
+
+/// Por qué es aproximada la tabla del alimento de una receta.
+String aproximadoMotivo(Recipe? receta) {
+  if (receta == null) {
+    return 'Valor aproximado: es el alimento de una receta sin peso final o '
+        'con ingredientes sin datos.';
+  }
+  if (receta.pesoFinalG == null) {
+    return 'Valor aproximado: no se ha introducido el peso total final de '
+        '«${receta.nombre}». Para un valor más preciso, introdúcelo en la '
+        'receta.';
+  }
+  return 'Valor aproximado: a algún ingrediente de «${receta.nombre}» le '
+      'faltan datos. Para un valor más preciso, complétalos en la receta.';
+}
+
 /// Resumen de una línea: "350 kcal · G 1 · C 78 · P 7 (por 100 g)".
 String nutritionSummary(Food f) {
   final n = f.nutricion;
+  if (!f.esAlimento) return 'Artículo que no es un alimento';
   if (n.estaVacia) return 'Sin tabla nutricional';
   String v(double? x) => x == null ? '—' : AppUtils.formatNumero(x);
   return '${v(n.kcal)} kcal · G ${v(n.grasas)} · C ${v(n.carbohidratos)} · '
@@ -58,11 +122,13 @@ class FoodTile extends StatelessWidget {
     this.trailing,
   });
 
-  IconData get _icon => switch (food.tipo) {
-    FoodType.envasado => Icons.qr_code_2,
-    FoodType.preparado => Icons.soup_kitchen_outlined,
-    FoodType.generico => Icons.eco_outlined,
-  };
+  IconData get _icon => !food.esAlimento
+      ? Icons.cleaning_services_outlined
+      : switch (food.tipo) {
+          FoodType.envasado => Icons.qr_code_2,
+          FoodType.preparado => Icons.soup_kitchen_outlined,
+          FoodType.generico => Icons.eco_outlined,
+        };
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +140,13 @@ class FoodTile extends StatelessWidget {
           if (food.pendiente) ...[
             const SizedBox(width: 6),
             const PendingChip(),
+          ] else if (food.aproximado) ...[
+            const SizedBox(width: 6),
+            const ApproxChip(),
+          ],
+          if (!food.esAlimento) ...[
+            const SizedBox(width: 6),
+            const NonFoodChip(),
           ],
         ],
       ),

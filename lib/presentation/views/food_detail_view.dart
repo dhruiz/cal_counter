@@ -11,6 +11,7 @@ import '../../domain/repositories/food_repository.dart';
 import '../../domain/services/barcode.dart';
 import '../../domain/services/money.dart';
 import '../providers/foods_provider.dart';
+import '../providers/recipes_provider.dart';
 import '../widgets/add_to_shopping_list_dialog.dart';
 import '../widgets/category_widgets.dart';
 import '../widgets/dialog_controllers.dart';
@@ -127,7 +128,8 @@ class FoodDetailView extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 32),
                 children: [
                   _Header(food: f),
-                  _NutritionCard(food: f),
+                  _RecipeSourceCard(food: f),
+                  if (f.esAlimento) _NutritionCard(food: f),
                   _Actions(food: f),
                   _PortionsCard(food: f),
                   _PackagesCard(food: f),
@@ -181,6 +183,8 @@ class _Header extends ConsumerWidget {
               ),
               Chip(label: Text(food.tipo.etiqueta)),
               if (food.pendiente) const PendingChip(dense: false),
+              if (!food.pendiente && food.aproximado) const ApproxChip(),
+              if (!food.esAlimento) const NonFoodChip(),
               if (food.archivado)
                 const Chip(
                   avatar: Icon(Icons.archive_outlined, size: 18),
@@ -314,18 +318,19 @@ class _Actions extends ConsumerWidget {
         spacing: 8,
         runSpacing: 8,
         children: [
-          FilledButton.icon(
-            onPressed: () async {
-              final ok = await FoodFlows.registerIntake(context, ref, food);
-              if (ok && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${food.nombre} añadido al día')),
-                );
-              }
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Añadir al día'),
-          ),
+          if (food.esAlimento)
+            FilledButton.icon(
+              onPressed: () async {
+                final ok = await FoodFlows.registerIntake(context, ref, food);
+                if (ok && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${food.nombre} añadido al día')),
+                  );
+                }
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Añadir al día'),
+            ),
           OutlinedButton.icon(
             onPressed: () => AddFoodToShoppingListDialog.show(context, food),
             icon: const Icon(Icons.add_shopping_cart),
@@ -789,8 +794,12 @@ class _RecipesCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recipes =
-        ref.watch(recipesUsingFoodProvider(food.id!)).valueOrNull ?? const [];
+    final recipes = [
+      for (final r
+          in ref.watch(recipesUsingFoodProvider(food.id!)).valueOrNull ??
+              const [])
+        if (r.alimentoId != food.id) r,
+    ];
     if (recipes.isEmpty) return const SizedBox.shrink();
     return _SectionCard(
       title: 'Usado en recetas',
@@ -806,6 +815,44 @@ class _RecipesCard extends ConsumerWidget {
                 builder: (_) => RecipeDetailView(recipeId: r.id!),
               ),
             ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Alimento de una receta: de dónde sale su tabla y si es aproximada.
+class _RecipeSourceCard extends ConsumerWidget {
+  final Food food;
+
+  const _RecipeSourceCard({required this.food});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final receta = ref.watch(recipeByFoodProvider(food.id!)).valueOrNull;
+    if (receta == null) return const SizedBox.shrink();
+    return _SectionCard(
+      title: 'De la receta',
+      trailing: TextButton.icon(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RecipeDetailView(recipeId: receta.id!),
+          ),
+        ),
+        icon: const Icon(Icons.menu_book_outlined, size: 18),
+        label: const Text('Ver receta'),
+      ),
+      children: [
+        Text(
+          'La tabla se calcula con los ingredientes de «${receta.nombre}» y '
+          'se actualiza sola al cambiar la receta.',
+        ),
+        if (food.aproximado)
+          InfoBanner(
+            color: AppStyles.semaphBlue,
+            icon: Icons.info_outline,
+            text: aproximadoMotivo(receta),
           ),
       ],
     );

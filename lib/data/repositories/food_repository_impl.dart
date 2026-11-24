@@ -10,9 +10,10 @@ import '../db/app_database.dart';
 import '../db/mappers.dart';
 
 /// Condición SQL (sobre el alias `a`) de un alimento pendiente de completar.
+/// Un artículo que no es un alimento nunca está pendiente.
 const String kPendienteSql =
-    '(a.kcal IS NULL OR a.proteinas IS NULL OR a.grasas IS NULL '
-    'OR a.carbohidratos IS NULL)';
+    '(a.es_alimento = 1 AND (a.kcal IS NULL OR a.proteinas IS NULL '
+    'OR a.grasas IS NULL OR a.carbohidratos IS NULL))';
 
 /// Repertorio de alimentos sobre Drift.
 class FoodRepositoryImpl implements FoodRepository {
@@ -28,6 +29,7 @@ class FoodRepositoryImpl implements FoodRepository {
     FoodFilter.envasados => "a.archivado = 0 AND a.tipo = 'envasado'",
     FoodFilter.genericos => "a.archivado = 0 AND a.tipo = 'generico'",
     FoodFilter.preparados => "a.archivado = 0 AND a.tipo = 'preparado'",
+    FoodFilter.otrosProductos => 'a.archivado = 0 AND a.es_alimento = 0',
     FoodFilter.archivados => 'a.archivado = 1',
   };
 
@@ -63,8 +65,10 @@ class FoodRepositoryImpl implements FoodRepository {
     FoodFilter filter,
     int limit, {
     int? categoriaId,
+    bool soloAlimentos = false,
   }) {
     var where = _filterSql(filter);
+    if (soloAlimentos) where += ' AND a.es_alimento = 1';
     if (categoriaId == kSinCategoria) {
       where += ' AND a.categoria_id IS NULL';
     } else if (categoriaId != null) {
@@ -126,7 +130,14 @@ class FoodRepositoryImpl implements FoodRepository {
     FoodFilter filter = FoodFilter.todos,
     int? categoriaId,
     int limit = 200,
-  }) => _searchQuery(query, filter, limit, categoriaId: categoriaId).watch();
+    bool soloAlimentos = false,
+  }) => _searchQuery(
+    query,
+    filter,
+    limit,
+    categoriaId: categoriaId,
+    soloAlimentos: soloAlimentos,
+  ).watch();
 
   @override
   Future<List<Food>> search(
@@ -134,7 +145,14 @@ class FoodRepositoryImpl implements FoodRepository {
     FoodFilter filter = FoodFilter.todos,
     int? categoriaId,
     int limit = 200,
-  }) => _searchQuery(query, filter, limit, categoriaId: categoriaId).get();
+    bool soloAlimentos = false,
+  }) => _searchQuery(
+    query,
+    filter,
+    limit,
+    categoriaId: categoriaId,
+    soloAlimentos: soloAlimentos,
+  ).get();
 
   // Lectura -------------------------------------------------------------------
 
@@ -375,7 +393,10 @@ class FoodRepositoryImpl implements FoodRepository {
   Stream<List<Food>> watchMostUsed({int limit = 20}) {
     final q = db.select(db.alimentos)
       ..where(
-        (a) => a.usoCount.isBiggerThanValue(0) & a.archivado.equals(false),
+        (a) =>
+            a.usoCount.isBiggerThanValue(0) &
+            a.archivado.equals(false) &
+            a.esAlimento.equals(true),
       )
       ..orderBy([
         (a) => OrderingTerm.desc(a.usoCount),
