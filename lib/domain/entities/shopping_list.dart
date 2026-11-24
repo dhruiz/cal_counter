@@ -34,6 +34,10 @@ class ShoppingItem extends Equatable {
   final int? alimentoId;
   final String texto;
   final String? cantidad;
+
+  /// Cantidad mínima que hace falta, en g o ml del alimento (p. ej. la suma
+  /// de lo que piden las recetas). [cantidad] es el texto que se muestra.
+  final double? cantidadMinima;
   final bool comprado;
   final int orden;
   final int? compraId;
@@ -59,6 +63,7 @@ class ShoppingItem extends Equatable {
     this.alimentoId,
     required this.texto,
     this.cantidad,
+    this.cantidadMinima,
     this.comprado = false,
     this.orden = 0,
     this.compraId,
@@ -83,6 +88,7 @@ class ShoppingItem extends Equatable {
     bool clearAlimento = false,
     String? texto,
     String? cantidad,
+    double? cantidadMinima,
     bool? comprado,
     int? orden,
     int? compraId,
@@ -94,6 +100,7 @@ class ShoppingItem extends Equatable {
       alimentoId: clearAlimento ? null : (alimentoId ?? this.alimentoId),
       texto: texto ?? this.texto,
       cantidad: cantidad ?? this.cantidad,
+      cantidadMinima: cantidadMinima ?? this.cantidadMinima,
       comprado: comprado ?? this.comprado,
       orden: orden ?? this.orden,
       compraId: clearCompra ? null : (compraId ?? this.compraId),
@@ -114,6 +121,7 @@ class ShoppingItem extends Equatable {
     alimentoId,
     texto,
     cantidad,
+    cantidadMinima,
     comprado,
     orden,
     compraId,

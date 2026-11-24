@@ -38,9 +38,11 @@ class AppDatabase extends _$AppDatabase {
       AppDatabase(driftDatabase(name: kDatabaseName));
 
   /// v1: esquema inicial. v2: categorías y orden de pasillos, etiquetas de
-  /// báscula por tienda y peso real de las compras.
+  /// báscula por tienda y peso real de las compras. v3: recetas como
+  /// alimentos (tabla aproximada, nota de ingrediente, última preparación),
+  /// artículos que no son alimentos y cantidad mínima en las listas.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,6 +68,13 @@ class AppDatabase extends _$AppDatabase {
         await _crearIndices(_indicesV2);
         await sembrarCategorias();
         await clasificarAlimentos();
+      }
+      if (from < 3) {
+        await m.addColumn(alimentos, alimentos.nutricionAproximada);
+        await m.addColumn(alimentos, alimentos.esAlimento);
+        await m.addColumn(recetas, recetas.ultimaPreparacion);
+        await m.addColumn(ingredientesReceta, ingredientesReceta.nota);
+        await m.addColumn(itemsLista, itemsLista.cantidadMinima);
       }
     },
     beforeOpen: (details) async {

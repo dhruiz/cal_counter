@@ -509,6 +509,35 @@ class $AlimentosTable extends Alimentos
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _nutricionAproximadaMeta =
+      const VerificationMeta('nutricionAproximada');
+  @override
+  late final GeneratedColumn<bool> nutricionAproximada = GeneratedColumn<bool>(
+    'nutricion_aproximada',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("nutricion_aproximada" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _esAlimentoMeta = const VerificationMeta(
+    'esAlimento',
+  );
+  @override
+  late final GeneratedColumn<bool> esAlimento = GeneratedColumn<bool>(
+    'es_alimento',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("es_alimento" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -533,6 +562,8 @@ class $AlimentosTable extends Alimentos
     archivado,
     creado,
     actualizado,
+    nutricionAproximada,
+    esAlimento,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -698,6 +729,21 @@ class $AlimentosTable extends Alimentos
     } else if (isInserting) {
       context.missing(_actualizadoMeta);
     }
+    if (data.containsKey('nutricion_aproximada')) {
+      context.handle(
+        _nutricionAproximadaMeta,
+        nutricionAproximada.isAcceptableOrUnknown(
+          data['nutricion_aproximada']!,
+          _nutricionAproximadaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('es_alimento')) {
+      context.handle(
+        _esAlimentoMeta,
+        esAlimento.isAcceptableOrUnknown(data['es_alimento']!, _esAlimentoMeta),
+      );
+    }
     return context;
   }
 
@@ -799,6 +845,14 @@ class $AlimentosTable extends Alimentos
         DriftSqlType.string,
         data['${effectivePrefix}actualizado'],
       )!,
+      nutricionAproximada: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}nutricion_aproximada'],
+      )!,
+      esAlimento: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}es_alimento'],
+      )!,
     );
   }
 
@@ -831,6 +885,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
   final bool archivado;
   final String creado;
   final String actualizado;
+  final bool nutricionAproximada;
+  final bool esAlimento;
   const AlimentoRow({
     required this.id,
     required this.uuid,
@@ -854,6 +910,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     required this.archivado,
     required this.creado,
     required this.actualizado,
+    required this.nutricionAproximada,
+    required this.esAlimento,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -904,6 +962,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     map['archivado'] = Variable<bool>(archivado);
     map['creado'] = Variable<String>(creado);
     map['actualizado'] = Variable<String>(actualizado);
+    map['nutricion_aproximada'] = Variable<bool>(nutricionAproximada);
+    map['es_alimento'] = Variable<bool>(esAlimento);
     return map;
   }
 
@@ -951,6 +1011,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       archivado: Value(archivado),
       creado: Value(creado),
       actualizado: Value(actualizado),
+      nutricionAproximada: Value(nutricionAproximada),
+      esAlimento: Value(esAlimento),
     );
   }
 
@@ -982,6 +1044,10 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       archivado: serializer.fromJson<bool>(json['archivado']),
       creado: serializer.fromJson<String>(json['creado']),
       actualizado: serializer.fromJson<String>(json['actualizado']),
+      nutricionAproximada: serializer.fromJson<bool>(
+        json['nutricionAproximada'],
+      ),
+      esAlimento: serializer.fromJson<bool>(json['esAlimento']),
     );
   }
   @override
@@ -1010,6 +1076,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       'archivado': serializer.toJson<bool>(archivado),
       'creado': serializer.toJson<String>(creado),
       'actualizado': serializer.toJson<String>(actualizado),
+      'nutricionAproximada': serializer.toJson<bool>(nutricionAproximada),
+      'esAlimento': serializer.toJson<bool>(esAlimento),
     };
   }
 
@@ -1036,6 +1104,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     bool? archivado,
     String? creado,
     String? actualizado,
+    bool? nutricionAproximada,
+    bool? esAlimento,
   }) => AlimentoRow(
     id: id ?? this.id,
     uuid: uuid ?? this.uuid,
@@ -1065,6 +1135,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     archivado: archivado ?? this.archivado,
     creado: creado ?? this.creado,
     actualizado: actualizado ?? this.actualizado,
+    nutricionAproximada: nutricionAproximada ?? this.nutricionAproximada,
+    esAlimento: esAlimento ?? this.esAlimento,
   );
   AlimentoRow copyWithCompanion(AlimentosCompanion data) {
     return AlimentoRow(
@@ -1100,6 +1172,12 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
       actualizado: data.actualizado.present
           ? data.actualizado.value
           : this.actualizado,
+      nutricionAproximada: data.nutricionAproximada.present
+          ? data.nutricionAproximada.value
+          : this.nutricionAproximada,
+      esAlimento: data.esAlimento.present
+          ? data.esAlimento.value
+          : this.esAlimento,
     );
   }
 
@@ -1127,7 +1205,9 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
           ..write('ultimoUso: $ultimoUso, ')
           ..write('archivado: $archivado, ')
           ..write('creado: $creado, ')
-          ..write('actualizado: $actualizado')
+          ..write('actualizado: $actualizado, ')
+          ..write('nutricionAproximada: $nutricionAproximada, ')
+          ..write('esAlimento: $esAlimento')
           ..write(')'))
         .toString();
   }
@@ -1156,6 +1236,8 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
     archivado,
     creado,
     actualizado,
+    nutricionAproximada,
+    esAlimento,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -1182,7 +1264,9 @@ class AlimentoRow extends DataClass implements Insertable<AlimentoRow> {
           other.ultimoUso == this.ultimoUso &&
           other.archivado == this.archivado &&
           other.creado == this.creado &&
-          other.actualizado == this.actualizado);
+          other.actualizado == this.actualizado &&
+          other.nutricionAproximada == this.nutricionAproximada &&
+          other.esAlimento == this.esAlimento);
 }
 
 class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
@@ -1208,6 +1292,8 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
   final Value<bool> archivado;
   final Value<String> creado;
   final Value<String> actualizado;
+  final Value<bool> nutricionAproximada;
+  final Value<bool> esAlimento;
   const AlimentosCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
@@ -1231,6 +1317,8 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     this.archivado = const Value.absent(),
     this.creado = const Value.absent(),
     this.actualizado = const Value.absent(),
+    this.nutricionAproximada = const Value.absent(),
+    this.esAlimento = const Value.absent(),
   });
   AlimentosCompanion.insert({
     this.id = const Value.absent(),
@@ -1255,6 +1343,8 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     this.archivado = const Value.absent(),
     required String creado,
     required String actualizado,
+    this.nutricionAproximada = const Value.absent(),
+    this.esAlimento = const Value.absent(),
   }) : uuid = Value(uuid),
        nombre = Value(nombre),
        creado = Value(creado),
@@ -1282,6 +1372,8 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     Expression<bool>? archivado,
     Expression<String>? creado,
     Expression<String>? actualizado,
+    Expression<bool>? nutricionAproximada,
+    Expression<bool>? esAlimento,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1306,6 +1398,9 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
       if (archivado != null) 'archivado': archivado,
       if (creado != null) 'creado': creado,
       if (actualizado != null) 'actualizado': actualizado,
+      if (nutricionAproximada != null)
+        'nutricion_aproximada': nutricionAproximada,
+      if (esAlimento != null) 'es_alimento': esAlimento,
     });
   }
 
@@ -1332,6 +1427,8 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     Value<bool>? archivado,
     Value<String>? creado,
     Value<String>? actualizado,
+    Value<bool>? nutricionAproximada,
+    Value<bool>? esAlimento,
   }) {
     return AlimentosCompanion(
       id: id ?? this.id,
@@ -1356,6 +1453,8 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
       archivado: archivado ?? this.archivado,
       creado: creado ?? this.creado,
       actualizado: actualizado ?? this.actualizado,
+      nutricionAproximada: nutricionAproximada ?? this.nutricionAproximada,
+      esAlimento: esAlimento ?? this.esAlimento,
     );
   }
 
@@ -1428,6 +1527,12 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
     if (actualizado.present) {
       map['actualizado'] = Variable<String>(actualizado.value);
     }
+    if (nutricionAproximada.present) {
+      map['nutricion_aproximada'] = Variable<bool>(nutricionAproximada.value);
+    }
+    if (esAlimento.present) {
+      map['es_alimento'] = Variable<bool>(esAlimento.value);
+    }
     return map;
   }
 
@@ -1455,7 +1560,9 @@ class AlimentosCompanion extends UpdateCompanion<AlimentoRow> {
           ..write('ultimoUso: $ultimoUso, ')
           ..write('archivado: $archivado, ')
           ..write('creado: $creado, ')
-          ..write('actualizado: $actualizado')
+          ..write('actualizado: $actualizado, ')
+          ..write('nutricionAproximada: $nutricionAproximada, ')
+          ..write('esAlimento: $esAlimento')
           ..write(')'))
         .toString();
   }
@@ -4086,6 +4193,18 @@ class $ItemsListaTable extends ItemsLista
       'UNIQUE REFERENCES compras (id) ON DELETE SET NULL',
     ),
   );
+  static const VerificationMeta _cantidadMinimaMeta = const VerificationMeta(
+    'cantidadMinima',
+  );
+  @override
+  late final GeneratedColumn<double> cantidadMinima = GeneratedColumn<double>(
+    'cantidad_minima',
+    aliasedName,
+    true,
+    check: () => ComparableExpr(cantidadMinima).isBiggerThanValue(0),
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4096,6 +4215,7 @@ class $ItemsListaTable extends ItemsLista
     orden,
     comprado,
     compraId,
+    cantidadMinima,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4160,6 +4280,15 @@ class $ItemsListaTable extends ItemsLista
         compraId.isAcceptableOrUnknown(data['compra_id']!, _compraIdMeta),
       );
     }
+    if (data.containsKey('cantidad_minima')) {
+      context.handle(
+        _cantidadMinimaMeta,
+        cantidadMinima.isAcceptableOrUnknown(
+          data['cantidad_minima']!,
+          _cantidadMinimaMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4201,6 +4330,10 @@ class $ItemsListaTable extends ItemsLista
         DriftSqlType.int,
         data['${effectivePrefix}compra_id'],
       ),
+      cantidadMinima: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}cantidad_minima'],
+      ),
     );
   }
 
@@ -4219,6 +4352,7 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
   final int orden;
   final bool comprado;
   final int? compraId;
+  final double? cantidadMinima;
   const ItemListaRow({
     required this.id,
     required this.listaId,
@@ -4228,6 +4362,7 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
     required this.orden,
     required this.comprado,
     this.compraId,
+    this.cantidadMinima,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4245,6 +4380,9 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
     map['comprado'] = Variable<bool>(comprado);
     if (!nullToAbsent || compraId != null) {
       map['compra_id'] = Variable<int>(compraId);
+    }
+    if (!nullToAbsent || cantidadMinima != null) {
+      map['cantidad_minima'] = Variable<double>(cantidadMinima);
     }
     return map;
   }
@@ -4265,6 +4403,9 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
       compraId: compraId == null && nullToAbsent
           ? const Value.absent()
           : Value(compraId),
+      cantidadMinima: cantidadMinima == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cantidadMinima),
     );
   }
 
@@ -4282,6 +4423,7 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
       orden: serializer.fromJson<int>(json['orden']),
       comprado: serializer.fromJson<bool>(json['comprado']),
       compraId: serializer.fromJson<int?>(json['compraId']),
+      cantidadMinima: serializer.fromJson<double?>(json['cantidadMinima']),
     );
   }
   @override
@@ -4296,6 +4438,7 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
       'orden': serializer.toJson<int>(orden),
       'comprado': serializer.toJson<bool>(comprado),
       'compraId': serializer.toJson<int?>(compraId),
+      'cantidadMinima': serializer.toJson<double?>(cantidadMinima),
     };
   }
 
@@ -4308,6 +4451,7 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
     int? orden,
     bool? comprado,
     Value<int?> compraId = const Value.absent(),
+    Value<double?> cantidadMinima = const Value.absent(),
   }) => ItemListaRow(
     id: id ?? this.id,
     listaId: listaId ?? this.listaId,
@@ -4317,6 +4461,9 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
     orden: orden ?? this.orden,
     comprado: comprado ?? this.comprado,
     compraId: compraId.present ? compraId.value : this.compraId,
+    cantidadMinima: cantidadMinima.present
+        ? cantidadMinima.value
+        : this.cantidadMinima,
   );
   ItemListaRow copyWithCompanion(ItemsListaCompanion data) {
     return ItemListaRow(
@@ -4330,6 +4477,9 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
       orden: data.orden.present ? data.orden.value : this.orden,
       comprado: data.comprado.present ? data.comprado.value : this.comprado,
       compraId: data.compraId.present ? data.compraId.value : this.compraId,
+      cantidadMinima: data.cantidadMinima.present
+          ? data.cantidadMinima.value
+          : this.cantidadMinima,
     );
   }
 
@@ -4343,7 +4493,8 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
           ..write('cantidad: $cantidad, ')
           ..write('orden: $orden, ')
           ..write('comprado: $comprado, ')
-          ..write('compraId: $compraId')
+          ..write('compraId: $compraId, ')
+          ..write('cantidadMinima: $cantidadMinima')
           ..write(')'))
         .toString();
   }
@@ -4358,6 +4509,7 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
     orden,
     comprado,
     compraId,
+    cantidadMinima,
   );
   @override
   bool operator ==(Object other) =>
@@ -4370,7 +4522,8 @@ class ItemListaRow extends DataClass implements Insertable<ItemListaRow> {
           other.cantidad == this.cantidad &&
           other.orden == this.orden &&
           other.comprado == this.comprado &&
-          other.compraId == this.compraId);
+          other.compraId == this.compraId &&
+          other.cantidadMinima == this.cantidadMinima);
 }
 
 class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
@@ -4382,6 +4535,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
   final Value<int> orden;
   final Value<bool> comprado;
   final Value<int?> compraId;
+  final Value<double?> cantidadMinima;
   const ItemsListaCompanion({
     this.id = const Value.absent(),
     this.listaId = const Value.absent(),
@@ -4391,6 +4545,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
     this.orden = const Value.absent(),
     this.comprado = const Value.absent(),
     this.compraId = const Value.absent(),
+    this.cantidadMinima = const Value.absent(),
   });
   ItemsListaCompanion.insert({
     this.id = const Value.absent(),
@@ -4401,6 +4556,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
     required int orden,
     this.comprado = const Value.absent(),
     this.compraId = const Value.absent(),
+    this.cantidadMinima = const Value.absent(),
   }) : listaId = Value(listaId),
        texto = Value(texto),
        orden = Value(orden);
@@ -4413,6 +4569,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
     Expression<int>? orden,
     Expression<bool>? comprado,
     Expression<int>? compraId,
+    Expression<double>? cantidadMinima,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4423,6 +4580,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
       if (orden != null) 'orden': orden,
       if (comprado != null) 'comprado': comprado,
       if (compraId != null) 'compra_id': compraId,
+      if (cantidadMinima != null) 'cantidad_minima': cantidadMinima,
     });
   }
 
@@ -4435,6 +4593,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
     Value<int>? orden,
     Value<bool>? comprado,
     Value<int?>? compraId,
+    Value<double?>? cantidadMinima,
   }) {
     return ItemsListaCompanion(
       id: id ?? this.id,
@@ -4445,6 +4604,7 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
       orden: orden ?? this.orden,
       comprado: comprado ?? this.comprado,
       compraId: compraId ?? this.compraId,
+      cantidadMinima: cantidadMinima ?? this.cantidadMinima,
     );
   }
 
@@ -4475,6 +4635,9 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
     if (compraId.present) {
       map['compra_id'] = Variable<int>(compraId.value);
     }
+    if (cantidadMinima.present) {
+      map['cantidad_minima'] = Variable<double>(cantidadMinima.value);
+    }
     return map;
   }
 
@@ -4488,7 +4651,8 @@ class ItemsListaCompanion extends UpdateCompanion<ItemListaRow> {
           ..write('cantidad: $cantidad, ')
           ..write('orden: $orden, ')
           ..write('comprado: $comprado, ')
-          ..write('compraId: $compraId')
+          ..write('compraId: $compraId, ')
+          ..write('cantidadMinima: $cantidadMinima')
           ..write(')'))
         .toString();
   }
@@ -4647,6 +4811,18 @@ class $RecetasTable extends Recetas with TableInfo<$RecetasTable, RecetaRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _ultimaPreparacionMeta = const VerificationMeta(
+    'ultimaPreparacion',
+  );
+  @override
+  late final GeneratedColumn<String> ultimaPreparacion =
+      GeneratedColumn<String>(
+        'ultima_preparacion',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4662,6 +4838,7 @@ class $RecetasTable extends Recetas with TableInfo<$RecetasTable, RecetaRow> {
     alimentoId,
     creada,
     actualizada,
+    ultimaPreparacion,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4767,6 +4944,15 @@ class $RecetasTable extends Recetas with TableInfo<$RecetasTable, RecetaRow> {
     } else if (isInserting) {
       context.missing(_actualizadaMeta);
     }
+    if (data.containsKey('ultima_preparacion')) {
+      context.handle(
+        _ultimaPreparacionMeta,
+        ultimaPreparacion.isAcceptableOrUnknown(
+          data['ultima_preparacion']!,
+          _ultimaPreparacionMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4828,6 +5014,10 @@ class $RecetasTable extends Recetas with TableInfo<$RecetasTable, RecetaRow> {
         DriftSqlType.string,
         data['${effectivePrefix}actualizada'],
       )!,
+      ultimaPreparacion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ultima_preparacion'],
+      ),
     );
   }
 
@@ -4851,6 +5041,7 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
   final int? alimentoId;
   final String creada;
   final String actualizada;
+  final String? ultimaPreparacion;
   const RecetaRow({
     required this.id,
     required this.uuid,
@@ -4865,6 +5056,7 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
     this.alimentoId,
     required this.creada,
     required this.actualizada,
+    this.ultimaPreparacion,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4894,6 +5086,9 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
     }
     map['creada'] = Variable<String>(creada);
     map['actualizada'] = Variable<String>(actualizada);
+    if (!nullToAbsent || ultimaPreparacion != null) {
+      map['ultima_preparacion'] = Variable<String>(ultimaPreparacion);
+    }
     return map;
   }
 
@@ -4924,6 +5119,9 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
           : Value(alimentoId),
       creada: Value(creada),
       actualizada: Value(actualizada),
+      ultimaPreparacion: ultimaPreparacion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ultimaPreparacion),
     );
   }
 
@@ -4946,6 +5144,9 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
       alimentoId: serializer.fromJson<int?>(json['alimentoId']),
       creada: serializer.fromJson<String>(json['creada']),
       actualizada: serializer.fromJson<String>(json['actualizada']),
+      ultimaPreparacion: serializer.fromJson<String?>(
+        json['ultimaPreparacion'],
+      ),
     );
   }
   @override
@@ -4965,6 +5166,7 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
       'alimentoId': serializer.toJson<int?>(alimentoId),
       'creada': serializer.toJson<String>(creada),
       'actualizada': serializer.toJson<String>(actualizada),
+      'ultimaPreparacion': serializer.toJson<String?>(ultimaPreparacion),
     };
   }
 
@@ -4982,6 +5184,7 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
     Value<int?> alimentoId = const Value.absent(),
     String? creada,
     String? actualizada,
+    Value<String?> ultimaPreparacion = const Value.absent(),
   }) => RecetaRow(
     id: id ?? this.id,
     uuid: uuid ?? this.uuid,
@@ -4996,6 +5199,9 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
     alimentoId: alimentoId.present ? alimentoId.value : this.alimentoId,
     creada: creada ?? this.creada,
     actualizada: actualizada ?? this.actualizada,
+    ultimaPreparacion: ultimaPreparacion.present
+        ? ultimaPreparacion.value
+        : this.ultimaPreparacion,
   );
   RecetaRow copyWithCompanion(RecetasCompanion data) {
     return RecetaRow(
@@ -5020,6 +5226,9 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
       actualizada: data.actualizada.present
           ? data.actualizada.value
           : this.actualizada,
+      ultimaPreparacion: data.ultimaPreparacion.present
+          ? data.ultimaPreparacion.value
+          : this.ultimaPreparacion,
     );
   }
 
@@ -5038,7 +5247,8 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
           ..write('pesoFinalG: $pesoFinalG, ')
           ..write('alimentoId: $alimentoId, ')
           ..write('creada: $creada, ')
-          ..write('actualizada: $actualizada')
+          ..write('actualizada: $actualizada, ')
+          ..write('ultimaPreparacion: $ultimaPreparacion')
           ..write(')'))
         .toString();
   }
@@ -5058,6 +5268,7 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
     alimentoId,
     creada,
     actualizada,
+    ultimaPreparacion,
   );
   @override
   bool operator ==(Object other) =>
@@ -5075,7 +5286,8 @@ class RecetaRow extends DataClass implements Insertable<RecetaRow> {
           other.pesoFinalG == this.pesoFinalG &&
           other.alimentoId == this.alimentoId &&
           other.creada == this.creada &&
-          other.actualizada == this.actualizada);
+          other.actualizada == this.actualizada &&
+          other.ultimaPreparacion == this.ultimaPreparacion);
 }
 
 class RecetasCompanion extends UpdateCompanion<RecetaRow> {
@@ -5092,6 +5304,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
   final Value<int?> alimentoId;
   final Value<String> creada;
   final Value<String> actualizada;
+  final Value<String?> ultimaPreparacion;
   const RecetasCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
@@ -5106,6 +5319,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
     this.alimentoId = const Value.absent(),
     this.creada = const Value.absent(),
     this.actualizada = const Value.absent(),
+    this.ultimaPreparacion = const Value.absent(),
   });
   RecetasCompanion.insert({
     this.id = const Value.absent(),
@@ -5121,6 +5335,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
     this.alimentoId = const Value.absent(),
     required String creada,
     required String actualizada,
+    this.ultimaPreparacion = const Value.absent(),
   }) : uuid = Value(uuid),
        nombre = Value(nombre),
        creada = Value(creada),
@@ -5139,6 +5354,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
     Expression<int>? alimentoId,
     Expression<String>? creada,
     Expression<String>? actualizada,
+    Expression<String>? ultimaPreparacion,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5154,6 +5370,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
       if (alimentoId != null) 'alimento_id': alimentoId,
       if (creada != null) 'creada': creada,
       if (actualizada != null) 'actualizada': actualizada,
+      if (ultimaPreparacion != null) 'ultima_preparacion': ultimaPreparacion,
     });
   }
 
@@ -5171,6 +5388,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
     Value<int?>? alimentoId,
     Value<String>? creada,
     Value<String>? actualizada,
+    Value<String?>? ultimaPreparacion,
   }) {
     return RecetasCompanion(
       id: id ?? this.id,
@@ -5186,6 +5404,7 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
       alimentoId: alimentoId ?? this.alimentoId,
       creada: creada ?? this.creada,
       actualizada: actualizada ?? this.actualizada,
+      ultimaPreparacion: ultimaPreparacion ?? this.ultimaPreparacion,
     );
   }
 
@@ -5231,6 +5450,9 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
     if (actualizada.present) {
       map['actualizada'] = Variable<String>(actualizada.value);
     }
+    if (ultimaPreparacion.present) {
+      map['ultima_preparacion'] = Variable<String>(ultimaPreparacion.value);
+    }
     return map;
   }
 
@@ -5249,7 +5471,8 @@ class RecetasCompanion extends UpdateCompanion<RecetaRow> {
           ..write('pesoFinalG: $pesoFinalG, ')
           ..write('alimentoId: $alimentoId, ')
           ..write('creada: $creada, ')
-          ..write('actualizada: $actualizada')
+          ..write('actualizada: $actualizada, ')
+          ..write('ultimaPreparacion: $ultimaPreparacion')
           ..write(')'))
         .toString();
   }
@@ -5356,6 +5579,15 @@ class $IngredientesRecetaTable extends IngredientesReceta
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _notaMeta = const VerificationMeta('nota');
+  @override
+  late final GeneratedColumn<String> nota = GeneratedColumn<String>(
+    'nota',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5366,6 +5598,7 @@ class $IngredientesRecetaTable extends IngredientesReceta
     cantidad,
     unidad,
     opcional,
+    nota,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5430,6 +5663,12 @@ class $IngredientesRecetaTable extends IngredientesReceta
         opcional.isAcceptableOrUnknown(data['opcional']!, _opcionalMeta),
       );
     }
+    if (data.containsKey('nota')) {
+      context.handle(
+        _notaMeta,
+        nota.isAcceptableOrUnknown(data['nota']!, _notaMeta),
+      );
+    }
     return context;
   }
 
@@ -5471,6 +5710,10 @@ class $IngredientesRecetaTable extends IngredientesReceta
         DriftSqlType.bool,
         data['${effectivePrefix}opcional'],
       )!,
+      nota: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nota'],
+      ),
     );
   }
 
@@ -5490,6 +5733,7 @@ class IngredienteRecetaRow extends DataClass
   final double? cantidad;
   final String? unidad;
   final bool opcional;
+  final String? nota;
   const IngredienteRecetaRow({
     required this.id,
     required this.recetaId,
@@ -5499,6 +5743,7 @@ class IngredienteRecetaRow extends DataClass
     this.cantidad,
     this.unidad,
     required this.opcional,
+    this.nota,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5517,6 +5762,9 @@ class IngredienteRecetaRow extends DataClass
       map['unidad'] = Variable<String>(unidad);
     }
     map['opcional'] = Variable<bool>(opcional);
+    if (!nullToAbsent || nota != null) {
+      map['nota'] = Variable<String>(nota);
+    }
     return map;
   }
 
@@ -5536,6 +5784,7 @@ class IngredienteRecetaRow extends DataClass
           ? const Value.absent()
           : Value(unidad),
       opcional: Value(opcional),
+      nota: nota == null && nullToAbsent ? const Value.absent() : Value(nota),
     );
   }
 
@@ -5553,6 +5802,7 @@ class IngredienteRecetaRow extends DataClass
       cantidad: serializer.fromJson<double?>(json['cantidad']),
       unidad: serializer.fromJson<String?>(json['unidad']),
       opcional: serializer.fromJson<bool>(json['opcional']),
+      nota: serializer.fromJson<String?>(json['nota']),
     );
   }
   @override
@@ -5567,6 +5817,7 @@ class IngredienteRecetaRow extends DataClass
       'cantidad': serializer.toJson<double?>(cantidad),
       'unidad': serializer.toJson<String?>(unidad),
       'opcional': serializer.toJson<bool>(opcional),
+      'nota': serializer.toJson<String?>(nota),
     };
   }
 
@@ -5579,6 +5830,7 @@ class IngredienteRecetaRow extends DataClass
     Value<double?> cantidad = const Value.absent(),
     Value<String?> unidad = const Value.absent(),
     bool? opcional,
+    Value<String?> nota = const Value.absent(),
   }) => IngredienteRecetaRow(
     id: id ?? this.id,
     recetaId: recetaId ?? this.recetaId,
@@ -5588,6 +5840,7 @@ class IngredienteRecetaRow extends DataClass
     cantidad: cantidad.present ? cantidad.value : this.cantidad,
     unidad: unidad.present ? unidad.value : this.unidad,
     opcional: opcional ?? this.opcional,
+    nota: nota.present ? nota.value : this.nota,
   );
   IngredienteRecetaRow copyWithCompanion(IngredientesRecetaCompanion data) {
     return IngredienteRecetaRow(
@@ -5601,6 +5854,7 @@ class IngredienteRecetaRow extends DataClass
       cantidad: data.cantidad.present ? data.cantidad.value : this.cantidad,
       unidad: data.unidad.present ? data.unidad.value : this.unidad,
       opcional: data.opcional.present ? data.opcional.value : this.opcional,
+      nota: data.nota.present ? data.nota.value : this.nota,
     );
   }
 
@@ -5614,7 +5868,8 @@ class IngredienteRecetaRow extends DataClass
           ..write('alimentoId: $alimentoId, ')
           ..write('cantidad: $cantidad, ')
           ..write('unidad: $unidad, ')
-          ..write('opcional: $opcional')
+          ..write('opcional: $opcional, ')
+          ..write('nota: $nota')
           ..write(')'))
         .toString();
   }
@@ -5629,6 +5884,7 @@ class IngredienteRecetaRow extends DataClass
     cantidad,
     unidad,
     opcional,
+    nota,
   );
   @override
   bool operator ==(Object other) =>
@@ -5641,7 +5897,8 @@ class IngredienteRecetaRow extends DataClass
           other.alimentoId == this.alimentoId &&
           other.cantidad == this.cantidad &&
           other.unidad == this.unidad &&
-          other.opcional == this.opcional);
+          other.opcional == this.opcional &&
+          other.nota == this.nota);
 }
 
 class IngredientesRecetaCompanion
@@ -5654,6 +5911,7 @@ class IngredientesRecetaCompanion
   final Value<double?> cantidad;
   final Value<String?> unidad;
   final Value<bool> opcional;
+  final Value<String?> nota;
   const IngredientesRecetaCompanion({
     this.id = const Value.absent(),
     this.recetaId = const Value.absent(),
@@ -5663,6 +5921,7 @@ class IngredientesRecetaCompanion
     this.cantidad = const Value.absent(),
     this.unidad = const Value.absent(),
     this.opcional = const Value.absent(),
+    this.nota = const Value.absent(),
   });
   IngredientesRecetaCompanion.insert({
     this.id = const Value.absent(),
@@ -5673,6 +5932,7 @@ class IngredientesRecetaCompanion
     this.cantidad = const Value.absent(),
     this.unidad = const Value.absent(),
     this.opcional = const Value.absent(),
+    this.nota = const Value.absent(),
   }) : recetaId = Value(recetaId),
        orden = Value(orden),
        texto = Value(texto);
@@ -5685,6 +5945,7 @@ class IngredientesRecetaCompanion
     Expression<double>? cantidad,
     Expression<String>? unidad,
     Expression<bool>? opcional,
+    Expression<String>? nota,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5695,6 +5956,7 @@ class IngredientesRecetaCompanion
       if (cantidad != null) 'cantidad': cantidad,
       if (unidad != null) 'unidad': unidad,
       if (opcional != null) 'opcional': opcional,
+      if (nota != null) 'nota': nota,
     });
   }
 
@@ -5707,6 +5969,7 @@ class IngredientesRecetaCompanion
     Value<double?>? cantidad,
     Value<String?>? unidad,
     Value<bool>? opcional,
+    Value<String?>? nota,
   }) {
     return IngredientesRecetaCompanion(
       id: id ?? this.id,
@@ -5717,6 +5980,7 @@ class IngredientesRecetaCompanion
       cantidad: cantidad ?? this.cantidad,
       unidad: unidad ?? this.unidad,
       opcional: opcional ?? this.opcional,
+      nota: nota ?? this.nota,
     );
   }
 
@@ -5747,6 +6011,9 @@ class IngredientesRecetaCompanion
     if (opcional.present) {
       map['opcional'] = Variable<bool>(opcional.value);
     }
+    if (nota.present) {
+      map['nota'] = Variable<String>(nota.value);
+    }
     return map;
   }
 
@@ -5760,7 +6027,8 @@ class IngredientesRecetaCompanion
           ..write('alimentoId: $alimentoId, ')
           ..write('cantidad: $cantidad, ')
           ..write('unidad: $unidad, ')
-          ..write('opcional: $opcional')
+          ..write('opcional: $opcional, ')
+          ..write('nota: $nota')
           ..write(')'))
         .toString();
   }
@@ -7090,6 +7358,8 @@ typedef $$AlimentosTableCreateCompanionBuilder =
       Value<bool> archivado,
       required String creado,
       required String actualizado,
+      Value<bool> nutricionAproximada,
+      Value<bool> esAlimento,
     });
 typedef $$AlimentosTableUpdateCompanionBuilder =
     AlimentosCompanion Function({
@@ -7115,6 +7385,8 @@ typedef $$AlimentosTableUpdateCompanionBuilder =
       Value<bool> archivado,
       Value<String> creado,
       Value<String> actualizado,
+      Value<bool> nutricionAproximada,
+      Value<bool> esAlimento,
     });
 
 final class $$AlimentosTableReferences
@@ -7365,6 +7637,16 @@ class $$AlimentosTableFilterComposer
 
   ColumnFilters<String> get actualizado => $composableBuilder(
     column: $table.actualizado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get nutricionAproximada => $composableBuilder(
+    column: $table.nutricionAproximada,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get esAlimento => $composableBuilder(
+    column: $table.esAlimento,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7656,6 +7938,16 @@ class $$AlimentosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get nutricionAproximada => $composableBuilder(
+    column: $table.nutricionAproximada,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get esAlimento => $composableBuilder(
+    column: $table.esAlimento,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$CategoriasTableOrderingComposer get categoriaId {
     final $$CategoriasTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -7757,6 +8049,16 @@ class $$AlimentosTableAnnotationComposer
 
   GeneratedColumn<String> get actualizado => $composableBuilder(
     column: $table.actualizado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get nutricionAproximada => $composableBuilder(
+    column: $table.nutricionAproximada,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get esAlimento => $composableBuilder(
+    column: $table.esAlimento,
     builder: (column) => column,
   );
 
@@ -7993,6 +8295,8 @@ class $$AlimentosTableTableManager
                 Value<bool> archivado = const Value.absent(),
                 Value<String> creado = const Value.absent(),
                 Value<String> actualizado = const Value.absent(),
+                Value<bool> nutricionAproximada = const Value.absent(),
+                Value<bool> esAlimento = const Value.absent(),
               }) => AlimentosCompanion(
                 id: id,
                 uuid: uuid,
@@ -8016,6 +8320,8 @@ class $$AlimentosTableTableManager
                 archivado: archivado,
                 creado: creado,
                 actualizado: actualizado,
+                nutricionAproximada: nutricionAproximada,
+                esAlimento: esAlimento,
               ),
           createCompanionCallback:
               ({
@@ -8041,6 +8347,8 @@ class $$AlimentosTableTableManager
                 Value<bool> archivado = const Value.absent(),
                 required String creado,
                 required String actualizado,
+                Value<bool> nutricionAproximada = const Value.absent(),
+                Value<bool> esAlimento = const Value.absent(),
               }) => AlimentosCompanion.insert(
                 id: id,
                 uuid: uuid,
@@ -8064,6 +8372,8 @@ class $$AlimentosTableTableManager
                 archivado: archivado,
                 creado: creado,
                 actualizado: actualizado,
+                nutricionAproximada: nutricionAproximada,
+                esAlimento: esAlimento,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -11227,6 +11537,7 @@ typedef $$ItemsListaTableCreateCompanionBuilder =
       required int orden,
       Value<bool> comprado,
       Value<int?> compraId,
+      Value<double?> cantidadMinima,
     });
 typedef $$ItemsListaTableUpdateCompanionBuilder =
     ItemsListaCompanion Function({
@@ -11238,6 +11549,7 @@ typedef $$ItemsListaTableUpdateCompanionBuilder =
       Value<int> orden,
       Value<bool> comprado,
       Value<int?> compraId,
+      Value<double?> cantidadMinima,
     });
 
 final class $$ItemsListaTableReferences
@@ -11327,6 +11639,11 @@ class $$ItemsListaTableFilterComposer
 
   ColumnFilters<bool> get comprado => $composableBuilder(
     column: $table.comprado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get cantidadMinima => $composableBuilder(
+    column: $table.cantidadMinima,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11434,6 +11751,11 @@ class $$ItemsListaTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get cantidadMinima => $composableBuilder(
+    column: $table.cantidadMinima,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ListasCompraTableOrderingComposer get listaId {
     final $$ListasCompraTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -11527,6 +11849,11 @@ class $$ItemsListaTableAnnotationComposer
 
   GeneratedColumn<bool> get comprado =>
       $composableBuilder(column: $table.comprado, builder: (column) => column);
+
+  GeneratedColumn<double> get cantidadMinima => $composableBuilder(
+    column: $table.cantidadMinima,
+    builder: (column) => column,
+  );
 
   $$ListasCompraTableAnnotationComposer get listaId {
     final $$ListasCompraTableAnnotationComposer composer = $composerBuilder(
@@ -11634,6 +11961,7 @@ class $$ItemsListaTableTableManager
                 Value<int> orden = const Value.absent(),
                 Value<bool> comprado = const Value.absent(),
                 Value<int?> compraId = const Value.absent(),
+                Value<double?> cantidadMinima = const Value.absent(),
               }) => ItemsListaCompanion(
                 id: id,
                 listaId: listaId,
@@ -11643,6 +11971,7 @@ class $$ItemsListaTableTableManager
                 orden: orden,
                 comprado: comprado,
                 compraId: compraId,
+                cantidadMinima: cantidadMinima,
               ),
           createCompanionCallback:
               ({
@@ -11654,6 +11983,7 @@ class $$ItemsListaTableTableManager
                 required int orden,
                 Value<bool> comprado = const Value.absent(),
                 Value<int?> compraId = const Value.absent(),
+                Value<double?> cantidadMinima = const Value.absent(),
               }) => ItemsListaCompanion.insert(
                 id: id,
                 listaId: listaId,
@@ -11663,6 +11993,7 @@ class $$ItemsListaTableTableManager
                 orden: orden,
                 comprado: comprado,
                 compraId: compraId,
+                cantidadMinima: cantidadMinima,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -11776,6 +12107,7 @@ typedef $$RecetasTableCreateCompanionBuilder =
       Value<int?> alimentoId,
       required String creada,
       required String actualizada,
+      Value<String?> ultimaPreparacion,
     });
 typedef $$RecetasTableUpdateCompanionBuilder =
     RecetasCompanion Function({
@@ -11792,6 +12124,7 @@ typedef $$RecetasTableUpdateCompanionBuilder =
       Value<int?> alimentoId,
       Value<String> creada,
       Value<String> actualizada,
+      Value<String?> ultimaPreparacion,
     });
 
 final class $$RecetasTableReferences
@@ -11906,6 +12239,11 @@ class $$RecetasTableFilterComposer
 
   ColumnFilters<String> get actualizada => $composableBuilder(
     column: $table.actualizada,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ultimaPreparacion => $composableBuilder(
+    column: $table.ultimaPreparacion,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12027,6 +12365,11 @@ class $$RecetasTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get ultimaPreparacion => $composableBuilder(
+    column: $table.ultimaPreparacion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$AlimentosTableOrderingComposer get alimentoId {
     final $$AlimentosTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -12099,6 +12442,11 @@ class $$RecetasTableAnnotationComposer
 
   GeneratedColumn<String> get actualizada => $composableBuilder(
     column: $table.actualizada,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ultimaPreparacion => $composableBuilder(
+    column: $table.ultimaPreparacion,
     builder: (column) => column,
   );
 
@@ -12193,6 +12541,7 @@ class $$RecetasTableTableManager
                 Value<int?> alimentoId = const Value.absent(),
                 Value<String> creada = const Value.absent(),
                 Value<String> actualizada = const Value.absent(),
+                Value<String?> ultimaPreparacion = const Value.absent(),
               }) => RecetasCompanion(
                 id: id,
                 uuid: uuid,
@@ -12207,6 +12556,7 @@ class $$RecetasTableTableManager
                 alimentoId: alimentoId,
                 creada: creada,
                 actualizada: actualizada,
+                ultimaPreparacion: ultimaPreparacion,
               ),
           createCompanionCallback:
               ({
@@ -12223,6 +12573,7 @@ class $$RecetasTableTableManager
                 Value<int?> alimentoId = const Value.absent(),
                 required String creada,
                 required String actualizada,
+                Value<String?> ultimaPreparacion = const Value.absent(),
               }) => RecetasCompanion.insert(
                 id: id,
                 uuid: uuid,
@@ -12237,6 +12588,7 @@ class $$RecetasTableTableManager
                 alimentoId: alimentoId,
                 creada: creada,
                 actualizada: actualizada,
+                ultimaPreparacion: ultimaPreparacion,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -12339,6 +12691,7 @@ typedef $$IngredientesRecetaTableCreateCompanionBuilder =
       Value<double?> cantidad,
       Value<String?> unidad,
       Value<bool> opcional,
+      Value<String?> nota,
     });
 typedef $$IngredientesRecetaTableUpdateCompanionBuilder =
     IngredientesRecetaCompanion Function({
@@ -12350,6 +12703,7 @@ typedef $$IngredientesRecetaTableUpdateCompanionBuilder =
       Value<double?> cantidad,
       Value<String?> unidad,
       Value<bool> opcional,
+      Value<String?> nota,
     });
 
 final class $$IngredientesRecetaTableReferences
@@ -12439,6 +12793,11 @@ class $$IngredientesRecetaTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get nota => $composableBuilder(
+    column: $table.nota,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$RecetasTableFilterComposer get recetaId {
     final $$RecetasTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -12525,6 +12884,11 @@ class $$IngredientesRecetaTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nota => $composableBuilder(
+    column: $table.nota,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$RecetasTableOrderingComposer get recetaId {
     final $$RecetasTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -12598,6 +12962,9 @@ class $$IngredientesRecetaTableAnnotationComposer
 
   GeneratedColumn<bool> get opcional =>
       $composableBuilder(column: $table.opcional, builder: (column) => column);
+
+  GeneratedColumn<String> get nota =>
+      $composableBuilder(column: $table.nota, builder: (column) => column);
 
   $$RecetasTableAnnotationComposer get recetaId {
     final $$RecetasTableAnnotationComposer composer = $composerBuilder(
@@ -12687,6 +13054,7 @@ class $$IngredientesRecetaTableTableManager
                 Value<double?> cantidad = const Value.absent(),
                 Value<String?> unidad = const Value.absent(),
                 Value<bool> opcional = const Value.absent(),
+                Value<String?> nota = const Value.absent(),
               }) => IngredientesRecetaCompanion(
                 id: id,
                 recetaId: recetaId,
@@ -12696,6 +13064,7 @@ class $$IngredientesRecetaTableTableManager
                 cantidad: cantidad,
                 unidad: unidad,
                 opcional: opcional,
+                nota: nota,
               ),
           createCompanionCallback:
               ({
@@ -12707,6 +13076,7 @@ class $$IngredientesRecetaTableTableManager
                 Value<double?> cantidad = const Value.absent(),
                 Value<String?> unidad = const Value.absent(),
                 Value<bool> opcional = const Value.absent(),
+                Value<String?> nota = const Value.absent(),
               }) => IngredientesRecetaCompanion.insert(
                 id: id,
                 recetaId: recetaId,
@@ -12716,6 +13086,7 @@ class $$IngredientesRecetaTableTableManager
                 cantidad: cantidad,
                 unidad: unidad,
                 opcional: opcional,
+                nota: nota,
               ),
           withReferenceMapper: (p0) => p0
               .map(

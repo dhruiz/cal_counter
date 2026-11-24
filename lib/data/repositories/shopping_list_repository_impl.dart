@@ -93,6 +93,7 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
           alimentoId: row.alimentoId,
           texto: row.texto,
           cantidad: row.cantidad,
+          cantidadMinima: row.cantidadMinima,
           comprado: row.comprado,
           orden: row.orden,
           compraId: row.compraId,
@@ -130,6 +131,7 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
               alimentoId: Value(item.alimentoId),
               texto: item.texto.trim(),
               cantidad: Value(emptyToNull(item.cantidad)),
+              cantidadMinima: Value(_minima(item.cantidadMinima)),
               orden: res.read<int>('siguiente'),
               comprado: Value(item.comprado),
               compraId: Value(item.compraId),
@@ -147,11 +149,14 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
         alimentoId: Value(item.alimentoId),
         texto: Value(item.texto.trim()),
         cantidad: Value(emptyToNull(item.cantidad)),
+        cantidadMinima: Value(_minima(item.cantidadMinima)),
         comprado: Value(item.comprado),
         compraId: Value(item.compraId),
       ),
     );
   }
+
+  static double? _minima(double? v) => (v == null || v <= 0) ? null : v;
 
   /// Desmarcar saca el artículo del carrito pero NO borra la compra:
   /// reutilizar una lista no debe perder historial de precios.

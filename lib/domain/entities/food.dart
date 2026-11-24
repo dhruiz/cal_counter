@@ -65,6 +65,14 @@ class Food extends Equatable {
   final DateTime? creado;
   final DateTime? actualizado;
 
+  /// La tabla es una aproximación: es el alimento de una receta sin peso
+  /// final o con ingredientes sin datos.
+  final bool aproximado;
+
+  /// false = artículo que no es un alimento (limpieza, higiene...): se compra
+  /// y tiene historial de precios, pero no tabla nutricional ni contador.
+  final bool esAlimento;
+
   const Food({
     this.id,
     this.uuid,
@@ -81,11 +89,14 @@ class Food extends Equatable {
     this.archivado = false,
     this.creado,
     this.actualizado,
+    this.aproximado = false,
+    this.esAlimento = true,
   });
 
   /// Le faltan datos nutricionales esenciales: no se puede registrar en el
-  /// contador hasta completarlo.
-  bool get pendiente => !nutricion.estaCompleta;
+  /// contador hasta completarlo. Un artículo que no es un alimento nunca
+  /// está pendiente (no tiene tabla).
+  bool get pendiente => esAlimento && !nutricion.estaCompleta;
 
   /// "Leche semidesnatada · Hacendado" (o solo el nombre si es genérico).
   String get nombreCompleto =>
@@ -110,6 +121,8 @@ class Food extends Equatable {
     int? usoCount,
     DateTime? ultimoUso,
     bool? archivado,
+    bool? aproximado,
+    bool? esAlimento,
   }) {
     return Food(
       id: id ?? this.id,
@@ -129,6 +142,8 @@ class Food extends Equatable {
       archivado: archivado ?? this.archivado,
       creado: creado,
       actualizado: actualizado,
+      aproximado: aproximado ?? this.aproximado,
+      esAlimento: esAlimento ?? this.esAlimento,
     );
   }
 
@@ -147,6 +162,8 @@ class Food extends Equatable {
     usoCount,
     ultimoUso,
     archivado,
+    aproximado,
+    esAlimento,
   ];
 }
 

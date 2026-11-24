@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/errors/domain_errors.dart';
 import '../../domain/repositories/recipe_repository.dart';
+import '../../domain/services/dates.dart';
 import '../db/app_database.dart';
 import '../db/mappers.dart';
 
@@ -85,6 +86,11 @@ class RecipeRepositoryImpl implements RecipeRepository {
           (recipe.pesoFinalG ?? 0) > 0 ? recipe.pesoFinalG : null,
         ),
         alimentoId: Value(recipe.alimentoId),
+        ultimaPreparacion: Value(
+          recipe.ultimaPreparacion == null
+              ? null
+              : dateKey(recipe.ultimaPreparacion!),
+        ),
         actualizada: Value(now),
       );
       final int id;
@@ -128,6 +134,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
                   ing.alimentoId == null ? null : emptyToNull(ing.unidad),
                 ),
                 opcional: Value(ing.opcional),
+                nota: Value(emptyToNull(ing.nota)),
               ),
             );
       }
