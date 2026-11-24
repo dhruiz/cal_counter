@@ -88,8 +88,15 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
     final frutas = await importar(
       await ref.read(produceCatalogProvider.future),
     );
+    await markProduceCatalogDone();
     return '${base.nuevos + frutas.nuevos} alimentos añadidos.';
   });
+
+  /// Empezar vacío: tampoco se añade sola la lista de frutas y verduras.
+  Future<void> _empty() async {
+    await markProduceCatalogDone();
+    await _finish();
+  }
 
   Future<void> _import() => _run('Importando...', () async {
     final file = await FileTransfer.pick();
@@ -196,7 +203,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
               title: 'Empezar vacío',
               subtitle:
                   'Irás creando tus alimentos al escanearlos o comprarlos.',
-              onTap: () => _finish(),
+              onTap: _empty,
             ),
           ],
         ),

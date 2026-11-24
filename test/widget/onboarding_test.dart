@@ -27,6 +27,9 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    // rootBundle guarda los assets leídos; un Future de un test anterior queda
+    // ligado a su reloj simulado y no se completaría en este.
+    rootBundle.clear();
     db = memoryDb();
   });
 
@@ -69,17 +72,67 @@ void main() {
     expect(foods.length, 678 + 229); // catálogo base + frutas y verduras
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool(kOnboardingDone), isTrue);
+    // Ya incorporada: al abrir la app no se vuelve a importar.
+    expect(prefs.getInt(kProduceCatalogVersionKey), kProduceCatalogVersion);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
   });
 
-  testWidgets('con alimentos ya guardados no se muestra', (tester) async {
+  /// Deja correr la app en tiempo real (el asset se decodifica en otro
+  /// isolate) hasta que aparezca [finder] o pasen [vueltas] × 100 ms.
+  Future<void> esperar(
+    WidgetTester tester, {
+    Finder? finder,
+    int vueltas = 150,
+  }) async {
+    for (var i = 0; i < vueltas; i++) {
+      if (finder != null && finder.evaluate().isNotEmpty) return;
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+  }
+
+  Future<List<Food>> alimentos(WidgetTester tester) async => (await tester
+      .runAsync(() => FoodRepositoryImpl(db).search('', limit: 2000)))!;
+
+  testWidgets(
+    'con alimentos ya guardados no se muestra y se añaden solas las frutas',
+    (tester) async {
+      await tester.runAsync(
+        () => FoodRepositoryImpl(db).saveFood(const Food(nombre: 'Pan')),
+      );
+      await pump(tester);
+      expect(find.text('Tus alimentos, en el centro de todo'), findsNothing);
+      expect(find.text('Agregar Ingesta'), findsOneWidget);
+
+      final aviso = find.text(
+        'Se añadieron 229 frutas, verduras y hortalizas a tus alimentos.',
+      );
+      await esperar(tester, finder: aviso);
+      expect(aviso, findsOneWidget);
+      expect((await alimentos(tester)).length, 1 + 229);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt(kProduceCatalogVersionKey), kProduceCatalogVersion);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 5));
+    },
+  );
+
+  testWidgets('la lista se añade una sola vez por versión', (tester) async {
+    // Ya incorporada (por ejemplo, y luego se borraron alimentos): no vuelve.
+    SharedPreferences.setMockInitialValues({
+      kOnboardingDone: true,
+      kProduceCatalogVersionKey: kProduceCatalogVersion,
+    });
     await tester.runAsync(
       () => FoodRepositoryImpl(db).saveFood(const Food(nombre: 'Pan')),
     );
     await pump(tester);
-    expect(find.text('Tus alimentos, en el centro de todo'), findsNothing);
     expect(find.text('Agregar Ingesta'), findsOneWidget);
+    await esperar(tester, vueltas: 20);
+    expect((await alimentos(tester)).map((f) => f.nombre), ['Pan']);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
   });
@@ -89,6 +142,11 @@ void main() {
     await tester.tap(find.text('Empezar vacío'));
     await tester.pumpAndSettle();
     expect(find.text('Agregar Ingesta'), findsOneWidget);
+    // Se respeta la elección: tampoco se añade sola la lista de frutas.
+    await esperar(tester, vueltas: 20);
+    expect(await alimentos(tester), isEmpty);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getInt(kProduceCatalogVersionKey), kProduceCatalogVersion);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 1));
   });

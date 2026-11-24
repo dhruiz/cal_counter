@@ -92,6 +92,35 @@ final needsOnboardingProvider = FutureProvider<bool>((ref) async {
   return true;
 });
 
+/// Versión de la lista de frutas y verduras incluida en la app. Al subirla,
+/// la lista se vuelve a fusionar sola al abrir la app, sin duplicar: los
+/// alimentos se emparejan por uuid y se conservan los valores del usuario.
+const int kProduceCatalogVersion = 1;
+
+/// Clave de SharedPreferences con la última versión de la lista incorporada.
+const String kProduceCatalogVersionKey = 'catalogo_frutas_version';
+
+/// Marca la lista de frutas y verduras de esta versión como ya incorporada,
+/// para que no se importe sola.
+Future<void> markProduceCatalogDone() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setInt(kProduceCatalogVersionKey, kProduceCatalogVersion);
+}
+
+/// Al abrir la app, incorpora la lista de frutas y verduras una sola vez por
+/// versión (las instalaciones que ya tenían datos la reciben sin hacer nada).
+/// Devuelve los alimentos añadidos. Si falla no se marca y se reintenta en el
+/// próximo arranque. Quien eligió «Empezar vacío» ya la tiene marcada.
+final autoImportProduceProvider = FutureProvider<int>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  final hecha = prefs.getInt(kProduceCatalogVersionKey) ?? 0;
+  if (hecha >= kProduceCatalogVersion) return 0;
+  final rep = await ref.read(produceCatalogProvider.future);
+  final r = await ref.read(importRepertoireProvider)(rep);
+  await prefs.setInt(kProduceCatalogVersionKey, kProduceCatalogVersion);
+  return r.nuevos;
+});
+
 Future<void> markOnboardingDone() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool(kOnboardingDone, true);

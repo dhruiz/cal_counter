@@ -10,7 +10,7 @@ import 'package:cal_counter/domain/entities/purchase.dart';
 import 'package:cal_counter/domain/entities/recipe.dart';
 import 'package:cal_counter/domain/entities/shopping_list.dart';
 import 'package:cal_counter/domain/repositories/food_repository.dart';
-import 'package:cal_counter/presentation/providers/core_providers.dart';
+import 'package:cal_counter/presentation/providers/data_provider.dart';
 import 'package:cal_counter/presentation/views/cart_mode_view.dart';
 import 'package:cal_counter/presentation/views/main_shell.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,10 @@ void main() {
   late int lecheId, panId, huevoId, listaId;
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
+    // La lista de frutas y verduras ya incorporada: no se importa sola.
+    SharedPreferences.setMockInitialValues({
+      kProduceCatalogVersionKey: kProduceCatalogVersion,
+    });
     db = memoryDb();
     foods = FoodRepositoryImpl(db);
     purchases = PurchaseRepositoryImpl(db);
