@@ -55,7 +55,7 @@ void main() {
 
     test('valores de control idénticos a la fuente', () {
       // USDA SR28, NDB 09040 «Bananas, raw».
-      final cambur = buscar('Cambur (banano, banana), crudo');
+      final cambur = buscar('Cambur (banano, banana), crudo / Banane, roh');
       expect(cambur.alimento.nutricion.kcal, 89);
       expect(cambur.alimento.nutricion.proteinas, 1.09);
       expect(cambur.alimento.nutricion.grasas, 0.33);
@@ -69,16 +69,27 @@ void main() {
       );
       // NDB 09037 «Avocados, raw, all commercial varieties».
       final aguacate = buscar(
-        'Aguacate (palta), crudo, promedio de variedades comerciales',
+        'Aguacate (palta), crudo, promedio de variedades comerciales / '
+        'Avocado, roh, Durchschnitt der Handelssorten',
       );
       expect(aguacate.alimento.nutricion.kcal, 160);
       expect(aguacate.alimento.nutricion.grasas, 14.66);
       expect(aguacate.alimento.nutricion.grasasSaturadas, 2.126);
     });
 
+    test('nombre en español y en alemán', () {
+      for (final rf in frutas.alimentos) {
+        final partes = rf.alimento.nombre.split(' / ');
+        expect(partes, hasLength(2), reason: rf.alimento.nombre);
+        expect(partes.every((p) => p.trim().isNotEmpty), isTrue);
+      }
+    });
+
     test('un dato ausente en la fuente queda vacío, nunca en 0', () {
       // NDB 09138: USDA no publica fibra, azúcares, saturadas ni sodio.
-      final uchuva = buscar('Uchuva (aguaymanto, Physalis), cruda');
+      final uchuva = buscar(
+        'Uchuva (aguaymanto, physalis), cruda / Physalis (Kapstachelbeere), roh',
+      );
       final n = uchuva.alimento.nutricion;
       expect(n.fibra, isNull);
       expect(n.azucares, isNull);
@@ -103,13 +114,13 @@ void main() {
         expect((await importar(frutas)).nuevos, 0);
         expect((await foods.search('', limit: 2000)).length, 900);
 
-        final kale = (await foods.search(
-          'grünkohl',
-        )).firstWhere((f) => f.nombre == 'Col rizada (kale, Grünkohl), cruda');
+        final kale = (await foods.search('grünkohl')).firstWhere(
+          (f) => f.nombre == 'Col rizada (kale), cruda / Grünkohl, roh',
+        );
         expect((await foods.getPortionsFor([kale.id!]))[kale.id!], isNull);
-        final cambur = (await foods.search(
-          'cambur',
-        )).firstWhere((f) => f.nombre == 'Cambur (banano, banana), crudo');
+        final cambur = (await foods.search('cambur')).firstWhere(
+          (f) => f.nombre == 'Cambur (banano, banana), crudo / Banane, roh',
+        );
         expect(
           (await foods.getPortionsFor([cambur.id!]))[cambur.id!],
           hasLength(3),
@@ -118,6 +129,30 @@ void main() {
           (c) => c.id == kale.categoriaId,
         );
         expect(cat.nombre, 'Frutas y verduras');
+
+        // Se encuentra en los dos idiomas, con o sin tildes, diéresis o ß.
+        Future<List<String>> nombres(String q) async => [
+          for (final f in await foods.search(q, limit: 50)) f.nombre,
+        ];
+        const weisskohl = 'Repollo blanco (col), crudo / Weißkohl, roh';
+        for (final q in ['repollo blanco', 'weißkohl', 'Weisskohl', 'weiß']) {
+          expect(await nombres(q), contains(weisskohl), reason: q);
+        }
+        const batata = 'Batata (boniato, camote), cruda / Süßkartoffel, roh';
+        for (final q in ['batata', 'camote', 'süßkartoffel', 'Susskartoffel']) {
+          expect(await nombres(q), contains(batata), reason: q);
+        }
+        for (final q in ['grünkohl', 'grunkohl', 'col rizada']) {
+          expect(
+            await nombres(q),
+            contains('Col rizada (kale), cruda / Grünkohl, roh'),
+            reason: q,
+          );
+        }
+        expect(
+          await nombres('lechoza'),
+          contains('Lechoza (papaya), cruda / Papaya, roh'),
+        );
       } finally {
         await db.close();
       }

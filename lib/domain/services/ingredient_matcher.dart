@@ -88,10 +88,12 @@ final Map<int, int> _accentMap = {
 };
 
 const int _a = 0x61, _z = 0x7a, _d0 = 0x30, _d9 = 0x39, _space = 0x20;
+const int _eszett = 0xdf, _s = 0x73;
 
 final RegExp _leadingDigit = RegExp(r'^\d');
 
-/// Minúsculas, sin tildes, ñ→n, cualquier signo → espacio, espacios colapsados.
+/// Minúsculas, sin tildes, ñ→n, ß→ss ("Weißkohl" = "Weisskohl"), cualquier
+/// signo → espacio, espacios colapsados.
 ///
 /// Se llama miles de veces por pulsación al buscar recetas por ingredientes:
 /// trabaja con códigos de carácter en vez de crear un `RegExp` por carácter
@@ -100,6 +102,14 @@ String normalizeText(String input) {
   final out = <int>[];
   var pendingSpace = false;
   for (final rune in input.toLowerCase().runes) {
+    if (rune == _eszett) {
+      if (pendingSpace && out.isNotEmpty) out.add(_space);
+      pendingSpace = false;
+      out
+        ..add(_s)
+        ..add(_s);
+      continue;
+    }
     final mapped = _accentMap[rune] ?? rune;
     final isWordChar =
         (mapped >= _a && mapped <= _z) || (mapped >= _d0 && mapped <= _d9);

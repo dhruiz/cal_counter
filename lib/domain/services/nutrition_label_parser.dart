@@ -141,8 +141,8 @@ class NutritionLabelParser {
       ],
     ),
     (Nutrient.fibra, ['fibra', 'fibre', 'fiber', 'ballaststoff']),
-    // "eiwei" cubre "Eiweiß" (la ß no es una letra a-z y la normalización la
-    // quita), "Eiweiss" y "EiweiB" (el OCR confunde a menudo la ß con una B).
+    // "eiwei" cubre "Eiweiß" (la normalización convierte la ß en "ss"),
+    // "Eiweiss" y "EiweiB" (el OCR confunde a menudo la ß con una B).
     (Nutrient.proteinas, ['proteina', 'protein', 'proteine', 'eiwei']),
     (Nutrient.sal, ['sal', 'salt', 'sel', 'sale', 'salz']),
   ];

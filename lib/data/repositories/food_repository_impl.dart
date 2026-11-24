@@ -34,12 +34,21 @@ class FoodRepositoryImpl implements FoodRepository {
   /// Expresión MATCH de FTS5: cada palabra por prefijo, con su singular y
   /// sus sinónimos ("papas fritas" → ("papas"* OR "papa"* OR "patata"*)
   /// AND ("fritas"* OR "frita"*)). Null si no queda ninguna palabra.
+  ///
+  /// La normalización convierte la ß en "ss", pero el índice FTS guarda el
+  /// nombre tal cual ("weißkohl"): cada variante con "ss" se busca también
+  /// con ß, así "Weißkohl" y "Weisskohl" encuentran lo mismo.
   static String? ftsQuery(String query) {
     final words = normalizeText(query).split(' ').where((w) => w.isNotEmpty);
     final parts = <String>[];
     for (final w in words) {
-      final variants = searchVariants(w).where((v) => v.isNotEmpty).toList()
-        ..sort();
+      final variants = {
+        for (final v in searchVariants(w))
+          if (v.isNotEmpty) ...[
+            v,
+            if (v.contains('ss')) v.replaceAll('ss', 'ß'),
+          ],
+      }.toList()..sort();
       if (variants.isEmpty) continue;
       final ors = variants
           .map((v) => '"${v.replaceAll('"', '')}"*')
