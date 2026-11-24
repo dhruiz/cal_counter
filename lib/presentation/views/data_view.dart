@@ -163,11 +163,6 @@ class _DataViewState extends ConsumerState<DataView> {
     );
   }
 
-  Future<void> _seed() => _run(() async {
-    final rep = await ref.read(seedCatalogProvider.future);
-    await _importRepertoire(rep, 'Catálogo base');
-  });
-
   Future<void> _produce() => _run(() async {
     final rep = await ref.read(produceCatalogProvider.future);
     await _importRepertoire(rep, 'Frutas y verduras');
@@ -282,14 +277,6 @@ class _DataViewState extends ConsumerState<DataView> {
               subtitle: Text('Usa «Importar» y elige el archivo de respaldo.'),
             ),
             const _Section('Catálogos incluidos'),
-            ListTile(
-              leading: const Icon(Icons.eco_outlined),
-              title: const Text('Añadir el catálogo base'),
-              subtitle: const Text(
-                '678 alimentos genéricos con su tabla nutricional',
-              ),
-              onTap: _seed,
-            ),
             ListTile(
               leading: const Icon(Icons.local_florist_outlined),
               title: const Text('Añadir frutas y verduras'),

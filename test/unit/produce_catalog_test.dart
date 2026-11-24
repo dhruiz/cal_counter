@@ -19,7 +19,9 @@ Repertoire _leer(String ruta) =>
 
 void main() {
   final frutas = _leer('assets/semilla/frutas_verduras.json');
-  final base = _leer('assets/semilla/alimentos_base.json');
+  // Catálogo base que traían las versiones anteriores: las instalaciones
+  // existentes lo conservan y la lista no debe chocar con él.
+  final base = _leer('test/fixtures/alimentos_base_v1.json');
 
   RepertoireFood buscar(String nombre) =>
       frutas.alimentos.firstWhere((f) => f.alimento.nombre == nombre);
@@ -46,7 +48,7 @@ void main() {
       }
     });
 
-    test('uuid y nombres únicos, sin chocar con el catálogo base', () {
+    test('uuid y nombres únicos, sin chocar con el antiguo catálogo base', () {
       final uuids = frutas.alimentos.map((f) => f.alimento.uuid).toSet();
       expect(uuids.length, 229);
       final nombres = {
@@ -144,7 +146,7 @@ void main() {
       expect(auyama.alimento.notas, contains('Sin cifra en la fuente'));
     });
 
-    test('se importa junto al catálogo base y sin duplicar', () async {
+    test('se importa junto al antiguo catálogo base y sin duplicar', () async {
       final AppDatabase db = memoryDb();
       try {
         final foods = FoodRepositoryImpl(db);

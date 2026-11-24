@@ -2,7 +2,7 @@
 
 > Archivo generado por `tool/semilla/generar_frutas_verduras.py`. No editar a mano.
 
-`assets/semilla/frutas_verduras.json` contiene **229 alimentos** (130 de CIQUAL 2025 y 99 de USDA SR Legacy) en formato `cal_counter/repertorio` v1. Se carga junto al catálogo base en la bienvenida; en una instalación que ya tenía datos se incorpora sola la primera vez que se abre la app tras actualizar (una vez por versión de la lista: `kProduceCatalogVersion`). También se puede añadir desde *Datos y respaldos → Catálogos incluidos → Añadir frutas y verduras* o importando el archivo. Importarlo de nuevo no duplica nada: cada alimento tiene un uuid v5 fijo derivado de su código en la fuente.
+`assets/semilla/frutas_verduras.json` contiene **229 alimentos** (130 de CIQUAL 2025 y 99 de USDA SR Legacy) en formato `cal_counter/repertorio` v1. Se carga en la bienvenida («Empezar con frutas y verduras»); en una instalación que ya tenía datos se incorpora sola la primera vez que se abre la app tras actualizar (una vez por versión de la lista: `kProduceCatalogVersion`). También se puede añadir desde *Datos y respaldos → Catálogos incluidos → Añadir frutas y verduras* o importando el archivo. Importarlo de nuevo no duplica nada: cada alimento tiene un uuid v5 fijo derivado de su código en la fuente.
 
 ## Fuentes
 
