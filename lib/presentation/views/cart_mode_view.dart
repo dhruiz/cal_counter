@@ -375,6 +375,7 @@ class _CartModeViewState extends ConsumerState<CartModeView> {
         marca: res.marca,
         unidad: FoodUnit.fromClave(res.unidad),
         alimentoExistenteId: existenteId,
+        esAlimento: res.esAlimento,
         presentacion: PackageDraft(
           codigoBarras: code,
           descripcion: res.presentacion,

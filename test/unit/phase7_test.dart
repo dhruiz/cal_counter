@@ -286,7 +286,10 @@ void main() {
         expect(cat.nombre, 'Mascotas'); // se creó en el otro móvil
 
         final tsv = FoodsTsvCodec.encode(rep);
-        expect(tsv.split('\n').first.endsWith('\tcategoria'), isTrue);
+        expect(
+          tsv.split('\n').first.endsWith('\tcategoria\tes_alimento'),
+          isTrue,
+        );
         expect(
           FoodsTsvCodec.decode(tsv).alimentos.single.categoria,
           'Mascotas',

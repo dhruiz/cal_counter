@@ -11,12 +11,14 @@ import '../../domain/errors/domain_errors.dart';
 /// ```json
 /// {"formato": "cal_counter/repertorio", "version": 1, "exportado": "...",
 ///  "alimentos": [{"uuid", "nombre", "marca", "tipo", "unidad", "categoria",
-///    "nutricion": {"kcal", ..., "origen"}, "notas",
+///    "es_alimento" (solo si es false),
+///    "nutricion": {"kcal", ..., "origen", "aproximada" (solo si true)},
+///    "notas",
 ///    "porciones": [{"nombre", "gramos"}],
 ///    "presentaciones": [{"uuid", "codigo_barras", "descripcion",
 ///      "contenido"}]}],
 ///  "recetas": [{"uuid", "nombre", ..., "ingredientes": [{"texto",
-///    "alimento_uuid", "cantidad", "unidad", "opcional"}]}]}
+///    "alimento_uuid", "cantidad", "unidad", "opcional", "nota"}]}]}
 /// ```
 ///
 /// Tolerante: ignora campos desconocidos y rechaza versiones mayores más
@@ -62,11 +64,13 @@ class RepertoireCodec {
       'tipo': f.tipo.clave,
       'unidad': f.unidad.clave,
       if ((rf.categoria ?? '').isNotEmpty) 'categoria': rf.categoria,
+      if (!f.esAlimento) 'es_alimento': false,
       if (!n.estaVacia)
         'nutricion': {
           for (final e in _claves.entries)
             if (n[e.key] != null) e.value: n[e.key],
           if (f.origenNutricion != null) 'origen': f.origenNutricion!.clave,
+          if (f.aproximado) 'aproximada': true,
         },
       if ((f.notas ?? '').isNotEmpty) 'notas': f.notas,
       if (rf.porciones.isNotEmpty)
@@ -108,6 +112,8 @@ class RepertoireCodec {
             if (r.ingredientes[i].unidad != null)
               'unidad': r.ingredientes[i].unidad,
             if (r.ingredientes[i].opcional) 'opcional': true,
+            if ((r.ingredientes[i].nota ?? '').isNotEmpty)
+              'nota': r.ingredientes[i].nota,
           },
       ],
       if (r.elaboracion.isNotEmpty) 'elaboracion': r.elaboracion,
@@ -173,12 +179,14 @@ class RepertoireCodec {
     final n = a['nutricion'];
     var nutricion = NutritionFacts.vacia;
     NutritionSource? origen;
+    var aproximada = false;
     if (n is Map) {
       for (final e in _claves.entries) {
         final v = _num(n[e.value]);
         if (v != null && v >= 0) nutricion = nutricion.conValor(e.key, v);
       }
       origen = NutritionSource.fromClave(n['origen'] as String?);
+      aproximada = n['aproximada'] == true;
     }
     final uuid = _str(a['uuid']);
     final categoria = _str(a['categoria']);
@@ -193,6 +201,8 @@ class RepertoireCodec {
         nutricion: nutricion,
         origenNutricion: origen,
         notas: _str(a['notas']).isEmpty ? null : _str(a['notas']),
+        aproximado: aproximada,
+        esAlimento: a['es_alimento'] != false,
       ),
       porciones: [
         for (final p in (a['porciones'] as List?) ?? const [])
@@ -233,6 +243,7 @@ class RepertoireCodec {
             cantidad: _num(i['cantidad']),
             unidad: _str(i['unidad']).isEmpty ? null : _str(i['unidad']),
             opcional: i['opcional'] == true,
+            nota: _str(i['nota']).isEmpty ? null : _str(i['nota']),
           ),
         );
         final u = _str(i['alimento_uuid']);
