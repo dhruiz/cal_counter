@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/styles.dart';
 import '../../core/utils.dart';
-import '../../domain/entities/food.dart';
 import '../../domain/entities/recipe.dart';
+import '../../domain/services/money.dart';
 import '../providers/recipes_provider.dart';
-import '../providers/search_provider.dart';
-import 'food_picker_view.dart';
 
 /// Alta o edición de una receta con campos de texto libres: ingredientes y
-/// pasos "uno por línea", como en un cuaderno. Devuelve el id guardado.
+/// pasos "uno por línea", como en un cuaderno. Al editar, las líneas que no
+/// cambian conservan su vínculo al repertorio (cantidad y unidad). Devuelve
+/// el id guardado.
 class RecipeFormView extends ConsumerStatefulWidget {
   final Recipe? recipe;
 
@@ -29,8 +29,7 @@ class _RecipeFormViewState extends ConsumerState<RecipeFormView> {
   late final TextEditingController _ingredientsCtrl;
   late final TextEditingController _stepsCtrl;
   late final TextEditingController _notesCtrl;
-  late final TextEditingController _portionCtrl;
-  int? _alimentoId;
+  late final TextEditingController _weightCtrl;
   bool _saving = false;
 
   @override
@@ -41,17 +40,12 @@ class _RecipeFormViewState extends ConsumerState<RecipeFormView> {
     _categoryCtrl = TextEditingController(text: r?.categoria ?? '');
     _servingsCtrl = TextEditingController(text: r?.porciones?.toString() ?? '');
     _timeCtrl = TextEditingController(text: r?.tiempoMin?.toString() ?? '');
-    _ingredientsCtrl = TextEditingController(
-      text: r?.ingredientes.join('\n') ?? '',
-    );
+    _ingredientsCtrl = TextEditingController(text: r?.lineas.join('\n') ?? '');
     _stepsCtrl = TextEditingController(text: r?.elaboracion ?? '');
     _notesCtrl = TextEditingController(text: r?.notas ?? '');
-    _portionCtrl = TextEditingController(
-      text: r?.pesoPorcionG == null
-          ? ''
-          : AppUtils.formatNumero(r!.pesoPorcionG!),
+    _weightCtrl = TextEditingController(
+      text: r?.pesoFinalG == null ? '' : AppUtils.formatNumero(r!.pesoFinalG!),
     );
-    _alimentoId = r?.alimentoId;
   }
 
   @override
@@ -64,7 +58,7 @@ class _RecipeFormViewState extends ConsumerState<RecipeFormView> {
       _ingredientsCtrl,
       _stepsCtrl,
       _notesCtrl,
-      _portionCtrl,
+      _weightCtrl,
     ]) {
       c.dispose();
     }
@@ -77,31 +71,35 @@ class _RecipeFormViewState extends ConsumerState<RecipeFormView> {
       .where((l) => l.isNotEmpty)
       .toList();
 
-  Future<void> _pickFood() async {
-    final food = await FoodPickerView.pick(
-      context,
-      initialQuery: _nameCtrl.text.trim(),
-    );
-    if (food != null) setState(() => _alimentoId = food.id);
+  /// Ingredientes del texto, reutilizando el vínculo de las líneas que ya
+  /// existían con el mismo texto.
+  List<RecipeIngredient> get _ingredientes {
+    final previos = [...?widget.recipe?.ingredientes];
+    return [
+      for (final linea in _ingredientLines)
+        () {
+          final i = previos.indexWhere((p) => p.texto.trim() == linea);
+          if (i < 0) return RecipeIngredient(texto: linea);
+          return previos.removeAt(i);
+        }(),
+    ];
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
-    final recipe = Recipe(
-      id: widget.recipe?.id,
+    final base = widget.recipe ?? const Recipe(nombre: '');
+    final peso = parseDecimal(_weightCtrl.text);
+    final recipe = base.copyWith(
       nombre: _nameCtrl.text.trim(),
       categoria: _categoryCtrl.text.trim(),
       porciones: int.tryParse(_servingsCtrl.text.trim()),
       tiempoMin: int.tryParse(_timeCtrl.text.trim()),
-      ingredientes: _ingredientLines,
+      ingredientes: _ingredientes,
       elaboracion: _stepsCtrl.text.trim(),
       notas: _notesCtrl.text.trim(),
-      favorita: widget.recipe?.favorita ?? false,
-      alimentoId: _alimentoId,
-      pesoPorcionG: double.tryParse(
-        _portionCtrl.text.trim().replaceAll(',', '.'),
-      ),
+      pesoFinalG: (peso ?? 0) > 0 ? peso : null,
+      clearPesoFinal: (peso ?? 0) <= 0,
     );
     try {
       final id = await ref.read(recipesProvider.notifier).save(recipe);
@@ -121,9 +119,6 @@ class _RecipeFormViewState extends ConsumerState<RecipeFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final Food? linked = _alimentoId == null
-        ? null
-        : ref.watch(foodByIdProvider(_alimentoId!)).valueOrNull;
     final categorias = ref
         .watch(recipesProvider)
         .recipes
@@ -254,48 +249,20 @@ class _RecipeFormViewState extends ConsumerState<RecipeFormView> {
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Calorías (opcional)',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Vincula la receta a un alimento del contador (por ejemplo, uno '
-              'creado con "Guardar comida como alimento") para ver sus calorías '
-              'y registrar una porción desde aquí.',
-              style: AppStyles.labelText,
-            ),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.local_fire_department_outlined),
-                title: Text(linked?.name ?? 'Sin vincular'),
-                subtitle: linked == null
-                    ? null
-                    : Text('${linked.kcalPer100} kcal por 100 g'),
-                trailing: _alimentoId == null
-                    ? TextButton(
-                        onPressed: _pickFood,
-                        child: const Text('Vincular'),
-                      )
-                    : IconButton(
-                        tooltip: 'Quitar vínculo',
-                        icon: const Icon(Icons.link_off),
-                        onPressed: () => setState(() => _alimentoId = null),
-                      ),
-                onTap: _pickFood,
+            TextFormField(
+              controller: _weightCtrl,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Peso final ya cocinado (opcional)',
+                suffixText: 'g',
+                helperText:
+                    'Si no se indica, se usa la suma de los ingredientes. '
+                    'Sirve para calcular bien las calorías por 100 g.',
+                helperMaxLines: 2,
               ),
             ),
-            if (_alimentoId != null)
-              TextFormField(
-                controller: _portionCtrl,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Peso de una porción (opcional)',
-                  suffixText: 'g',
-                ),
-              ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _saving ? null : _save,

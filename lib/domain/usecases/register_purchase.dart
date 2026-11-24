@@ -1,68 +1,61 @@
-import '../entities/product.dart';
-import '../repositories/product_repository.dart';
+import '../entities/purchase.dart';
+import '../errors/domain_errors.dart';
+import '../repositories/food_repository.dart';
+import '../repositories/purchase_repository.dart';
 import '../services/dates.dart';
+import '../services/money.dart' as money;
 
-/// Registra la compra de un producto (precio unitario, establecimiento, fecha).
+/// Registra la compra de un alimento: precio unitario (céntimos), unidades,
+/// establecimiento y fecha. Si no se indica presentación se usa la
+/// presentación sin código del alimento.
 class RegisterPurchase {
-  final ProductRepository repository;
+  final FoodRepository foods;
+  final PurchaseRepository purchases;
 
-  RegisterPurchase(this.repository);
+  RegisterPurchase(this.foods, this.purchases);
 
   Future<int> call({
-    required int productoId,
-    required double precio,
+    required int alimentoId,
+    int? presentacionId,
+    required int precioCent,
+    int unidades = 1,
     required String establecimiento,
     DateTime? fecha,
   }) async {
-    validarPrecio(precio);
-    return repository.addPurchase(
+    validarPrecioCent(precioCent);
+    final tienda = normalizarEstablecimiento(establecimiento);
+    final pid = presentacionId ?? await foods.defaultPackageId(alimentoId);
+    return purchases.addPurchase(
       Purchase(
-        productoId: productoId,
+        presentacionId: pid,
         fecha: dateOnly(fecha ?? DateTime.now()),
-        precio: redondear(precio),
-        establecimiento: normalizarEstablecimiento(establecimiento),
+        precioCent: precioCent,
+        unidades: unidades,
+        establecimiento: tienda,
       ),
     );
   }
 
-  /// Lanza [ArgumentError] si el precio no es un número mayor que 0.
-  static void validarPrecio(double precio) {
-    if (precio <= 0 || precio.isNaN || precio.isInfinite) {
-      throw ArgumentError('El precio debe ser mayor que 0.');
+  /// Lanza [ValidationException] si el precio no es mayor que 0.
+  static void validarPrecioCent(int precioCent) {
+    if (precioCent <= 0) {
+      throw const ValidationException('El precio debe ser mayor que 0.');
     }
   }
 
-  /// Espacios normalizados; lanza [ArgumentError] si queda vacío.
+  /// Espacios normalizados; lanza [ValidationException] si queda vacío.
   static String normalizarEstablecimiento(String establecimiento) {
     final store = establecimiento.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (store.isEmpty) {
-      throw ArgumentError('Indica el establecimiento.');
+      throw const ValidationException('Indica el establecimiento.');
     }
     return store;
   }
 
-  /// Redondea a céntimos.
-  static double redondear(double precio) =>
-      (precio * 100).roundToDouble() / 100;
+  /// Interpreta un precio escrito por el usuario ("2,35", "2.35",
+  /// "1.234,50"). Devuelve null si no es válido.
+  static double? parsePrecio(String input) => money.parsePrecio(input);
 
-  /// Interpreta un precio escrito por el usuario: "2,35", "2.35", "1.234,50",
-  /// "€ 3". Devuelve null si no es válido.
-  static double? parsePrecio(String input) {
-    var s = input.replaceAll(RegExp(r'[^\d.,]'), '');
-    if (s.isEmpty) return null;
-    final lastComma = s.lastIndexOf(',');
-    final lastDot = s.lastIndexOf('.');
-    if (lastComma >= 0 && lastDot >= 0) {
-      // El último separador es el decimal; el otro, de miles.
-      if (lastComma > lastDot) {
-        s = s.replaceAll('.', '').replaceAll(',', '.');
-      } else {
-        s = s.replaceAll(',', '');
-      }
-    } else {
-      s = s.replaceAll(',', '.');
-      // "1.234.5" no es válido; con un solo separador es decimal.
-    }
-    return double.tryParse(s);
-  }
+  /// Como [parsePrecio], en céntimos y solo si es mayor que 0.
+  static int? parsePrecioCent(String input) => money.parsePrecioCent(input);
 }

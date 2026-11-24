@@ -54,7 +54,7 @@ class RecipeTextCodec {
   }
 
   static String _cleanInput(String content) => content
-      .replaceFirst('﻿', '')
+      .replaceFirst('\uFEFF', '') // BOM de UTF-8
       .replaceAll('\r\n', '\n')
       .replaceAll('\r', '\n');
 
@@ -254,7 +254,13 @@ class RecipeTextCodec {
         final n = normalizeText(k);
         return n == 'recetas' || n == 'recipes';
       });
-      items = listKey.isNotEmpty ? data[listKey.first] as List : [data];
+      final value = listKey.isNotEmpty ? data[listKey.first] : [data];
+      // Antes `as List` lanzaba TypeError (no FormatException) si "recetas"
+      // no era una lista y el error no se mostraba de forma comprensible.
+      if (value is! List) {
+        throw const FormatException('"recetas" debe ser una lista.');
+      }
+      items = value;
     } else {
       throw const FormatException('El JSON no contiene recetas.');
     }
@@ -418,7 +424,8 @@ class RecipeTextCodec {
 
   static int? _firstInt(String v) {
     final m = RegExp(r'\d+').firstMatch(v);
-    return m == null ? null : int.parse(m.group(0)!);
+    // tryParse: un número enorme no debe abortar toda la importación.
+    return m == null ? null : int.tryParse(m.group(0)!);
   }
 
   /// "40 min" → 40, "1 h 30 min" → 90, "1h30" → 90, "1,5 horas" → 90,
@@ -431,7 +438,7 @@ class RecipeTextCodec {
     if (h != null) {
       final hours = double.parse(h.group(1)!.replaceAll(',', '.'));
       final rest = RegExp(r'(\d+)').firstMatch(v.substring(h.end));
-      final mins = rest == null ? 0 : int.parse(rest.group(1)!);
+      final mins = rest == null ? 0 : (int.tryParse(rest.group(1)!) ?? 0);
       return (hours * 60).round() + mins;
     }
     return _firstInt(v);
@@ -461,7 +468,7 @@ class RecipeTextCodec {
     b
       ..writeln()
       ..writeln('INGREDIENTES:');
-    for (final i in r.ingredientes) {
+    for (final i in r.lineas) {
       b.writeln('- $i');
     }
     final pasos = r.pasos;
@@ -563,12 +570,12 @@ class _RecipeDraft {
     if (name.isEmpty && ingredientes.isEmpty && pasos.isEmpty) return null;
     String? clean(String? s) =>
         (s == null || s.trim().isEmpty) ? null : s.trim();
-    return Recipe(
+    return Recipe.desdeLineas(
       nombre: name.isEmpty ? 'Receta importada $index' : name,
       categoria: clean(categoria),
       porciones: porciones,
       tiempoMin: tiempoMin,
-      ingredientes: List.unmodifiable(ingredientes),
+      lineas: List.unmodifiable(ingredientes),
       elaboracion: pasos.join('\n'),
       notas: clean(notas.join('\n')),
       favorita: favorita,

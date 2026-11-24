@@ -2,26 +2,26 @@ import '../entities/shopping_list.dart';
 
 abstract class ShoppingListRepository {
   /// Listas con contadores, de la más reciente a la más antigua.
-  Future<List<ShoppingList>> getLists();
+  Stream<List<ShoppingList>> watchLists();
   Future<int> createList(String nombre);
   Future<void> renameList(int id, String nombre);
 
-  /// Borra la lista y todos sus artículos.
+  /// Borra la lista y sus artículos (las compras del historial se conservan).
   Future<void> deleteList(int id);
 
-  /// Artículos de la lista (pendientes primero, luego por orden de alta),
-  /// con el precio de referencia de su producto si está vinculado.
+  /// Artículos (pendientes primero, luego por orden de alta) con los datos de
+  /// su compra en el carrito y el precio de referencia de su alimento.
+  Stream<List<ShoppingItem>> watchItems(int listaId);
   Future<List<ShoppingItem>> getItems(int listaId);
 
   /// Añade al final de la lista. Devuelve el id.
   Future<int> addItem(ShoppingItem item);
 
-  /// Actualiza texto, cantidad, producto, estado comprado y datos del carrito
-  /// (unidades, precio pagado, compra registrada).
+  /// Actualiza texto, cantidad, alimento, comprado y compra enlazada.
   Future<void> updateItem(ShoppingItem item);
 
-  /// Marca o desmarca. Desmarcar saca el artículo del carrito (unidades = 1,
-  /// sin precio pagado ni compra vinculada) sin borrar la compra del historial.
+  /// Marca o desmarca. Desmarcar saca el artículo del carrito (quita el
+  /// vínculo a la compra) sin borrar la compra del historial.
   Future<void> setItemBought(int itemId, bool comprado);
   Future<void> deleteItem(int itemId);
   Future<void> deleteBoughtItems(int listaId);

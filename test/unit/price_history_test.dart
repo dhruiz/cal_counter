@@ -1,5 +1,6 @@
 import 'package:cal_counter/core/utils.dart';
-import 'package:cal_counter/domain/entities/product.dart';
+import 'package:cal_counter/domain/entities/food.dart';
+import 'package:cal_counter/domain/entities/purchase.dart';
 import 'package:cal_counter/domain/services/dates.dart';
 import 'package:cal_counter/domain/usecases/export_price_history_csv.dart';
 import 'package:cal_counter/domain/usecases/get_price_stats.dart';
@@ -31,9 +32,9 @@ void main() {
     final now = DateTime(2026, 11, 23);
     Purchase p(int id, DateTime f, double precio, String tienda) => Purchase(
       id: id,
-      productoId: 1,
+      presentacionId: 1,
       fecha: f,
-      precio: precio,
+      precioCent: (precio * 100).round(),
       establecimiento: tienda,
     );
 
@@ -53,9 +54,9 @@ void main() {
       final s = GetPriceStats()(compras, now: now);
       expect(s.ultima!.id, 4);
       expect(s.numCompras, 3);
-      expect(s.minimo, 1.00);
-      expect(s.maximo, 1.50);
-      expect(s.promedio, closeTo(1.2333, 0.001));
+      expect(s.minimoCent, 100);
+      expect(s.maximoCent, 150);
+      expect(s.promedioCent, 123);
       // Último precio por tienda (sin distinguir mayúsculas), del más barato.
       expect(s.ultimoPorEstablecimiento.map((c) => c.id), [1, 4, 3]);
       expect(s.masBarato!.establecimiento, 'Antigua');
@@ -85,18 +86,20 @@ void main() {
 
   test('ExportPriceHistoryCsv.buildTsv', () {
     final tsv = ExportPriceHistoryCsv.buildTsv([
-      (
-        producto: const Product(
+      PurchaseRecord(
+        alimento: const Food(id: 1, nombre: 'Leche\tentera', marca: 'Marca'),
+        presentacion: const FoodPackage(
           id: 1,
+          alimentoId: 1,
           codigoBarras: '8410000000001',
-          nombre: 'Leche\tentera',
-          marca: 'Marca',
-          presentacion: '1 L',
+          descripcion: '1 L',
+          contenido: 1000,
         ),
         compra: Purchase(
-          productoId: 1,
+          presentacionId: 1,
           fecha: DateTime(2026, 11, 2),
-          precio: 0.9,
+          precioCent: 90,
+          unidades: 2,
           establecimiento: 'Súper',
         ),
       ),
@@ -105,7 +108,7 @@ void main() {
     expect(lines.first, ExportPriceHistoryCsv.header);
     expect(
       lines[1],
-      '2026-11-02\t8410000000001\tLeche entera\tMarca\t1 L\tSúper\t0.90',
+      '2026-11-02\t8410000000001\tLeche entera\tMarca\t1 L\tSúper\t0.90\t2\t0.90',
     );
   });
 }

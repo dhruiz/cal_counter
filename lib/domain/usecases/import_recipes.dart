@@ -11,19 +11,22 @@ class ImportRecipes {
   ImportRecipes(this.repository);
 
   Future<int> call(List<Recipe> recipes) async {
-    final existing = await repository.getAllRecipes();
+    final existing = await repository.getAll();
     final names = existing.map((r) => normalizeText(r.nombre)).toSet();
     var saved = 0;
     for (final recipe in recipes) {
       final key = normalizeText(recipe.nombre);
       if (key.isEmpty || names.contains(key)) continue;
-      await repository.saveRecipe(
+      await repository.save(
         Recipe(
           nombre: recipe.nombre.trim(),
           categoria: recipe.categoria,
           porciones: recipe.porciones,
           tiempoMin: recipe.tiempoMin,
-          ingredientes: recipe.ingredientes,
+          ingredientes: [
+            for (final i in recipe.ingredientes)
+              RecipeIngredient(texto: i.texto, opcional: i.opcional),
+          ],
           elaboracion: recipe.elaboracion,
           notas: recipe.notas,
           favorita: recipe.favorita,

@@ -81,22 +81,37 @@ const Map<String, String> _synonyms = {
 const String _accentFrom = 'áàäâãéèëêíìïîóòöôõúùüûñç';
 const String _accentTo = 'aaaaaeeeeiiiiooooouuuunc';
 
+/// Tabla rune → letra sin tilde (construida una vez).
+final Map<int, int> _accentMap = {
+  for (var i = 0; i < _accentFrom.length; i++)
+    _accentFrom.codeUnitAt(i): _accentTo.codeUnitAt(i),
+};
+
+const int _a = 0x61, _z = 0x7a, _d0 = 0x30, _d9 = 0x39, _space = 0x20;
+
+final RegExp _leadingDigit = RegExp(r'^\d');
+
 /// Minúsculas, sin tildes, ñ→n, cualquier signo → espacio, espacios colapsados.
+///
+/// Se llama miles de veces por pulsación al buscar recetas por ingredientes:
+/// trabaja con códigos de carácter en vez de crear un `RegExp` por carácter
+/// (la versión anterior tardaba ~130 ms con 300 recetas).
 String normalizeText(String input) {
-  final lower = input.toLowerCase();
-  final buffer = StringBuffer();
-  for (final rune in lower.runes) {
-    final ch = String.fromCharCode(rune);
-    final idx = _accentFrom.indexOf(ch);
-    if (idx >= 0) {
-      buffer.write(_accentTo[idx]);
-    } else if (RegExp(r'[a-z0-9]').hasMatch(ch)) {
-      buffer.write(ch);
+  final out = <int>[];
+  var pendingSpace = false;
+  for (final rune in input.toLowerCase().runes) {
+    final mapped = _accentMap[rune] ?? rune;
+    final isWordChar =
+        (mapped >= _a && mapped <= _z) || (mapped >= _d0 && mapped <= _d9);
+    if (isWordChar) {
+      if (pendingSpace && out.isNotEmpty) out.add(_space);
+      pendingSpace = false;
+      out.add(mapped);
     } else {
-      buffer.write(' ');
+      pendingSpace = true;
     }
   }
-  return buffer.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
+  return String.fromCharCodes(out);
 }
 
 /// Singular aproximado en español. No es perfecto, pero es consistente:
@@ -121,7 +136,7 @@ Set<String> keyTokens(String text) {
   final out = <String>{};
   for (final raw in normalizeText(text).split(' ')) {
     if (raw.length < 2) continue;
-    if (RegExp(r'^\d').hasMatch(raw)) continue; // "200", "200g", "1"
+    if (_leadingDigit.hasMatch(raw)) continue; // "200", "200g", "1"
     if (_stopwords.contains(raw) || _numberWords.contains(raw)) continue;
     final s = singularize(raw);
     if (_units.contains(raw) || _units.contains(s)) continue;
@@ -129,6 +144,22 @@ Set<String> keyTokens(String text) {
     out.add(_synonyms[s] ?? s);
   }
   return out;
+}
+
+/// Variantes equivalentes de una palabra para buscar: ella misma, su
+/// singular y sus sinónimos regionales ("papas" → {papas, papa, patata}).
+Set<String> searchVariants(String word) {
+  final n = normalizeText(word).replaceAll(' ', '');
+  if (n.isEmpty) return const {};
+  final s = singularize(n);
+  final canon = _synonyms[s] ?? s;
+  return {
+    n,
+    s,
+    canon,
+    for (final e in _synonyms.entries)
+      if (e.value == canon) e.key,
+  };
 }
 
 /// Dos ingredientes coinciden si los tokens de uno contienen a los del otro:
@@ -163,14 +194,22 @@ class ParsedIngredient {
   /// Marcado como "(opcional)": no cuenta como faltante.
   final bool opcional;
 
-  const ParsedIngredient({
+  ParsedIngredient({
     this.cantidad,
     required this.nombre,
     this.opcional = false,
   });
 
-  Set<String> get tokens => keyTokens(nombre);
+  /// Tokens clave del nombre (calculados una vez; conjunto inmodificable
+  /// porque la instancia se comparte desde la caché de [parseIngredientLine]).
+  late final Set<String> tokens = Set.unmodifiable(keyTokens(nombre));
 }
+
+/// Caché de líneas ya interpretadas. [parseIngredientLine] es una función
+/// pura y las líneas de las recetas casi nunca cambian, pero la búsqueda por
+/// ingredientes las reinterpreta en cada pulsación.
+final Map<String, ParsedIngredient> _parseCache = {};
+const int _parseCacheMax = 4096;
 
 final RegExp _numberToken = RegExp(
   r'^(\d+([.,/\-]\d+)*[a-zA-Z.]*|[½¼¾⅓⅔⅛]|\d+[½¼¾⅓⅔⅛])$',
@@ -187,6 +226,10 @@ final RegExp _parensRe = RegExp(r'\(([^)]*)\)');
 final RegExp _trailingQtyRe = RegExp(
   r'^(.*?\S)\s*[:\-–,]?\s+(\d+(?:[.,/]\d+)?\s*[a-zA-Záéíóú.]*)$',
 );
+final RegExp _bulletPrefixRe = RegExp(r'^[-•*·▪►✓✔]+\s*');
+final RegExp _whitespaceRe = RegExp(r'\s+');
+final RegExp _leadingQtyNumberRe = RegExp(r'^[\d.,/]+\s*');
+final RegExp _edgePunctuationRe = RegExp(r'^[\s,;:.\-–]+|[\s,;:.\-–]+$');
 
 bool _isQuantityWord(String word) {
   if (_numberToken.hasMatch(word)) return true;
@@ -200,7 +243,18 @@ bool _isUnitWord(String word) {
 
 /// Interpreta una línea de ingrediente escrita libremente.
 ParsedIngredient parseIngredientLine(String line) {
-  var text = line.trim().replaceFirst(RegExp(r'^[-•*·▪►✓✔]+\s*'), '');
+  final cached = _parseCache[line];
+  if (cached != null) return cached;
+  final parsed = _parseIngredientLine(line);
+  if (_parseCache.length >= _parseCacheMax) _parseCache.clear();
+  _parseCache[line] = parsed;
+  return parsed;
+}
+
+ParsedIngredient _parseIngredientLine(String line) {
+  // Línea vacía: antes `nombre[0]` lanzaba RangeError.
+  if (line.trim().isEmpty) return ParsedIngredient(nombre: '');
+  var text = line.trim().replaceFirst(_bulletPrefixRe, '');
 
   final opcional = _optionalRe.hasMatch(text);
   text = text.replaceAll(_optionalRe, ' ');
@@ -210,10 +264,10 @@ ParsedIngredient parseIngredientLine(String line) {
   String? parenQty;
   text = text.replaceAllMapped(_parensRe, (m) {
     final inner = m.group(1)!.trim();
-    if (parenQty == null && RegExp(r'^\d').hasMatch(inner)) parenQty = inner;
+    if (parenQty == null && _leadingDigit.hasMatch(inner)) parenQty = inner;
     return ' ';
   });
-  text = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+  text = text.replaceAll(_whitespaceRe, ' ').trim();
 
   final words = text.split(' ').where((w) => w.isNotEmpty).toList();
   var i = 0;
@@ -247,7 +301,7 @@ ParsedIngredient parseIngredientLine(String line) {
     final m = _trailingQtyRe.firstMatch(nombre);
     if (m != null) {
       final qty = m.group(2)!;
-      final unitPart = qty.replaceFirst(RegExp(r'^[\d.,/]+\s*'), '');
+      final unitPart = qty.replaceFirst(_leadingQtyNumberRe, '');
       if (unitPart.isEmpty || _isUnitWord(unitPart)) {
         cantidad = qty;
         nombre = m.group(1)!;
@@ -256,7 +310,7 @@ ParsedIngredient parseIngredientLine(String line) {
   }
   cantidad ??= parenQty;
 
-  nombre = nombre.replaceAll(RegExp(r'^[\s,;:.\-–]+|[\s,;:.\-–]+$'), '');
+  nombre = nombre.replaceAll(_edgePunctuationRe, '');
   if (nombre.isEmpty) nombre = line.trim();
   nombre = nombre[0].toUpperCase() + nombre.substring(1);
 
@@ -282,17 +336,22 @@ class IngredientAvailability {
   bool get isEmpty => _userSets.isEmpty;
 
   /// El usuario indicó explícitamente este ingrediente.
-  bool coveredByUser(String ingredientLine) {
-    final tokens = parseIngredientLine(ingredientLine).tokens;
-    return _userSets.any((u) => tokensMatch(tokens, u));
-  }
+  bool coveredByUser(String ingredientLine) =>
+      coveredByUserTokens(parseIngredientLine(ingredientLine).tokens);
 
   /// El usuario lo tiene (indicado o asumido como básico).
-  bool covers(String ingredientLine) {
-    final tokens = parseIngredientLine(ingredientLine).tokens;
-    return _userSets.any((u) => tokensMatch(tokens, u)) ||
-        _basicSets.any((b) => tokensMatch(tokens, b));
-  }
+  bool covers(String ingredientLine) =>
+      coversTokens(parseIngredientLine(ingredientLine).tokens);
+
+  /// Como [coveredByUser] con los tokens ya calculados (evita reinterpretar
+  /// la línea varias veces en bucles).
+  bool coveredByUserTokens(Set<String> tokens) =>
+      _userSets.any((u) => tokensMatch(tokens, u));
+
+  /// Como [covers] con los tokens ya calculados.
+  bool coversTokens(Set<String> tokens) =>
+      coveredByUserTokens(tokens) ||
+      _basicSets.any((b) => tokensMatch(tokens, b));
 
   /// Es uno de los básicos (sal, pimienta, agua, aceite).
   static bool isBasic(String ingredientLine) {

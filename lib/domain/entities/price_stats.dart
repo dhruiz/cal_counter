@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
-import 'product.dart';
+import 'purchase.dart';
 
-/// Resumen de precios de un producto en un periodo.
+/// Resumen de precios (céntimos) de un alimento o presentación en un periodo.
 class PriceStats extends Equatable {
   final Purchase? ultima;
-  final double? minimo;
-  final double? maximo;
-  final double? promedio;
+  final int? minimoCent;
+  final int? maximoCent;
+  final int? promedioCent;
   final int numCompras;
 
   /// Último precio conocido en cada establecimiento, del más barato al más caro.
@@ -14,9 +14,9 @@ class PriceStats extends Equatable {
 
   const PriceStats({
     this.ultima,
-    this.minimo,
-    this.maximo,
-    this.promedio,
+    this.minimoCent,
+    this.maximoCent,
+    this.promedioCent,
     this.numCompras = 0,
     this.ultimoPorEstablecimiento = const [],
   });
@@ -30,9 +30,9 @@ class PriceStats extends Equatable {
   @override
   List<Object?> get props => [
     ultima,
-    minimo,
-    maximo,
-    promedio,
+    minimoCent,
+    maximoCent,
+    promedioCent,
     numCompras,
     ultimoPorEstablecimiento,
   ];

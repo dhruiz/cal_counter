@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../core/styles.dart';
+import '../widgets/dialog_controllers.dart';
 
 /// Lector de códigos de barras a pantalla completa. Devuelve el código leído
 /// (`Navigator.pop(context, codigo)`) o null si se cancela. Permite escribir
@@ -51,10 +54,18 @@ class _BarcodeScannerViewState extends State<BarcodeScannerView> {
 
 /// Pide el código escrito a mano. Devuelve null si se cancela.
 Future<String?> askBarcodeManually(BuildContext context) async {
-  final ctrl = TextEditingController();
   final code = await showDialog<String>(
     context: context,
-    builder: (ctx) => AlertDialog(
+    builder: (_) => DialogControllers(
+      iniciales: const [''],
+      builder: (ctx, c) => _manualCodeDialog(ctx, c.first),
+    ),
+  );
+  return (code == null || code.isEmpty) ? null : code;
+}
+
+Widget _manualCodeDialog(BuildContext ctx, TextEditingController ctrl) =>
+    AlertDialog(
       title: const Text('Escribir código'),
       content: TextField(
         controller: ctrl,
@@ -76,11 +87,7 @@ Future<String?> askBarcodeManually(BuildContext context) async {
           child: const Text('Aceptar'),
         ),
       ],
-    ),
-  );
-  ctrl.dispose();
-  return (code == null || code.isEmpty) ? null : code;
-}
+    );
 
 /// Cámara con marco, linterna, mensajes de error y entrada manual del código.
 ///
@@ -104,7 +111,33 @@ class BarcodeScannerPanel extends StatefulWidget {
   State<BarcodeScannerPanel> createState() => _BarcodeScannerPanelState();
 }
 
-class _BarcodeScannerPanelState extends State<BarcodeScannerPanel> {
+/// Al pasar un controlador propio, `MobileScanner` no pausa la cámara al
+/// salir de la app (solo lo hace con su controlador interno; la doc de
+/// mobile_scanner pide gestionarlo uno mismo): se para en `inactive` y se
+/// reanuda en `resumed`, como hace el widget internamente.
+class _BarcodeScannerPanelState extends State<BarcodeScannerPanel>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_controller.value.hasCameraPermission) return;
+    switch (state) {
+      case AppLifecycleState.resumed:
+        unawaited(_controller.start());
+      case AppLifecycleState.inactive:
+        unawaited(_controller.stop());
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        break;
+    }
+  }
+
   final MobileScannerController _controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.normal,
     detectionTimeoutMs: 500,
@@ -121,6 +154,7 @@ class _BarcodeScannerPanelState extends State<BarcodeScannerPanel> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }

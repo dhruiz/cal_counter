@@ -2,33 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/meal.dart';
-import '../../domain/usecases/add_food_to_meal.dart';
-import '../../domain/usecases/create_meal_if_not_exists.dart';
+import '../../domain/services/meal_naming.dart';
+import '../../domain/services/money.dart';
+import '../providers/foods_provider.dart';
 import '../providers/home_provider.dart';
-import '../providers/search_provider.dart';
 import '../providers/settings_provider.dart';
 
-// We need a provider for AddFoodToMeal and CreateMealIfNotExists
-// We can define them here or in home_provider.dart.
-// Let's assume they are needed here.
-
-final addFoodToMealProvider = Provider<AddFoodToMeal>((ref) {
-  return AddFoodToMeal(ref.watch(mealRepositoryProvider));
-});
-
-final createMealIfNotExistsProvider = Provider<CreateMealIfNotExists>((ref) {
-  return CreateMealIfNotExists(ref.watch(mealRepositoryProvider));
-});
-
+/// Diálogo para registrar una cantidad de un alimento (con la tabla
+/// completa) en una comida del día. Devuelve true si se agregó.
 class AddFoodPopup extends ConsumerStatefulWidget {
   final Food food;
   final List<Meal> availableMeals;
   final DateTime selectedDate;
 
-  /// Cantidad inicial en gramos (p. ej. la porción de una receta). Si es null
-  /// se sugiere el máximo que cabe en las metas restantes.
+  /// Cantidad inicial (p. ej. la porción de una receta). Si es null se
+  /// sugiere el máximo que cabe en las metas restantes.
   final double? initialQuantity;
 
   const AddFoodPopup({
@@ -39,15 +30,16 @@ class AddFoodPopup extends ConsumerStatefulWidget {
     this.initialQuantity,
   });
 
-  /// Abre el popup sobre el día actual del contador (desde recetas o
-  /// productos) y refresca [homeProvider] si se agregó. Devuelve true si se
-  /// agregó.
+  /// Abre el popup sobre el día actual del contador. Devuelve true si se
+  /// agregó. (El día se actualiza solo: observa la base de datos.)
   static Future<bool> showForToday(
     BuildContext context,
     WidgetRef ref,
     Food food, {
     double? initialQuantity,
   }) async {
+    await ref.read(homeProvider.notifier).refresh();
+    if (!context.mounted) return false;
     final homeState = ref.read(homeProvider);
     final added = await showDialog<bool>(
       context: context,
@@ -58,11 +50,7 @@ class AddFoodPopup extends ConsumerStatefulWidget {
         initialQuantity: initialQuantity,
       ),
     );
-    if (added == true) {
-      await ref.read(homeProvider.notifier).refresh();
-      return true;
-    }
-    return false;
+    return added == true;
   }
 
   @override
@@ -75,6 +63,14 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
 
   Meal? _selectedMeal;
   bool _isCreatingNewMeal = false;
+  bool _saving = false;
+
+  /// Nombre de la comida que se creará con "Nueva comida": el siguiente
+  /// `Comida_N` libre (con `comidas + 1` podía coincidir con una existente y
+  /// el alimento acababa en esa otra comida).
+  late final String _newMealName = nextMealName(widget.availableMeals);
+
+  String get _u => widget.food.u;
 
   @override
   void initState() {
@@ -82,61 +78,48 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     if (widget.availableMeals.isNotEmpty) {
       _selectedMeal = widget.availableMeals.last;
     } else {
-      // If no meals, we default to creating "Comida_1"
       _isCreatingNewMeal = true;
     }
     final initial = widget.initialQuantity;
     if (initial != null && initial > 0) {
-      _quantityController.text = initial == initial.roundToDouble()
-          ? initial.toInt().toString()
-          : initial.toString();
-      _quantityController.selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: _quantityController.text.length,
-      );
+      _setQuantity(initial);
     } else {
       _prefillSuggestedQuantity();
     }
   }
 
-  /// Pre-rellena la cantidad con el máximo de gramos que no supera NINGUNA
-  /// meta diaria (kcal, grasas, carbos, proteínas): para cada límite se
-  /// calcula cuántos gramos caben en su restante (meta exacta, sin
-  /// tolerancia) y se sugiere el menor. Si ya no queda margen o el alimento
-  /// no aporta nada, el campo se deja vacío.
-  void _prefillSuggestedQuantity() {
-    final settings = ref.read(settingsProvider);
-    final settingsNotifier = ref.read(settingsProvider.notifier);
-    final home = ref.read(homeProvider);
-    final food = widget.food;
-
-    double? maxGrams;
-    void consider(double remaining, double per100) {
-      if (per100 <= 0) return; // este nutriente no limita
-      final grams = remaining * 100 / per100;
-      if (maxGrams == null || grams < maxGrams!) maxGrams = grams;
-    }
-
-    consider(settings.kcalTarget - home.totalKcal, food.kcalPer100);
-    consider(settingsNotifier.fatsRequired - home.totalFats, food.grasasPer100);
-    consider(settingsNotifier.carbsRequired - home.totalCarbs, food.carbsPer100);
-    consider(
-      settingsNotifier.proteinsRequired - home.totalProteins,
-      food.proteinsPer100,
-    );
-
-    if (maxGrams == null) return; // alimento sin valores nutricionales
-
-    final suggestion = maxGrams!.floor();
-    if (suggestion <= 0) return; // alguna meta ya alcanzada/superada
-
-    _quantityController.text = suggestion.toString();
-    // Pre-selecciona todo el valor sugerido: con el campo enfocado
-    // (autofocus) el usuario puede sobrescribirlo de inmediato o aceptarlo.
+  void _setQuantity(double v) {
+    _quantityController.text = AppUtils.formatNumero(v).replaceAll('.', ',');
     _quantityController.selection = TextSelection(
       baseOffset: 0,
       extentOffset: _quantityController.text.length,
     );
+  }
+
+  /// Pre-rellena la cantidad con el máximo que no supera NINGUNA meta diaria
+  /// (kcal, grasas, carbos, proteínas). Si ya no queda margen o el alimento
+  /// no aporta nada, el campo se deja vacío.
+  void _prefillSuggestedQuantity() {
+    final settings = ref.read(settingsProvider);
+    final home = ref.read(homeProvider);
+    final n = widget.food.nutricion;
+
+    double? maxGrams;
+    void consider(double remaining, double? per100) {
+      if (per100 == null || per100 <= 0) return; // este nutriente no limita
+      final grams = remaining * 100 / per100;
+      if (maxGrams == null || grams < maxGrams!) maxGrams = grams;
+    }
+
+    consider(settings.kcalTarget - home.totalKcal, n.kcal);
+    consider(settings.fatsRequired - home.totalFats, n.grasas);
+    consider(settings.carbsRequired - home.totalCarbs, n.carbohidratos);
+    consider(settings.proteinsRequired - home.totalProteins, n.proteinas);
+
+    if (maxGrams == null) return;
+    final suggestion = maxGrams!.floor();
+    if (suggestion <= 0) return;
+    _setQuantity(suggestion.toDouble());
   }
 
   @override
@@ -145,111 +128,131 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
     super.dispose();
   }
 
+  double? get _quantity {
+    final q = parseDecimal(_quantityController.text);
+    return (q == null || q <= 0) ? null : q;
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final quantity = double.parse(_quantityController.text);
-    int mealId;
-
-    if (_isCreatingNewMeal || _selectedMeal == null) {
-      // Create new meal
-      // Name logic: Comida_n+1
-      // If we have meals, find max index.
-      int nextIndex = 1;
-      if (widget.availableMeals.isNotEmpty) {
-        // Try to parse "Comida_X"
-        // Or just count + 1?
-        // Requirement says "Nueva Comida permite crear Comida_n+1".
-        // Let's assume standard naming "Comida_1", "Comida_2".
-        // We can regex parse existing names or just use length + 1.
-        // Length + 1 is safer if they are sequential.
-        nextIndex = widget.availableMeals.length + 1;
+    if (!_formKey.currentState!.validate() || _saving) return;
+    final quantity = _quantity!;
+    setState(() => _saving = true);
+    try {
+      int mealId;
+      if (_isCreatingNewMeal || _selectedMeal == null) {
+        mealId = await ref.read(createMealIfNotExistsProvider)(
+          _newMealName,
+          widget.selectedDate,
+        );
+      } else {
+        mealId = _selectedMeal!.id!;
       }
-      final name = 'Comida_$nextIndex';
-
-      final createMeal = ref.read(createMealIfNotExistsProvider);
-      mealId = await createMeal(name, widget.selectedDate);
-    } else {
-      mealId = _selectedMeal!.id!;
-    }
-
-    final addFood = ref.read(addFoodToMealProvider);
-    await addFood(mealId: mealId, food: widget.food, quantity: quantity);
-
-    // Registra el uso para la lista de "más usados" (persistente en db_alimentos).
-    final foodId = widget.food.id;
-    if (foodId != null) {
-      await ref.read(recordFoodUsageProvider)(foodId);
-    }
-
-    if (mounted) {
-      Navigator.pop(context, true); // Return true to indicate success
+      await ref.read(addFoodToMealProvider)(
+        mealId: mealId,
+        food: widget.food,
+        quantity: quantity,
+      );
+      // Uso para la lista de "más usados" (persiste en el repertorio).
+      final foodId = widget.food.id;
+      if (foodId != null) {
+        await ref.read(foodRepositoryProvider).incrementUsage(foodId);
+      }
+      if (mounted) Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo agregar: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final foodId = widget.food.id;
+    final portions = foodId == null
+        ? const <FoodPortion>[]
+        : ref.watch(foodPortionsProvider(foodId)).valueOrNull ?? const [];
+    final q = _quantity;
+    final kcal = widget.food.nutricion.kcal;
+
     return AlertDialog(
-      title: Text('Agregar ${widget.food.name}'),
+      title: Text('Agregar ${widget.food.nombreCompleto}'),
       content: Form(
         key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _quantityController,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Cantidad (g)',
-                suffixText: 'g',
-              ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-              ],
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Requerido';
-                final n = double.tryParse(value);
-                if (n == null || n <= 0) return '> 0';
-                return null;
-              },
-              onChanged: (_) => setState(() {}), // Update button state
-            ),
-            const SizedBox(height: 16),
-            if (!_isCreatingNewMeal && widget.availableMeals.isNotEmpty)
-              DropdownButtonFormField<Meal>(
-                initialValue: _selectedMeal,
-                decoration: const InputDecoration(labelText: 'Comida'),
-                items: widget.availableMeals.map((m) {
-                  return DropdownMenuItem(value: m, child: Text(m.name));
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedMeal = val;
-                  });
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _quantityController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: 'Cantidad ($_u)',
+                  suffixText: _u,
+                  helperText: (q != null && kcal != null)
+                      ? '≈ ${(kcal * q / 100).round()} kcal'
+                      : null,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*[.,]?\d*')),
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Requerido';
+                  final n = parseDecimal(value);
+                  if (n == null || n <= 0) return '> 0';
+                  return null;
                 },
+                onChanged: (_) => setState(() {}),
               ),
-            if (!_isCreatingNewMeal)
-              TextButton(
-                onPressed: () {
-                  setState(() {
+              if (portions.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    for (final p in portions)
+                      ActionChip(
+                        label: Text(
+                          '1 ${p.nombre} (${AppUtils.formatNumero(p.gramos)} $_u)',
+                        ),
+                        onPressed: () => setState(() => _setQuantity(p.gramos)),
+                      ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 16),
+              if (!_isCreatingNewMeal && widget.availableMeals.isNotEmpty)
+                DropdownButtonFormField<Meal>(
+                  initialValue: _selectedMeal,
+                  decoration: const InputDecoration(labelText: 'Comida'),
+                  items: [
+                    for (final m in widget.availableMeals)
+                      DropdownMenuItem(value: m, child: Text(m.name)),
+                  ],
+                  onChanged: (val) => setState(() => _selectedMeal = val),
+                ),
+              if (!_isCreatingNewMeal)
+                TextButton(
+                  onPressed: () => setState(() {
                     _isCreatingNewMeal = true;
                     _selectedMeal = null;
-                  });
-                },
-                child: const Text('Nueva Comida'),
-              ),
-            if (_isCreatingNewMeal)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  'Se creará: Comida_${widget.availableMeals.length + 1}',
-                  style: const TextStyle(fontStyle: FontStyle.italic),
+                  }),
+                  child: const Text('Nueva Comida'),
                 ),
-              ),
-          ],
+              if (_isCreatingNewMeal)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Se creará: $_newMealName',
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
       actions: [
@@ -258,12 +261,7 @@ class _AddFoodPopupState extends ConsumerState<AddFoodPopup> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed:
-              _quantityController.text.isNotEmpty &&
-                  double.tryParse(_quantityController.text) != null &&
-                  double.parse(_quantityController.text) > 0
-              ? _submit
-              : null,
+          onPressed: q != null && !_saving ? _submit : null,
           child: const Text('Ok'),
         ),
       ],

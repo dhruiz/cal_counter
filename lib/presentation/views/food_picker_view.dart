@@ -1,26 +1,39 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/styles.dart';
 import '../../domain/entities/food.dart';
-import '../providers/search_provider.dart';
+import '../providers/foods_provider.dart';
+import '../widgets/food_search_body.dart';
+import 'barcode_scanner_view.dart';
+import 'food_flows.dart';
 import 'food_form_view.dart';
 
-/// Selector de un alimento de la base de calorías (para vincularlo a una
-/// receta o producto). Devuelve el [Food] elegido o null.
-///
-/// Usa [searchFoodsProvider] directamente para no alterar el estado de
-/// búsqueda de `SearchView`.
+/// Selector de un alimento del repertorio (vincular ingredientes, artículos
+/// de listas...). Busca por texto o código y permite crear uno nuevo.
+/// Devuelve el alimento elegido o null.
 class FoodPickerView extends ConsumerStatefulWidget {
   final String initialQuery;
+  final String title;
 
-  const FoodPickerView({super.key, this.initialQuery = ''});
+  const FoodPickerView({
+    super.key,
+    this.initialQuery = '',
+    this.title = 'Elegir alimento',
+  });
 
-  static Future<Food?> pick(BuildContext context, {String initialQuery = ''}) {
+  static Future<Food?> pick(
+    BuildContext context, {
+    String initialQuery = '',
+    String title = 'Elegir alimento',
+  }) {
     return Navigator.push<Food>(
       context,
       MaterialPageRoute(
-        builder: (_) => FoodPickerView(initialQuery: initialQuery),
+        builder: (_) =>
+            FoodPickerView(initialQuery: initialQuery, title: title),
       ),
     );
   }
@@ -31,15 +44,14 @@ class FoodPickerView extends ConsumerStatefulWidget {
 
 class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
   late final TextEditingController _ctrl;
+  late String _query;
   Timer? _debounce;
-  List<Food> _results = const [];
-  bool _searching = false;
 
   @override
   void initState() {
     super.initState();
     _ctrl = TextEditingController(text: widget.initialQuery);
-    if (widget.initialQuery.trim().isNotEmpty) _search(widget.initialQuery);
+    _query = widget.initialQuery;
   }
 
   @override
@@ -49,91 +61,64 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
     super.dispose();
   }
 
-  void _onChanged(String q) {
+  void _onChanged(String v) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 250), () => _search(q));
-  }
-
-  Future<void> _search(String q) async {
-    if (q.trim().isEmpty) {
-      setState(() => _results = const []);
-      return;
-    }
-    setState(() => _searching = true);
-    final res = await ref.read(searchFoodsProvider)(q.trim());
-    if (!mounted) return;
-    setState(() {
-      _results = res;
-      _searching = false;
+    _debounce = Timer(const Duration(milliseconds: 200), () {
+      if (mounted) setState(() => _query = v);
     });
   }
 
-  Future<void> _createFood() async {
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FoodFormView(initialName: _ctrl.text.trim()),
-      ),
-    );
-    if (created == true) {
-      ref.invalidate(mostUsedFoodsProvider);
-      await _search(_ctrl.text);
-    }
+  Future<void> _scan() async {
+    final code = await BarcodeScannerView.scan(context);
+    if (code == null || !mounted) return;
+    final food = await FoodFlows.foodForBarcode(context, ref, code);
+    if (food != null && mounted) Navigator.pop(context, food);
+  }
+
+  Future<void> _create(String nombre) async {
+    final id = await FoodFormView.open(context, nombreInicial: nombre);
+    if (id == null || !mounted) return;
+    final food = await ref.read(foodRepositoryProvider).getFood(id);
+    if (food != null && mounted) Navigator.pop(context, food);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(widget.title),
         backgroundColor: AppStyles.primary,
         foregroundColor: Colors.white,
-        title: TextField(
-          controller: _ctrl,
-          autofocus: widget.initialQuery.isEmpty,
-          onChanged: _onChanged,
-          style: const TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
-          decoration: const InputDecoration(
-            hintText: 'Buscar alimento...',
-            hintStyle: TextStyle(color: Colors.white70),
-            border: InputBorder.none,
+        actions: [
+          IconButton(
+            tooltip: 'Escanear código',
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _scan,
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(64),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+            child: TextField(
+              controller: _ctrl,
+              autofocus: true,
+              onChanged: _onChanged,
+              decoration: InputDecoration(
+                hintText: 'Buscar por nombre, marca o código',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surface,
+                isDense: true,
+              ),
+            ),
           ),
         ),
       ),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text(
-              'Elige el alimento del contador de calorías con el que se '
-              'registrará. Si no existe, créalo con sus valores por 100 g.',
-              style: AppStyles.labelText,
-            ),
-          ),
-          if (_searching) const LinearProgressIndicator(),
-          Expanded(
-            child: ListView(
-              children: [
-                ..._results.map(
-                  (f) => ListTile(
-                    title: Text(f.name),
-                    subtitle: Text(
-                      '${f.kcalPer100} kcal | G: ${f.grasasPer100} | '
-                      'C: ${f.carbsPer100} | P: ${f.proteinsPer100} (por 100g)',
-                      style: AppStyles.labelText,
-                    ),
-                    onTap: () => Navigator.pop(context, f),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.add_circle_outline),
-                  title: const Text('Crear alimento nuevo'),
-                  onTap: _createFood,
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: FoodSearchBody(
+        query: _query,
+        onSelect: (f) => Navigator.pop(context, f),
+        onCreate: _create,
       ),
     );
   }

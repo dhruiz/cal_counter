@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/styles.dart';
-import '../../core/utils.dart';
 import '../../data/parsers/recipe_text_codec.dart';
 import '../../domain/entities/food.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/services/ingredient_matcher.dart';
 import '../providers/recipes_provider.dart';
-import '../providers/search_provider.dart';
-import '../widgets/add_food_popup.dart';
 import '../widgets/add_to_shopping_list_dialog.dart';
 import '../widgets/empty_state.dart';
-import 'food_picker_view.dart';
+import '../widgets/recipe_nutrition_card.dart';
+import 'cook_mode_view.dart';
+import 'recipe_actions.dart';
 import 'recipe_form_view.dart';
+import 'recipe_link_view.dart';
 
-/// Detalle de una receta: ingredientes (marcando los que el usuario tiene si
-/// viene de una búsqueda), pasos, notas, calorías si está vinculada a un
-/// alimento, y acciones (lista de compra, copiar, editar, borrar).
+/// Detalle de una receta: nutrición calculada de sus ingredientes (con lo
+/// que falta para calcularla), ingredientes con su vínculo al repertorio
+/// (marcando los que el usuario tiene si viene de una búsqueda), pasos y
+/// acciones (cocinar, lista de compra, copiar, editar, borrar).
 class RecipeDetailView extends ConsumerWidget {
   final int recipeId;
 
@@ -68,51 +70,6 @@ class RecipeDetailView extends ConsumerWidget {
     }
   }
 
-  Future<void> _linkFood(BuildContext context, WidgetRef ref, Recipe r) async {
-    final food = await FoodPickerView.pick(context, initialQuery: r.nombre);
-    if (food == null || !context.mounted) return;
-    final grams = await _askPortion(context, r.pesoPorcionG);
-    await ref
-        .read(recipesProvider.notifier)
-        .save(r.copyWith(alimentoId: food.id, pesoPorcionG: grams));
-  }
-
-  Future<double?> _askPortion(BuildContext context, double? current) async {
-    final ctrl = TextEditingController(
-      text: current == null ? '' : AppUtils.formatNumero(current),
-    );
-    final res = await showDialog<double?>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Peso de una porción'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
-            labelText: 'Gramos por porción (opcional)',
-            suffixText: 'g',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Omitir'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(
-              ctx,
-              double.tryParse(ctrl.text.replaceAll(',', '.')),
-            ),
-            child: const Text('Aceptar'),
-          ),
-        ],
-      ),
-    );
-    ctrl.dispose();
-    return res;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(recipeDetailProvider(recipeId));
@@ -143,10 +100,15 @@ class RecipeDetailView extends ConsumerWidget {
             ),
             PopupMenuButton<String>(
               onSelected: (v) {
+                if (v == 'link') RecipeLinkView.open(context, recipe);
                 if (v == 'copy') _copy(context, recipe);
                 if (v == 'delete') _delete(context, ref, recipe);
               },
               itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: 'link',
+                  child: Text('Vincular ingredientes'),
+                ),
                 PopupMenuItem(value: 'copy', child: Text('Copiar como texto')),
                 PopupMenuItem(value: 'delete', child: Text('Eliminar')),
               ],
@@ -154,6 +116,14 @@ class RecipeDetailView extends ConsumerWidget {
           ],
         ],
       ),
+      floatingActionButton: recipe == null
+          ? null
+          : FloatingActionButton.extended(
+              heroTag: 'cocinar',
+              onPressed: () => CookModeView.open(context, recipe.id!),
+              icon: const Icon(Icons.soup_kitchen),
+              label: const Text('Cocinar'),
+            ),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -173,7 +143,6 @@ class RecipeDetailView extends ConsumerWidget {
                     terminos,
                     incluirBasicos: incluirBasicos,
                   ),
-            onLinkFood: () => _linkFood(context, ref, r),
           );
         },
       ),
@@ -184,13 +153,8 @@ class RecipeDetailView extends ConsumerWidget {
 class _RecipeBody extends ConsumerWidget {
   final Recipe recipe;
   final IngredientAvailability? availability;
-  final VoidCallback onLinkFood;
 
-  const _RecipeBody({
-    required this.recipe,
-    required this.availability,
-    required this.onLinkFood,
-  });
+  const _RecipeBody({required this.recipe, required this.availability});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -198,6 +162,8 @@ class _RecipeBody extends ConsumerWidget {
     final r = recipe;
     final av = availability;
     final pasos = r.pasos;
+    final analisis = ref.watch(recipeAnalysisProvider(r.id!)).valueOrNull;
+    final alimentos = analisis?.alimentos ?? const <int, Food>{};
 
     final meta = <Widget>[
       if ((r.categoria ?? '').isNotEmpty)
@@ -222,17 +188,17 @@ class _RecipeBody extends ConsumerWidget {
     // Faltantes preseleccionados para la lista de compra.
     final faltantes = av == null
         ? null
-        : r.ingredientes.where((l) => !av.covers(l)).toSet();
+        : r.lineas.where((l) => !av.covers(l)).toSet();
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: 32),
+      padding: const EdgeInsets.only(bottom: 96),
       children: [
         if (meta.isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Wrap(spacing: 8, runSpacing: 4, children: meta),
           ),
-        _NutritionCard(recipe: r, onLink: onLinkFood),
+        if (analisis != null) RecipeNutritionCard(analisis: analisis),
         SectionTitle('Ingredientes (${r.ingredientes.length})'),
         if (av != null)
           const Padding(
@@ -254,27 +220,8 @@ class _RecipeBody extends ConsumerWidget {
               ],
             ),
           ),
-        ...r.ingredientes.map((linea) {
-          final tiene = av?.covers(linea);
-          // Un opcional que falta no se marca en rojo: no es imprescindible.
-          final faltaColor = parseIngredientLine(linea).opcional
-              ? AppStyles.neutral
-              : AppStyles.semaphRed;
-          return ListTile(
-            dense: true,
-            visualDensity: VisualDensity.compact,
-            leading: Icon(
-              tiene == null
-                  ? Icons.circle
-                  : (tiene ? Icons.check_circle : Icons.radio_button_unchecked),
-              size: tiene == null ? 8 : 22,
-              color: tiene == null
-                  ? theme.colorScheme.primary
-                  : (tiene ? AppStyles.semaphGreen : faltaColor),
-            ),
-            title: Text(linea, style: const TextStyle(fontSize: 16)),
-          );
-        }),
+        for (var i = 0; i < r.ingredientes.length; i++)
+          _ingredientTile(context, ref, r, i, alimentos, av, theme),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: OutlinedButton.icon(
@@ -282,7 +229,7 @@ class _RecipeBody extends ConsumerWidget {
                 ? null
                 : () => AddToShoppingListDialog.show(
                     context,
-                    lineas: r.ingredientes,
+                    ingredientes: r.ingredientes,
                     preseleccionados: faltantes,
                   ),
             icon: const Icon(Icons.add_shopping_cart),
@@ -295,8 +242,8 @@ class _RecipeBody extends ConsumerWidget {
         ),
         if (pasos.isNotEmpty) ...[
           const SectionTitle('Preparación'),
-          ...List.generate(pasos.length, (i) {
-            return Padding(
+          for (var i = 0; i < pasos.length; i++)
+            Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,8 +262,7 @@ class _RecipeBody extends ConsumerWidget {
                   ),
                 ],
               ),
-            );
-          }),
+            ),
         ],
         if ((r.notas ?? '').isNotEmpty) ...[
           const SectionTitle('Notas'),
@@ -331,104 +277,66 @@ class _RecipeBody extends ConsumerWidget {
       ],
     );
   }
-}
 
-/// Calorías de la receta si está vinculada a un alimento de `db_alimentos`.
-class _NutritionCard extends ConsumerWidget {
-  final Recipe recipe;
-  final VoidCallback onLink;
-
-  const _NutritionCard({required this.recipe, required this.onLink});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final id = recipe.alimentoId;
-    final Food? food = id == null
-        ? null
-        : ref.watch(foodByIdProvider(id)).valueOrNull;
-
-    if (food == null) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        child: TextButton.icon(
-          onPressed: onLink,
-          icon: const Icon(Icons.local_fire_department_outlined),
-          label: const Text('Vincular al contador de calorías'),
-        ),
+  Widget _ingredientTile(
+    BuildContext context,
+    WidgetRef ref,
+    Recipe r,
+    int i,
+    Map<int, Food> alimentos,
+    IngredientAvailability? av,
+    ThemeData theme,
+  ) {
+    final ing = r.ingredientes[i];
+    final linea = ing.texto;
+    final tiene = av?.covers(linea);
+    final food = ing.alimentoId == null ? null : alimentos[ing.alimentoId];
+    // Un opcional que falta no se marca en rojo: no es imprescindible.
+    final faltaColor = (ing.opcional || parseIngredientLine(linea).opcional)
+        ? AppStyles.neutral
+        : AppStyles.semaphRed;
+    final Widget leading;
+    if (tiene != null) {
+      leading = Icon(
+        tiene ? Icons.check_circle : Icons.radio_button_unchecked,
+        size: 22,
+        color: tiene ? AppStyles.semaphGreen : faltaColor,
+      );
+    } else {
+      leading = Icon(
+        food == null
+            ? Icons.circle
+            : (food.pendiente ? Icons.error_outline : Icons.link),
+        size: food == null ? 8 : 20,
+        color: food == null
+            ? theme.colorScheme.primary
+            : (food.pendiente ? AppStyles.semaphOrange : AppStyles.semaphGreen),
       );
     }
-
-    final g = recipe.pesoPorcionG;
-    String per(double per100) =>
-        g == null ? '' : ' · ${AppUtils.formatNumero(per100 * g / 100)}';
-
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Padding(
-        padding: const EdgeInsets.all(AppStyles.paddingMedium),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.local_fire_department,
-                  color: AppStyles.ringKcal,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    food.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Cambiar alimento vinculado',
-                  icon: const Icon(Icons.swap_horiz),
-                  onPressed: onLink,
-                ),
-              ],
-            ),
-            Text(
-              g == null
-                  ? 'Por 100 g'
-                  : 'Por 100 g · por porción (${AppUtils.formatNumero(g)} g)',
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      leading: SizedBox(width: 24, child: Center(child: leading)),
+      title: Text(linea, style: const TextStyle(fontSize: 16)),
+      subtitle: food == null
+          ? null
+          : Text(
+              '→ ${food.nombreCompleto}${food.pendiente ? ' (pendiente)' : ''}',
               style: AppStyles.labelText,
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Calorías: ${AppUtils.formatNumero(food.kcalPer100)}${per(food.kcalPer100)} kcal',
-            ),
-            Text(
-              'Grasas ${AppUtils.formatNumero(food.grasasPer100)}${per(food.grasasPer100)} g · '
-              'Carbs ${AppUtils.formatNumero(food.carbsPer100)}${per(food.carbsPer100)} g · '
-              'Prot ${AppUtils.formatNumero(food.proteinsPer100)}${per(food.proteinsPer100)} g',
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  final added = await AddFoodPopup.showForToday(
-                    context,
-                    ref,
-                    food,
-                    initialQuantity: g,
-                  );
-                  if (added && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${food.name} añadido al día')),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.add),
-                label: Text(
-                  g == null ? 'Registrar en el día' : 'Registrar porción',
-                ),
-              ),
-            ),
-          ],
-        ),
+      onTap: () => RecipeActions.edit(
+        context,
+        ref,
+        r,
+        i,
+        alimento: food,
+        porciones: food == null
+            ? const []
+            : ref
+                      .read(recipeAnalysisProvider(r.id!))
+                      .valueOrNull
+                      ?.porciones[food.id] ??
+                  const [],
       ),
     );
   }

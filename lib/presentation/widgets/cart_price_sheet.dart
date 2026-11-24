@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+
 import '../../core/styles.dart';
 import '../../core/utils.dart';
-import '../../domain/entities/product.dart';
-import '../../domain/usecases/register_purchase.dart';
+import '../../domain/entities/purchase.dart';
+import '../../domain/services/money.dart';
+import 'food_widgets.dart';
 
 /// Resultado de [CartPriceSheet].
 class CartPriceResult {
-  final double precio;
+  /// Precio unitario en céntimos.
+  final int precioCent;
   final int unidades;
 
   /// Solo en edición: el usuario pulsó «Quitar del carrito».
@@ -16,7 +19,7 @@ class CartPriceResult {
   final String? tienda;
 
   const CartPriceResult({
-    required this.precio,
+    required this.precioCent,
     required this.unidades,
     this.quitar = false,
     this.tienda,
@@ -32,7 +35,7 @@ class CartPriceSheet extends StatefulWidget {
   final String titulo;
   final String? detalle;
   final Purchase? ultima;
-  final double? precioInicial;
+  final int? precioInicialCent;
   final int unidadesIniciales;
 
   /// Unidades que ya hay en el carrito (se sumarán las nuevas).
@@ -43,27 +46,28 @@ class CartPriceSheet extends StatefulWidget {
   final bool fueraDeLista;
   final bool edicion;
 
-  /// Artículo sin producto vinculado: el precio no va al historial.
-  final bool sinHistorial;
-
   /// Si no es null, se pide también la tienda (fuera del modo carrito).
   final List<String>? tiendas;
   final String? tiendaInicial;
+
+  /// Producto al peso (etiqueta de báscula): se pide el importe del paquete
+  /// y no hay unidades.
+  final bool alPeso;
 
   const CartPriceSheet({
     super.key,
     required this.titulo,
     this.detalle,
     this.ultima,
-    this.precioInicial,
+    this.precioInicialCent,
     this.unidadesIniciales = 1,
     this.yaEnCarrito = 0,
     this.marcaraItem,
     this.fueraDeLista = false,
     this.edicion = false,
-    this.sinHistorial = false,
     this.tiendas,
     this.tiendaInicial,
+    this.alPeso = false,
   });
 
   static Future<CartPriceResult?> show(
@@ -91,9 +95,9 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
   @override
   void initState() {
     super.initState();
-    final p = widget.precioInicial;
+    final p = widget.precioInicialCent;
     _priceCtrl = TextEditingController(
-      text: p == null ? '' : AppUtils.formatPrecioEditable(p),
+      text: p == null ? '' : AppUtils.formatPrecioEditableCent(p),
     );
     _unidades = widget.unidadesIniciales < 1 ? 1 : widget.unidadesIniciales;
   }
@@ -104,13 +108,13 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
     super.dispose();
   }
 
-  double? get _precio => RegisterPurchase.parsePrecio(_priceCtrl.text);
+  int? get _precioCent => parsePrecioCent(_priceCtrl.text);
 
   void _submit({bool quitar = false}) {
     if (quitar) {
       Navigator.pop(
         context,
-        CartPriceResult(precio: 0, unidades: 0, quitar: true),
+        const CartPriceResult(precioCent: 0, unidades: 0, quitar: true),
       );
       return;
     }
@@ -118,7 +122,7 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
     Navigator.pop(
       context,
       CartPriceResult(
-        precio: _precio!,
+        precioCent: _precioCent!,
         unidades: _unidades,
         tienda: widget.tiendas == null ? null : _storeCtrl?.text.trim(),
       ),
@@ -129,8 +133,8 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ultima = widget.ultima;
-    final precio = _precio;
-    final sinPrecioGuardado = widget.precioInicial == null;
+    final precio = _precioCent;
+    final sinPrecioGuardado = widget.precioInicialCent == null;
     final String boton;
     if (widget.edicion) {
       boton = 'Guardar';
@@ -159,37 +163,40 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
                 Text(widget.detalle!, style: AppStyles.labelText),
               if (ultima != null)
                 Text(
-                  'Último: ${AppUtils.formatPrecio(ultima.precio)} en '
+                  'Último: ${AppUtils.formatPrecioCent(ultima.precioCent)} en '
                   '${ultima.establecimiento} '
                   '(${AppUtils.formatFechaCorta(ultima.fecha)})',
                   style: AppStyles.labelText,
                 ),
               if (widget.fueraDeLista)
-                _Banner(
+                const InfoBanner(
                   color: AppStyles.semaphOrange,
                   icon: Icons.playlist_add,
                   text: 'Este producto no está en tu lista de compra.',
                 ),
               if (widget.marcaraItem != null)
-                _Banner(
+                InfoBanner(
                   color: AppStyles.semaphGreen,
                   icon: Icons.checklist,
                   text: 'Marcará «${widget.marcaraItem}» de tu lista.',
                 ),
               if (widget.yaEnCarrito > 0)
-                _Banner(
+                InfoBanner(
                   color: AppStyles.semaphBlue,
                   icon: Icons.shopping_cart,
-                  text:
-                      'Ya llevas ${widget.yaEnCarrito} en el carrito; '
-                      'se sumarán estas unidades.',
+                  text: widget.alPeso
+                      ? 'Ya llevas este producto en el carrito; se sumará '
+                            'este paquete.'
+                      : 'Ya llevas ${widget.yaEnCarrito} en el carrito; '
+                            'se sumarán estas unidades.',
                 ),
               if (sinPrecioGuardado && !widget.edicion)
-                _Banner(
+                InfoBanner(
                   color: AppStyles.semaphBlue,
                   icon: Icons.sell_outlined,
-                  text: widget.sinHistorial
-                      ? 'Escribe el precio de la etiqueta.'
+                  text: widget.alPeso
+                      ? 'Escribe el importe que marca la etiqueta: la próxima '
+                            'vez se calculará solo con el peso.'
                       : 'No hay precio guardado: escribe el de la etiqueta y '
                             'quedará registrado.',
                 ),
@@ -204,26 +211,27 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Precio por unidad',
+                      decoration: InputDecoration(
+                        labelText: widget.alPeso
+                            ? 'Importe del paquete'
+                            : 'Precio por unidad',
                         hintText: 'Ej: 2,35',
                         suffixText: '€',
-                        prefixIcon: Icon(Icons.sell_outlined),
+                        prefixIcon: const Icon(Icons.sell_outlined),
                       ),
                       onChanged: (_) => setState(() {}),
-                      validator: (v) {
-                        final p = RegisterPurchase.parsePrecio(v ?? '');
-                        return (p == null || p <= 0)
-                            ? 'Escribe un precio válido'
-                            : null;
-                      },
+                      validator: (v) => parsePrecioCent(v ?? '') == null
+                          ? 'Escribe un precio válido'
+                          : null,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  _UnitsStepper(
-                    value: _unidades,
-                    onChanged: (v) => setState(() => _unidades = v),
-                  ),
+                  if (!widget.alPeso) ...[
+                    const SizedBox(width: 8),
+                    _UnitsStepper(
+                      value: _unidades,
+                      onChanged: (v) => setState(() => _unidades = v),
+                    ),
+                  ],
                 ],
               ),
               if (widget.tiendas != null) ...[
@@ -255,21 +263,12 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
                   },
                 ),
               ],
-              if (widget.sinHistorial)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: Text(
-                    'Este artículo no está vinculado a un producto: el precio '
-                    'cuenta para el total pero no se guarda en el historial.',
-                    style: AppStyles.labelText,
-                  ),
-                ),
               const SizedBox(height: 12),
               Text(
-                precio == null || precio <= 0
+                precio == null || widget.alPeso
                     ? ' '
-                    : 'Subtotal: $_unidades × ${AppUtils.formatPrecio(precio)}'
-                          ' = ${AppUtils.formatPrecio(precio * _unidades)}',
+                    : 'Subtotal: $_unidades × ${AppUtils.formatPrecioCent(precio)}'
+                          ' = ${AppUtils.formatPrecioCent(precio * _unidades)}',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleMedium,
               ),
@@ -311,20 +310,32 @@ class _CartPriceSheetState extends State<CartPriceSheet> {
 /// Resultado de [NewProductSheet].
 class NewProductResult {
   final String nombre;
-  final String? marca;
-  final double precio;
+  final String marca;
+  final String presentacion;
+  final double? contenido;
+  final String unidad;
+  final int precioCent;
   final int unidades;
+
+  /// El usuario indicó que es otra presentación de un alimento que ya tiene:
+  /// hay que elegirlo (nombre y marca se ignoran).
+  final bool otraPresentacion;
 
   const NewProductResult({
     required this.nombre,
-    this.marca,
-    required this.precio,
+    this.marca = '',
+    this.presentacion = '',
+    this.contenido,
+    this.unidad = 'g',
+    required this.precioCent,
     required this.unidades,
+    this.otraPresentacion = false,
   });
 }
 
-/// Tarjeta para un código que no está registrado: crea el producto con su
-/// precio y lo mete en el carrito.
+/// Alta mínima EN LA TIENDA para un código que no está registrado: avisa de
+/// que no existe y pide solo lo básico (nombre, marca, presentación y
+/// precio). Nunca la tabla nutricional: queda pendiente para casa.
 class NewProductSheet extends StatefulWidget {
   final String codigo;
 
@@ -347,26 +358,60 @@ class _NewProductSheetState extends State<NewProductSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _brandCtrl = TextEditingController();
+  final _packCtrl = TextEditingController();
+  final _contentCtrl = TextEditingController();
   final _priceCtrl = TextEditingController();
+  String _unidad = 'g';
   int _unidades = 1;
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _brandCtrl.dispose();
-    _priceCtrl.dispose();
+    for (final c in [
+      _nameCtrl,
+      _brandCtrl,
+      _packCtrl,
+      _contentCtrl,
+      _priceCtrl,
+    ]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
-  void _submit() {
+  void _submit({bool otraPresentacion = false}) {
+    final precio = parsePrecioCent(_priceCtrl.text);
+    if (otraPresentacion) {
+      // Solo hace falta el precio para registrar la compra.
+      if (precio == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Escribe primero el precio.')),
+        );
+        return;
+      }
+      Navigator.pop(
+        context,
+        NewProductResult(
+          nombre: '',
+          presentacion: _packCtrl.text.trim(),
+          contenido: parseDecimal(_contentCtrl.text),
+          unidad: _unidad,
+          precioCent: precio,
+          unidades: _unidades,
+          otraPresentacion: true,
+        ),
+      );
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
-    final marca = _brandCtrl.text.trim();
     Navigator.pop(
       context,
       NewProductResult(
         nombre: _nameCtrl.text.trim(),
-        marca: marca.isEmpty ? null : marca,
-        precio: RegisterPurchase.parsePrecio(_priceCtrl.text)!,
+        marca: _brandCtrl.text.trim(),
+        presentacion: _packCtrl.text.trim(),
+        contenido: parseDecimal(_contentCtrl.text),
+        unidad: _unidad,
+        precioCent: precio!,
         unidades: _unidades,
       ),
     );
@@ -389,17 +434,17 @@ class _NewProductSheetState extends State<NewProductSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Producto nuevo',
+                'Producto no registrado',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Text('Código ${widget.codigo}', style: AppStyles.labelText),
-              const _Banner(
+              const InfoBanner(
                 color: AppStyles.semaphOrange,
                 icon: Icons.info_outline,
                 text:
-                    'No está registrado. Se guardará con su precio. Si coincide '
-                    'con algo de tu lista se marcará; si no, se añadirá a la '
-                    'lista como comprado.',
+                    'Este código no está en tus alimentos. Indica lo básico y '
+                    'el precio; la tabla nutricional se completa luego en '
+                    'casa.',
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -407,8 +452,8 @@ class _NewProductSheetState extends State<NewProductSheet> {
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(
-                  labelText: 'Nombre del producto *',
-                  hintText: 'Ej: Leche entera',
+                  labelText: 'Nombre *',
+                  hintText: 'Ej: Leche semidesnatada',
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Escribe un nombre'
@@ -418,9 +463,46 @@ class _NewProductSheetState extends State<NewProductSheet> {
               TextFormField(
                 controller: _brandCtrl,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  labelText: 'Marca (opcional)',
-                ),
+                decoration: const InputDecoration(labelText: 'Marca'),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: TextFormField(
+                      controller: _packCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Presentación',
+                        hintText: 'Brick 1 L, pack 6...',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: TextFormField(
+                      controller: _contentCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: const InputDecoration(labelText: 'Contenido'),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: DropdownButton<String>(
+                      value: _unidad,
+                      items: const [
+                        DropdownMenuItem(value: 'g', child: Text('g')),
+                        DropdownMenuItem(value: 'ml', child: Text('ml')),
+                      ],
+                      onChanged: (v) => setState(() => _unidad = v ?? 'g'),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Row(
@@ -438,12 +520,9 @@ class _NewProductSheetState extends State<NewProductSheet> {
                         suffixText: '€',
                         prefixIcon: Icon(Icons.sell_outlined),
                       ),
-                      validator: (v) {
-                        final p = RegisterPurchase.parsePrecio(v ?? '');
-                        return (p == null || p <= 0)
-                            ? 'Escribe un precio válido'
-                            : null;
-                      },
+                      validator: (v) => parsePrecioCent(v ?? '') == null
+                          ? 'Escribe un precio válido'
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -461,6 +540,11 @@ class _NewProductSheetState extends State<NewProductSheet> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
                 ),
+              ),
+              TextButton.icon(
+                onPressed: () => _submit(otraPresentacion: true),
+                icon: const Icon(Icons.link),
+                label: const Text('Es otra presentación de uno que ya tengo'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -558,34 +642,6 @@ Future<String?> askStore(
     ),
   );
   return (result == null || result.trim().isEmpty) ? null : result.trim();
-}
-
-class _Banner extends StatelessWidget {
-  final Color color;
-  final IconData icon;
-  final String text;
-
-  const _Banner({required this.color, required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppStyles.borderRadius),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 8),
-          Expanded(child: Text(text)),
-        ],
-      ),
-    );
-  }
 }
 
 class _UnitsStepper extends StatelessWidget {

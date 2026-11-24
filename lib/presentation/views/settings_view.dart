@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/styles.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/user_settings.dart';
 import '../providers/settings_provider.dart';
 import '../providers/theme_provider.dart';
+import 'categories_view.dart';
+import 'data_view.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -40,16 +43,16 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     final settings = ref.read(settingsProvider);
 
     _weightController = TextEditingController(
-      text: settings.weightKg.toString(),
+      text: AppUtils.formatDecimalEditable(settings.weightKg),
     );
     _kcalController = TextEditingController(
       text: settings.kcalTarget.toString(),
     );
     _proteinsController = TextEditingController(
-      text: settings.proteinsPerKg.toString(),
+      text: AppUtils.formatDecimalEditable(settings.proteinsPerKg),
     );
     _fatsController = TextEditingController(
-      text: settings.fatsPerKg.toString(),
+      text: AppUtils.formatDecimalEditable(settings.fatsPerKg),
     );
     _toleranceController = TextEditingController(
       text: settings.tolerancePercent.toString(),
@@ -57,10 +60,12 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
     // TDEE fields
     _bodyFatController = TextEditingController(
-      text: settings.bodyFatPercent?.toString() ?? '',
+      text: settings.bodyFatPercent == null
+          ? ''
+          : AppUtils.formatDecimalEditable(settings.bodyFatPercent!),
     );
     _heightController = TextEditingController(
-      text: settings.heightCm.toString(),
+      text: AppUtils.formatDecimalEditable(settings.heightCm),
     );
     _ageController = TextEditingController(text: settings.age.toString());
     _selectedSex = settings.sex;
@@ -86,10 +91,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     super.dispose();
   }
 
+  /// Lee los campos decimales aceptando coma o punto.
+  double? _decimal(TextEditingController c) => AppUtils.parseDecimal(c.text);
+
   bool _isBodyFatValid() {
-    final text = _bodyFatController.text.trim();
-    if (text.isEmpty) return false;
-    final value = double.tryParse(text);
+    final value = _decimal(_bodyFatController);
     return value != null && value > 0 && value <= 60;
   }
 
@@ -97,18 +103,18 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   /// personales, el factor de actividad y el objetivo de peso.
   /// Silencioso: si faltan datos o son inválidos, no toca el campo.
   void _recalculateTDEE() {
-    final weight = double.tryParse(_weightController.text);
+    final weight = _decimal(_weightController);
     if (weight == null || weight <= 0) return;
 
     double tmb;
     if (_isBodyFatValid()) {
       // Katch-McArdle (solo requiere peso y % grasa)
-      final bodyFat = double.parse(_bodyFatController.text);
+      final bodyFat = _decimal(_bodyFatController)!;
       final lbm = weight * (1 - (bodyFat / 100));
       tmb = 370 + (21.6 * lbm);
     } else {
       // Mifflin-St Jeor (requiere altura y edad)
-      final height = double.tryParse(_heightController.text);
+      final height = _decimal(_heightController);
       final age = int.tryParse(_ageController.text);
       if (height == null || height <= 0 || age == null || age <= 0) return;
       final c = _selectedSex == 'male' ? 5.0 : -161.0;
@@ -131,15 +137,14 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
   void _save() {
     if (_formKey.currentState!.validate()) {
-      final bodyFatText = _bodyFatController.text.trim();
       final newSettings = UserSettings(
-        weightKg: double.parse(_weightController.text),
+        weightKg: _decimal(_weightController)!,
         kcalTarget: int.parse(_kcalController.text),
-        proteinsPerKg: double.parse(_proteinsController.text),
-        fatsPerKg: double.parse(_fatsController.text),
+        proteinsPerKg: _decimal(_proteinsController)!,
+        fatsPerKg: _decimal(_fatsController)!,
         tolerancePercent: int.parse(_toleranceController.text),
-        bodyFatPercent: bodyFatText.isEmpty ? null : double.parse(bodyFatText),
-        heightCm: double.parse(_heightController.text),
+        bodyFatPercent: _decimal(_bodyFatController),
+        heightCm: _decimal(_heightController)!,
         age: int.parse(_ageController.text),
         sex: _selectedSex,
         activityFactor: _selectedActivity,
@@ -155,7 +160,11 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
-    final isDarkMode = themeMode == ThemeMode.dark;
+    // Con "seguir al sistema" el interruptor refleja el tema que se ve.
+    final isDarkMode = ThemeNotifier.isDarkFor(
+      themeMode,
+      MediaQuery.platformBrightnessOf(context),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -170,7 +179,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               Switch(
                 value: isDarkMode,
                 onChanged: (value) {
-                  ref.read(themeProvider.notifier).toggleTheme();
+                  ref.read(themeProvider.notifier).setDark(value);
                 },
                 activeThumbColor: Colors.white,
               ),
@@ -184,6 +193,31 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           key: _formKey,
           child: ListView(
             children: [
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.import_export),
+                  title: const Text('Datos y respaldos'),
+                  subtitle: const Text(
+                    'Compartir repertorio, respaldo completo, importar',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DataView()),
+                  ),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.category_outlined),
+                  title: const Text('Categorías y pasillos'),
+                  subtitle: const Text(
+                    'Secciones del súper y orden de recorrido por tienda',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => CategoriesView.open(context),
+                ),
+              ),
               _buildSectionTitle('Datos Personales'),
               _buildTextField(
                 controller: _weightController,
@@ -363,10 +397,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Objetivo de peso',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('Objetivo de peso', style: Theme.of(context).textTheme.bodyMedium),
         const SizedBox(height: 8),
         SegmentedButton<String>(
           segments: const [
@@ -440,7 +471,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         keyboardType: TextInputType.numberWithOptions(decimal: isDecimal),
         inputFormatters: [
           isDecimal
-              ? FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+              ? AppUtils.decimalInputFormatter
               : FilteringTextInputFormatter.digitsOnly,
         ],
         validator: (value) {
@@ -453,15 +484,17 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           }
 
           if (isBodyFat) {
-            final n = double.tryParse(value);
-            if (n != null && (n <= 0 || n > 60)) {
+            final n = AppUtils.parseDecimal(value);
+            if (n == null || n <= 0 || n > 60) {
               return 'Debe estar entre 1% y 60%';
             }
           } else if (isTolerance) {
             final n = int.tryParse(value);
             if (n == null || n < 0 || n > 100) return '0 - 100';
           } else {
-            final n = isDecimal ? double.tryParse(value) : int.tryParse(value);
+            final n = isDecimal
+                ? AppUtils.parseDecimal(value)
+                : int.tryParse(value);
             if (n == null || n <= 0) return 'Debe ser positivo';
           }
 
@@ -475,15 +508,18 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   }
 
   Widget _buildCalculatedValues() {
-    double weight = double.tryParse(_weightController.text) ?? 0;
-    int kcal = int.tryParse(_kcalController.text) ?? 0;
-    double protPerKg = double.tryParse(_proteinsController.text) ?? 0;
-    double fatsPerKg = double.tryParse(_fatsController.text) ?? 0;
-
-    double proteinsReq = weight * protPerKg;
-    double fatsReq = weight * fatsPerKg;
-    double carbsReq = (kcal - (proteinsReq * 4 + fatsReq * 9)) / 4;
-    if (carbsReq < 0) carbsReq = 0;
+    // Misma fórmula que el contador (UserSettings), con lo que hay escrito.
+    final preview = ref
+        .read(settingsProvider)
+        .copyWith(
+          weightKg: _decimal(_weightController) ?? 0,
+          kcalTarget: int.tryParse(_kcalController.text) ?? 0,
+          proteinsPerKg: _decimal(_proteinsController) ?? 0,
+          fatsPerKg: _decimal(_fatsController) ?? 0,
+        );
+    final proteinsReq = preview.proteinsRequired;
+    final fatsReq = preview.fatsRequired;
+    final carbsReq = preview.carbsRequired;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 

@@ -12,7 +12,7 @@ void main() {
       expect(t.categoria, 'Plato principal');
       expect(t.porciones, 4);
       expect(t.tiempoMin, 40);
-      expect(t.ingredientes, [
+      expect(t.lineas, [
         '4 huevos',
         '500 g de patatas',
         '1 cebolla (opcional)',
@@ -46,13 +46,13 @@ Ingredientes: huevo, harina, 1,5 kg de azúcar
       expect(a.nombre, 'Arroz con leche');
       expect(a.porciones, 6);
       expect(a.tiempoMin, 75);
-      expect(a.ingredientes, [
+      expect(a.lineas, [
         '1 l de leche',
         '200 g de arroz',
         '1.5 cucharadas de canela',
       ]);
       expect(a.pasos, ['Hervir la leche.', 'Añadir el arroz.']);
-      expect(res[1].ingredientes, ['huevo', 'harina', '1,5 kg de azúcar']);
+      expect(res[1].lineas, ['huevo', 'harina', '1,5 kg de azúcar']);
     });
 
     test('texto pegado sin encabezados (p. ej. desde WhatsApp)', () {
@@ -68,11 +68,7 @@ Triturar y servir caliente.
       expect(res.length, 1);
       final r = res.first;
       expect(r.nombre, 'Crema de calabaza');
-      expect(r.ingredientes, [
-        '1 kg de calabaza',
-        '2 zanahorias',
-        'Una cebolla',
-      ]);
+      expect(r.lineas, ['1 kg de calabaza', '2 zanahorias', 'Una cebolla']);
       expect(r.pasos, [
         'Cocer todo 20 minutos en agua.',
         'Triturar y servir caliente.',
@@ -93,17 +89,17 @@ Triturar y servir caliente.
   });
 
   test('ida y vuelta formatRecipes → parseText', () {
-    const original = [
-      Recipe(
+    final original = [
+      Recipe.desdeLineas(
         nombre: 'Gazpacho',
         categoria: 'Sopa fría',
         porciones: 4,
         tiempoMin: 90,
-        ingredientes: ['1 kg de tomates', '1 pimiento verde', 'Sal'],
+        lineas: ['1 kg de tomates', '1 pimiento verde', 'Sal'],
         elaboracion: 'Lavar y trocear.\nTriturar todo.\nEnfriar.',
         notas: 'Mejor de un día para otro.\nServir con picatostes.',
       ),
-      Recipe(nombre: 'Tostada', ingredientes: ['Pan', 'Tomate']),
+      Recipe.desdeLineas(nombre: 'Tostada', lineas: ['Pan', 'Tomate']),
     ];
     final text = RecipeTextCodec.formatRecipes(original);
     expect(text, contains('TIEMPO: 1 h 30 min'));
@@ -126,7 +122,7 @@ Triturar y servir caliente.
       expect(res[0].categoria, 'Bebida');
       expect(res[0].tiempoMin, 5);
       expect(res[0].pasos, ['Pelar el plátano', 'Batir todo']);
-      expect(res[1].ingredientes, ['café', 'agua']);
+      expect(res[1].lineas, ['café', 'agua']);
     });
 
     test('objeto con "recetas" y detección por contenido', () {
@@ -145,20 +141,16 @@ Triturar y servir caliente.
       expect(res.length, 2);
       expect(res[0].nombre, 'Pancakes');
       expect(res[0].porciones, 2);
-      expect(res[0].ingredientes, [
-        '1 huevo',
-        '200 ml de leche',
-        '100 g de harina',
-      ]);
+      expect(res[0].lineas, ['1 huevo', '200 ml de leche', '100 g de harina']);
       expect(res[0].pasos, ['Mezclar', 'Cocinar en sartén']);
-      expect(res[1].ingredientes, ['agua', 'té']);
+      expect(res[1].lineas, ['agua', 'té']);
     });
 
     test('coma como delimitador', () {
       const csv =
           'Nombre,Ingredientes\nSopa,"agua | fideos | 1,5 l de caldo"\n';
       final r = RecipeTextCodec.parseCsv(csv).single;
-      expect(r.ingredientes, ['agua', 'fideos', '1,5 l de caldo']);
+      expect(r.lineas, ['agua', 'fideos', '1,5 l de caldo']);
     });
   });
 
@@ -169,5 +161,32 @@ Triturar y servir caliente.
     expect(RecipeTextCodec.parseMinutes('2 horas'), 120);
     expect(RecipeTextCodec.parseMinutes('45'), 45);
     expect(RecipeTextCodec.parseMinutes('rápido'), isNull);
+  });
+
+  group('regresiones de la auditoría', () {
+    test('JSON con "recetas" que no es una lista → FormatException (antes '
+        'TypeError)', () {
+      expect(
+        () => RecipeTextCodec.parseJson('{"recetas": {"nombre": "X"}}'),
+        throwsFormatException,
+      );
+    });
+
+    test('un número enorme no aborta la importación', () {
+      final res = RecipeTextCodec.parseText(
+        'RECETA: Tarta\nPORCIONES: 99999999999999999999999\n'
+        'INGREDIENTES:\n- 2 huevos',
+      );
+      expect(res, hasLength(1));
+      expect(res.single.porciones, isNull);
+      expect(res.single.lineas, ['2 huevos']);
+    });
+
+    test('se quita el BOM inicial', () {
+      final res = RecipeTextCodec.parse(
+        '\uFEFFRECETA: Sopa\nINGREDIENTES:\n- Agua',
+      );
+      expect(res.single.nombre, 'Sopa');
+    });
   });
 }

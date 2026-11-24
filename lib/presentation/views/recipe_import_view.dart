@@ -69,7 +69,16 @@ class _RecipeImportViewState extends ConsumerState<RecipeImportView> {
   }
 
   void _analyze() {
-    final recipes = RecipeTextCodec.parse(_textCtrl.text);
+    final List<Recipe> recipes;
+    try {
+      recipes = RecipeTextCodec.parse(_textCtrl.text);
+    } catch (e) {
+      // Antes la excepción se perdía y el botón no hacía nada visible.
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo leer el texto: $e')));
+      return;
+    }
     if (recipes.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -91,9 +100,21 @@ class _RecipeImportViewState extends ConsumerState<RecipeImportView> {
       for (var i = 0; i < parsed.length; i++)
         if (_selected.contains(i)) parsed[i],
     ];
-    final saved = await ref
-        .read(recipesProvider.notifier)
-        .importRecipes(toSave);
+    final int saved;
+    try {
+      saved = await ref.read(recipesProvider.notifier).importRecipes(toSave);
+    } catch (e) {
+      // Sin esto el botón quedaba deshabilitado (_saving) para siempre.
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al importar: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

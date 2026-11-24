@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +17,9 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView> {
+  late final AppLifecycleListener _lifecycle;
+  bool _newDayDialogOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -27,136 +27,109 @@ class _HomeViewState extends ConsumerState<HomeView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkNewDay();
     });
+    // Android mantiene la app en memoria durante días: al volver a primer
+    // plano se comprueba si cambió la fecha (antes solo se hacía al arrancar
+    // y lo registrado tras la medianoche iba al día anterior).
+    _lifecycle = AppLifecycleListener(onResume: _onResume);
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onResume() async {
+    final changed = await ref.read(homeProvider.notifier).syncToday();
+    if (changed && mounted) await _checkNewDay();
   }
 
   Future<void> _checkNewDay() async {
-    final checkNewDay = ref.read(checkNewDayOnStartupProvider);
-    final lastDate = await checkNewDay();
+    if (_newDayDialogOpen) return;
+    final DateTime? found;
+    try {
+      found = await _previousDayToExport();
+    } catch (e) {
+      _showError('No se pudo comprobar el día anterior: $e');
+      return;
+    }
+    if (found == null || !mounted) return;
+    final lastDate = found;
 
-    if (lastDate != null && mounted) {
-      // Check if there are meals to export
-      final meals = await ref
-          .read(mealRepositoryProvider)
-          .getMealsByDate(lastDate);
-      if (meals.isEmpty) return;
-
-      if (meals.isEmpty) return;
-
-      if (!mounted) return;
-
-      final dateStr = DateFormat('yyyy-MM-dd').format(lastDate);
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Nuevo Día Detectado'),
-          content: Text(
-            '¿Desea exportar el día anterior ($dateStr) antes de iniciar el nuevo día?',
+    final dateStr = DateFormat('yyyy-MM-dd').format(lastDate);
+    _newDayDialogOpen = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Nuevo Día Detectado'),
+        content: Text(
+          '¿Desea exportar el día anterior ($dateStr) antes de iniciar el nuevo día?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext); // Cancel -> Stay
+            },
+            child: const Text('Cancelar'),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext); // Cancel -> Stay
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              try {
                 await ref.read(mealRepositoryProvider).clearMealsAndItems();
-                ref.read(homeProvider.notifier).refresh();
-              },
-              child: const Text('Descartar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                final export = ref.read(exportDayToCsvProvider);
-                final path = await export(lastDate);
-                if (path.isNotEmpty) {
-                  ref.read(homeProvider.notifier).refresh();
-                }
-                if (mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Exportado a: $path')));
-                }
-              },
-              child: const Text('Exportar'),
-            ),
-          ],
-        ),
-      );
-    }
+              } catch (e) {
+                _showError('No se pudo descartar el día: $e');
+              }
+              ref.read(homeProvider.notifier).refresh();
+            },
+            child: const Text('Descartar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await _exportDay(lastDate);
+            },
+            child: const Text('Exportar'),
+          ),
+        ],
+      ),
+    ).whenComplete(() => _newDayDialogOpen = false);
   }
 
-  Future<void> _exportFoodsTsv() async {
-    try {
-      final tsv = await ref.read(exportFoodsTsvProvider).call();
-      final bytes = Uint8List.fromList(utf8.encode(tsv));
-      final timestamp = DateFormat(
-        'yyyy-MM-dd_HH-mm-ss',
-      ).format(DateTime.now());
-      // FilePicker.saveFile con bytes escribe el archivo vía SAF (igual que
-      // el export CSV de meal_repository_impl); sustituye a file_saver.
-      final saved = await FilePicker.saveFile(
-        dialogTitle: 'Exportar alimentos',
-        fileName: 'db_alimentos_export_$timestamp.tsv',
-        type: FileType.custom,
-        allowedExtensions: ['tsv'],
-        bytes: bytes,
-      );
-      if (!mounted) return;
-      if (saved == null || saved.isEmpty) return; // User cancelled
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Alimentos exportados a: $saved'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al exportar: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  /// Fecha anterior con comidas sin exportar, o null.
+  Future<DateTime?> _previousDayToExport() async {
+    final lastDate = await ref.read(checkNewDayOnStartupProvider)();
+    if (lastDate == null) return null;
+    final meals = await ref
+        .read(mealRepositoryProvider)
+        .getMealsByDate(lastDate);
+    return meals.isEmpty ? null : lastDate;
   }
 
-  Future<void> _importFoodsTsv() async {
+  /// Exporta el día (y vacía las comidas si se guardó, ver [ExportDayToCsv]).
+  /// Si el usuario cancela el diálogo de guardado no se muestra nada (antes
+  /// aparecía "Exportado a: " vacío).
+  Future<void> _exportDay(DateTime date) async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['tsv'],
-        withData: true,
-      );
-      if (result == null || result.files.isEmpty) return;
-
-      final bytes = result.files.single.bytes;
-      if (bytes == null) {
-        throw Exception('No se pudo leer el contenido del archivo.');
+      final path = await ref.read(exportDayToCsvProvider)(date);
+      if (path.isEmpty) return;
+      ref.read(homeProvider.notifier).refresh();
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Exportado a: $path')));
       }
-      final content = utf8.decode(bytes);
-      final imported = await ref.read(importFoodsTsvProvider).call(content);
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$imported alimentos importados.'),
-          backgroundColor: Colors.green,
-        ),
-      );
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al importar: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showError('Error al exportar: $e');
     }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   @override
@@ -164,12 +137,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final settings = ref.watch(settingsProvider);
     final homeState = ref.watch(homeProvider);
 
-    // Targets
+    // Targets (fórmula única en UserSettings)
     final double targetKcal = settings.kcalTarget.toDouble();
-    final double targetProt = settings.weightKg * settings.proteinsPerKg;
-    final double targetFats = settings.weightKg * settings.fatsPerKg;
-    final double targetCarbs =
-        (targetKcal - (targetProt * 4 + targetFats * 9)) / 4;
+    final double targetProt = settings.proteinsRequired;
+    final double targetFats = settings.fatsRequired;
+    final double targetCarbs = settings.carbsRequired;
 
     // Consumed
     final double consumedKcal = homeState.totalKcal;
@@ -179,44 +151,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calorie Counter'),
+        title: const Text('Calorías'),
         backgroundColor: AppStyles.primary,
         foregroundColor: Colors.white,
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.import_export),
-            tooltip: 'Importar / Exportar Alimentos',
-            onSelected: (value) {
-              if (value == 'export') {
-                _exportFoodsTsv();
-              } else if (value == 'import') {
-                _importFoodsTsv();
-              }
-            },
-            itemBuilder: (ctx) => const [
-              PopupMenuItem<String>(
-                value: 'export',
-                child: ListTile(
-                  leading: Icon(Icons.upload_file),
-                  title: Text('Exportar Alimentos (TSV)'),
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'import',
-                child: ListTile(
-                  leading: Icon(Icons.download),
-                  title: Text('Importar Alimentos (TSV)'),
-                ),
-              ),
-            ],
-          ),
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: 'Configuración',
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const SettingsView()),
-              ).then((_) => ref.read(homeProvider.notifier).refresh());
+              );
             },
           ),
         ],
@@ -228,6 +174,19 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (homeState.error != null)
+                    Card(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      child: ListTile(
+                        leading: const Icon(Icons.error_outline),
+                        title: Text(homeState.error!),
+                        trailing: TextButton(
+                          onPressed: () =>
+                              ref.read(homeProvider.notifier).refresh(),
+                          child: const Text('Reintentar'),
+                        ),
+                      ),
+                    ),
                   _buildSectionTitle('Progreso Diario'),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,7 +244,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const SearchView()),
-                      ).then((_) => ref.read(homeProvider.notifier).refresh());
+                      );
                     },
                     icon: const Icon(Icons.add),
                     label: const Text('Agregar Ingesta'),
@@ -305,7 +264,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         MaterialPageRoute(
                           builder: (_) => const DayManagementView(),
                         ),
-                      ).then((_) => ref.read(homeProvider.notifier).refresh());
+                      );
                     },
                     icon: const Icon(Icons.restaurant_menu),
                     label: const Text('Gestionar Día'),
