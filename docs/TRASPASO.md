@@ -198,7 +198,7 @@ Notas:
 
 - **Toolchain Android**: AGP 9.1.0, Gradle 9.3.1, KGP 2.4.0, `android.builtInKotlin=false`, `android.newDsl=false` (plantilla de Flutter 3.47).
   - `file_picker` 13+ (la 11 no compila bajo AGP 9). API: `saveFile` → `Uri?`, `pickFile()` + `readAsBytes()`.
-  - `google_mlkit_text_recognition` **anclado a `^0.16.0`** (con AGP 9 podría subirse; no hace falta).
+  - `google_mlkit_text_recognition` **^1.0.3** (Kotlin integrado; la 0.16 provocaba el aviso de KGP). R8 necesita `android/app/proguard-rules.pro` (reconocedores no latinos ausentes).
   - No reintroducir `file_saver`.
 - **SQLite** viene con el paquete `sqlite3` (build hooks; descarga binarios al compilar).
 - **Reglas que no se rompen** (detalle en `README.md` y `CLAUDE.md`):

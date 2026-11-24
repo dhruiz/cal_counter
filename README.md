@@ -305,7 +305,7 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 
 - **Toolchain**: AGP 9.1.0, Gradle 9.3.1 y KGP 2.4.0, con `android.builtInKotlin=false` y `android.newDsl=false`, los mismos flags que la plantilla de Flutter 3.47 (su plugin de Gradle aún no soporta `newDsl=true`). Con `builtInKotlin=false` cada plugin aplica KGP. Revisar al actualizar Flutter.
 - **`file_picker` 13+**: la 11 omitía KGP bajo AGP 9 y su código Kotlin no se compilaba. Desde la 12, `saveFile(fileName:, bytes:)` escribe el archivo con SAF y devuelve `Uri?` (se muestra con `AppUtils.formatRutaGuardada`), y `pickFile()` devuelve un `PlatformFile?` que se lee con `readAsBytes()`.
-- **`google_mlkit_text_recognition` anclado a `^0.16.0`**: aplica `kotlin-android` por sí misma. Flutter 3.47 avisa de que versiones futuras no compilarán con plugins que apliquen KGP; al actualizar Flutter, subirlo a una versión con Kotlin integrado (0.17+/1.x).
+- **`google_mlkit_text_recognition` ^1.0.3**: desde la 0.17 usa el Kotlin integrado de AGP. La 0.16 aplicaba KGP por su cuenta y Flutter 3.47 avisaba de que versiones futuras no compilarán con plugins así.
 - **R8** (`android/app/proguard-rules.pro`): `-dontwarn` para los reconocedores de chino, devanagari, japonés y coreano que referencia ML Kit pero que la app no incluye (solo usa el alfabeto latino). Sin ellas, `flutter build apk --release` falla en `minifyReleaseWithR8`.
 - **SQLite**: la incluye el paquete `sqlite3` mediante *build hooks*. Durante el build descarga binarios precompilados, así que el build necesita internet.
 - **Permisos**: `CAMERA` (escáner de códigos con `mobile_scanner` y fotos con `image_picker`), con `uses-feature camera required=false`: sin cámara se escribe el código a mano. **Sin permisos de almacenamiento**: importar y exportar usa SAF.
@@ -324,7 +324,7 @@ El reconocedor se inyecta con `labelRecognizerProvider` (sustituible en tests).
 | `drift`, `drift_flutter`, `sqlite3` | Base de datos (Drift sobre SQLite incluida, FTS5) |
 | `uuid` | Identidad global de alimentos, presentaciones y recetas |
 | `mobile_scanner` | Escáner de códigos de barras (ML Kit incluido) |
-| `google_mlkit_text_recognition` (0.16), `image_picker` | OCR de etiquetas |
+| `google_mlkit_text_recognition` (1.0), `image_picker` | OCR de etiquetas |
 | `file_picker` | Guardar/abrir archivos con SAF |
 | `path_provider`, `path` | Directorios (base de datos antigua, temporales, copia automática) |
 | `shared_preferences` | Ajustes del usuario y tema |
