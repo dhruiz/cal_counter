@@ -517,7 +517,7 @@ Tipo: `ConsumerStatefulWidget`
 1. `AppBar` con título "Contador de calorías". `actions` (de izquierda a derecha):
    - `PopupMenuButton` con icono `Icons.import_export`, dos opciones:
      - **Exportar Alimentos (TSV)** → genera el TSV (`exportFoodsTsvProvider`), lo codifica a UTF-8 y lo guarda con `FilePicker.saveFile(bytes:)` (SAF). Nombre: `db_alimentos_export_<yyyy-MM-dd_HH-mm-ss>.tsv`.
-     - **Importar Alimentos (TSV)** → `FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['tsv'], withData: true)`, decodifica UTF-8 y llama a `importFoodsTsvProvider`.
+     - **Importar Alimentos (TSV)** → `FilePicker.pickFile(type: FileType.custom, allowedExtensions: ['tsv'])` + `readAsBytes()`, decodifica UTF-8 y llama a `importFoodsTsvProvider`.
    - `IconButton` `Icons.settings` → navega a `SettingsView`.
 2. Sección **"Progreso Diario"**: cuatro `NutrientRing` (Calorías, Grasas, Carbohidratos, Proteínas) con % consumido, consumido/objetivo y restante; el exceso se pinta en `AppStyles.ringOver`.
 3. Botón **"Agregar Ingesta"** (navega a `SearchView`) y botón **"Gestionar Día"** (`DayManagementView`: editar, renombrar, guardar como alimento, exportar y eliminar comidas).
@@ -845,7 +845,7 @@ Las nuevas comidas se nombran automáticamente `Comida_N` con `nextMealName` (`l
 
 ### Exportación CSV diaria
 
-El CSV diario usa separador **tabulador** (`\t`), generado con `csv.ListToCsvConverter(fieldDelimiter: '\t')`. Cada fila corresponde a un `MealItem`. Header: `nombre_comida\tcantidad\talimento\tgrasas\tcarbos\tproteinas\tkcal`. Se añade una fila final con totales (`Total`). El archivo se guarda con `FilePicker.platform.saveFile` (SAF) y nombre `comidas_<yyyy-MM-dd>.csv`.
+El CSV diario usa separador **tabulador** (`\t`), generado con `csv.ListToCsvConverter(fieldDelimiter: '\t')`. Cada fila corresponde a un `MealItem`. Header: `nombre_comida\tcantidad\talimento\tgrasas\tcarbos\tproteinas\tkcal`. Se añade una fila final con totales (`Total`). El archivo se guarda con `FilePicker.saveFile` (SAF) y nombre `comidas_<yyyy-MM-dd>.csv`; el `Uri` devuelto se convierte en ruta legible con `AppUtils.formatRutaGuardada` (cadena vacía si se cancela, y entonces no se vacía el día).
 
 > **IMPORTANTE**: Aunque la extensión del archivo es `.csv` (compatibilidad histórica), el delimitador real es **TAB**, no coma. No cambiar a coma sin actualizar también los tests y el comportamiento esperado por el usuario.
 
@@ -964,7 +964,7 @@ Lector de códigos de barras (la cámara es opcional: sin ella se escribe el có
 <uses-feature android:name="android.hardware.camera" android:required="false" />
 ```
 
-`mobile_scanner` pide el permiso de cámara en tiempo de ejecución al abrir el escáner y exige `minSdk 23` (Flutter 3.44 usa 24). Con AGP 8.x y `android.builtInKotlin=false` el plugin aplica KGP por sí mismo.
+`mobile_scanner` pide el permiso de cámara en tiempo de ejecución al abrir el escáner y exige `minSdk 23` (Flutter 3.44 usa 24). Con AGP 9 y `android.builtInKotlin=false` el plugin aplica KGP por sí mismo.
 
 Sin `INTERNET` en el APK final: la app es 100 % local, pero ML Kit (dentro de `mobile_scanner`) añade `INTERNET` para telemetría de Google (`com.google.android.datatransport`); el manifiesto principal lo quita con `tools:node="remove"`. Los manifiestos de `debug`/`profile` lo vuelven a declarar para las herramientas de Flutter (hot reload, depurador). `ACCESS_NETWORK_STATE` se mantiene: lo usa el planificador de esa librería y quitarlo podría provocar `SecurityException`.
 
@@ -993,7 +993,7 @@ Solo la cámara (la pide `mobile_scanner` al abrir el escáner). No hay permisos
 | `flutter_localizations` | SDK    | Textos de los widgets de Material en español (selector de fecha...) |
 | `equatable`          | `^2.0.7`  | Comparación de entidades de dominio   |
 | `shared_preferences` | `^2.3.5`  | Persistencia de settings y tema       |
-| `file_picker`        | `^11.0.2` | Selección y guardado de archivos      |
+| `file_picker`        | `^13.4.1` | Selección y guardado de archivos      |
 | `mobile_scanner`     | `^7.5.0`  | Lector de códigos de barras (cámara, ML Kit empaquetado) |
 
 ### Dev
@@ -1002,7 +1002,7 @@ Solo la cámara (la pide `mobile_scanner` al abrir el escáner). No hay permisos
 | --------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
 | `flutter_lints`             | `^5.0.0` | Reglas de análisis estático                                                                             |
 | `sqflite_common_ffi`        | `^2.3.6` | SQLite en tests de escritorio                                                                           |
-| `plugin_platform_interface` | `^2.1.8` | Necesario para mockear `FilePicker.platform` en `csv_export_test.dart` vía `MockPlatformInterfaceMixin` |
+| `plugin_platform_interface` | `^2.1.8` | Necesario para mockear `FilePickerPlatform.instance` en `csv_export_test.dart` vía `MockPlatformInterfaceMixin` |
 
 ---
 
@@ -1060,7 +1060,7 @@ Estas son las reglas de diseño que si se violan romperán la aplicación o su c
 
 15. **El TSV de `db_alimentos` usa header fijo**: `id\talimento\tkCal\tgrasas\tcarbohidratos\tproteinas`. La importación lo valida exactamente. Cambiar nombres de columnas o añadir/quitar campos rompe los archivos exportados previamente. Si se debe migrar el formato, mantener compatibilidad detectando el header.
 
-16. **SAF en Android 13+**: la app evita `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` en versiones modernas usando `FilePicker.saveFile(bytes:)` y `FilePicker.pickFiles(withData: true)`. No reintroducir manejo manual de paths absolutos ni añadir permisos al manifest sin justificación clara.
+16. **SAF en Android 13+**: la app evita `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` en versiones modernas usando `FilePicker.saveFile(fileName:, bytes:)` y `FilePicker.pickFile()` + `readAsBytes()` (la importación de BD usa `PlatformFile.path`, disponible porque Android copia el archivo a la caché). No reintroducir manejo manual de paths absolutos ni añadir permisos al manifest sin justificación clara.
 
 17. **Raíz = `MainShell`** (barra inferior). `HomeView` es la primera pestaña y sigue llamando a `HomeNotifier.refresh()` tras sus escrituras; desde recetas/productos se registra comida con `AddFoodPopup.showForToday`, que ya refresca `homeProvider`.
 

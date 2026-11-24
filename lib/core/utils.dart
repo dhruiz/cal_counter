@@ -53,4 +53,19 @@ class AppUtils {
             ? newValue
             : oldValue;
       });
+
+  /// Ruta legible del archivo guardado con `FilePicker.saveFile`, que desde
+  /// file_picker 12 devuelve un [Uri] (con espacios y tildes codificados).
+  /// En Android es la ruta del documento SAF ("/document/primary:Download/
+  /// x.csv"), igual que la que devolvía file_picker 11 como texto; en
+  /// escritorio y tests, un `file:` que se convierte en ruta local.
+  static String formatRutaGuardada(Uri uri) {
+    if (uri.scheme == 'file') return uri.toFilePath();
+    final ruta = uri.path.isNotEmpty ? uri.path : uri.toString();
+    try {
+      return Uri.decodeFull(ruta);
+    } on ArgumentError {
+      return ruta;
+    }
+  }
 }

@@ -71,14 +71,15 @@ class ProductsView extends ConsumerWidget {
       final saved = await FilePicker.saveFile(
         dialogTitle: 'Exportar historial de precios',
         fileName: 'historial_precios_$date.csv',
-        type: FileType.custom,
-        allowedExtensions: ['csv'],
         bytes: Uint8List.fromList(utf8.encode(tsv)),
       );
-      if (saved == null || saved.isEmpty) return;
+      if (saved == null) return; // Cancelado
       messenger.showSnackBar(
         SnackBar(
-          content: Text('$rows compras exportadas a: $saved'),
+          content: Text(
+            '$rows compras exportadas a: '
+            '${AppUtils.formatRutaGuardada(saved)}',
+          ),
           backgroundColor: Colors.green,
         ),
       );

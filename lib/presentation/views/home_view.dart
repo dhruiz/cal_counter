@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/styles.dart';
+import '../../core/utils.dart';
 import '../providers/home_provider.dart';
 import '../providers/search_provider.dart';
 import '../providers/settings_provider.dart';
@@ -148,15 +149,15 @@ class _HomeViewState extends ConsumerState<HomeView> {
       final saved = await FilePicker.saveFile(
         dialogTitle: 'Exportar alimentos',
         fileName: 'db_alimentos_export_$timestamp.tsv',
-        type: FileType.custom,
-        allowedExtensions: ['tsv'],
         bytes: bytes,
       );
       if (!mounted) return;
-      if (saved == null || saved.isEmpty) return; // User cancelled
+      if (saved == null) return; // Cancelado
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Alimentos exportados a: $saved'),
+          content: Text(
+            'Alimentos exportados a: ${AppUtils.formatRutaGuardada(saved)}',
+          ),
           backgroundColor: Colors.green,
         ),
       );
@@ -173,18 +174,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   Future<void> _importFoodsTsv() async {
     try {
-      final result = await FilePicker.pickFiles(
+      final file = await FilePicker.pickFile(
         type: FileType.custom,
         allowedExtensions: ['tsv'],
-        withData: true,
       );
-      if (result == null || result.files.isEmpty) return;
+      if (file == null) return; // Cancelado
 
-      final bytes = result.files.single.bytes;
-      if (bytes == null) {
-        throw Exception('No se pudo leer el contenido del archivo.');
-      }
-      final content = utf8.decode(bytes);
+      final content = utf8.decode(await file.readAsBytes());
       final imported = await ref.read(importFoodsTsvProvider).call(content);
 
       if (!mounted) return;

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/meal.dart';
 import '../../domain/entities/meal_item.dart';
 import '../../domain/repositories/meal_repository.dart';
@@ -161,20 +162,15 @@ class MealRepositoryImpl implements MealRepository {
     // Encode CSV string to bytes
     final bytes = Uint8List.fromList(utf8.encode(csv));
 
-    String? outputFile = await FilePicker.saveFile(
+    // saveFile con bytes escribe el archivo vía SAF (no hace falta escribirlo
+    // a mano ni pedir permisos). En Android el tipo MIME sale de la extensión.
+    final saved = await FilePicker.saveFile(
       dialogTitle: 'Guardar reporte de comidas',
       fileName: fileName,
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
       bytes: bytes,
     );
 
-    if (outputFile != null) {
-      // On Android/iOS, saveFile with bytes writes the file.
-      // We don't need to write it again manually, which avoids permission issues.
-      return outputFile;
-    }
-
-    return '';
+    // Ruta vacía = cancelado: ExportDayToCsv solo vacía el día si no lo está.
+    return saved == null ? '' : AppUtils.formatRutaGuardada(saved);
   }
 }

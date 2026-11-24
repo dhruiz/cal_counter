@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import '../../core/styles.dart';
+import '../../core/utils.dart';
 import '../../domain/entities/food.dart';
 import '../providers/search_provider.dart';
 import '../providers/home_provider.dart';
@@ -135,8 +136,11 @@ class _SearchViewState extends ConsumerState<SearchView> {
         fileName: 'db_alimentos_export_$timestamp.db',
         bytes: bytes,
       );
-      if (saved == null || saved.isEmpty) return; // Cancelado
-      _snack('Base de datos exportada a: $saved', Colors.green);
+      if (saved == null) return; // Cancelado
+      _snack(
+        'Base de datos exportada a: ${AppUtils.formatRutaGuardada(saved)}',
+        Colors.green,
+      );
     } catch (e) {
       _snack('Error al exportar: $e', Colors.red);
     }
@@ -146,9 +150,15 @@ class _SearchViewState extends ConsumerState<SearchView> {
     try {
       // FileType.any: la extensión .db no tiene tipo MIME estándar y algunos
       // selectores no la filtran; el contenido se valida al abrirla.
-      final result = await FilePicker.pickFiles(type: FileType.any);
-      final sourcePath = result?.files.single.path;
-      if (sourcePath == null) return; // Cancelado
+      final file = await FilePicker.pickFile(type: FileType.any);
+      if (file == null) return; // Cancelado
+      // En Android el archivo elegido se copia a la caché de la app
+      // (AndroidSAFOptions.copyToCache, activo por defecto), así que hay ruta
+      // local; sin ella sqflite no puede abrir la copia.
+      final sourcePath = file.path;
+      if (sourcePath == null) {
+        throw Exception('No se pudo acceder al archivo seleccionado.');
+      }
       if (!mounted) return;
 
       final importedCount = await _withLoading(

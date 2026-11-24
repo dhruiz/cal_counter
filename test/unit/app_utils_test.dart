@@ -49,4 +49,17 @@ void main() {
     expect(apply('12', '12a').text, '12');
     expect(apply('', '-3').text, '');
   });
+
+  test('formatRutaGuardada muestra la ruta legible del Uri de saveFile', () {
+    // Android: file_picker convierte la ruta del documento SAF en Uri, lo que
+    // codifica espacios y tildes.
+    final saf = Uri.tryParse('/document/primary:Download/comidas día 1.csv')!;
+    expect(
+      AppUtils.formatRutaGuardada(saf),
+      '/document/primary:Download/comidas día 1.csv',
+    );
+    // Escritorio/tests: Uri file: → ruta local de la plataforma.
+    final local = Uri.file('/tmp/export.csv', windows: false);
+    expect(AppUtils.formatRutaGuardada(local), local.toFilePath());
+  });
 }

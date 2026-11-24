@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:cal_counter/data/datasources/local_data_source.dart';
 import 'package:cal_counter/data/repositories/meal_repository_impl.dart';
 import 'package:cal_counter/domain/entities/meal_item.dart';
+// file_picker.dart reexporta FilePickerPlatform (file_picker 12+): es el
+// punto de inyección para tests, ya que FilePicker es final/static.
 import 'package:file_picker/file_picker.dart';
-// FilePickerPlatform no se exporta desde file_picker.dart; es el único punto
-// de inyección para tests desde file_picker 11 (FilePicker pasó a ser final/static).
-import 'package:file_picker/src/platform/file_picker_platform_interface.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart';
@@ -22,21 +21,22 @@ class _FakeFilePicker extends FilePickerPlatform
   Uint8List? lastBytes;
 
   @override
-  Future<String?> saveFile({
+  Future<Uri?> saveFile({
+    required String fileName,
+    required Uint8List bytes,
+    required String mimeType,
     String? dialogTitle,
-    String? fileName,
     String? initialDirectory,
-    FileType type = FileType.any,
-    List<String>? allowedExtensions,
-    Uint8List? bytes,
-    bool lockParentWindow = false,
+    Function(FilePickerStatus)? onFileSaving,
+    WindowsOptions windowsOptions = const WindowsOptions(),
+    LinuxOptions linuxOptions = const LinuxOptions(),
+    WebOptions webOptions = const WebOptions(),
   }) async {
     lastFileName = fileName;
     lastBytes = bytes;
-    final outPath = join(saveDir, fileName ?? 'test_export.csv');
-    final file = File(outPath);
-    await file.writeAsBytes(bytes ?? Uint8List(0));
-    return outPath;
+    final file = File(join(saveDir, fileName));
+    await file.writeAsBytes(bytes);
+    return file.absolute.uri;
   }
 }
 
