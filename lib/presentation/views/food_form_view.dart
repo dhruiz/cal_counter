@@ -13,6 +13,7 @@ import '../../domain/services/ingredient_matcher.dart';
 import '../../domain/services/money.dart';
 import '../../domain/usecases/food_registration.dart';
 import '../providers/foods_provider.dart';
+import '../providers/recipes_provider.dart';
 import '../widgets/category_widgets.dart';
 import '../widgets/food_widgets.dart';
 import '../widgets/label_reader.dart';
@@ -24,11 +25,16 @@ import 'barcode_scanner_view.dart';
 ///
 /// Con [completar] se abre centrado en la tabla nutricional (alimentos
 /// pendientes dados de alta en la tienda).
+///
+/// También da de alta artículos que no son alimentos (limpieza, higiene...):
+/// sin tabla nutricional, pero con sus compras y precios. Con [soloAlimento]
+/// (ingredientes de recetas) no se ofrece esa opción.
 class FoodFormView extends ConsumerStatefulWidget {
   final Food? food;
   final String? nombreInicial;
   final String? codigoBarras;
   final bool completar;
+  final bool soloAlimento;
 
   const FoodFormView({
     super.key,
@@ -36,6 +42,7 @@ class FoodFormView extends ConsumerStatefulWidget {
     this.nombreInicial,
     this.codigoBarras,
     this.completar = false,
+    this.soloAlimento = false,
   });
 
   /// Abre el formulario y devuelve el id guardado (o null si se cancela).
@@ -45,6 +52,7 @@ class FoodFormView extends ConsumerStatefulWidget {
     String? nombreInicial,
     String? codigoBarras,
     bool completar = false,
+    bool soloAlimento = false,
   }) {
     return Navigator.push<int>(
       context,
@@ -54,6 +62,7 @@ class FoodFormView extends ConsumerStatefulWidget {
           nombreInicial: nombreInicial,
           codigoBarras: codigoBarras,
           completar: completar,
+          soloAlimento: soloAlimento,
         ),
       ),
     );
@@ -82,7 +91,20 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   NutritionSource? _origen;
   bool _saving = false;
 
+  /// Elección del usuario sobre «Es un alimento» (null = la propuesta).
+  bool? _esAlimentoElegido;
+
   bool get _isNew => widget.food == null;
+
+  /// Es un alimento: lo elegido, lo que ya era o lo que sugiere el nombre.
+  bool get _esAlimento {
+    if (widget.soloAlimento) return true;
+    final elegido = _esAlimentoElegido;
+    if (elegido != null) return elegido;
+    final f = widget.food;
+    if (f != null) return f.esAlimento;
+    return !pareceNoAlimentario(_nameCtrl.text);
+  }
 
   @override
   void initState() {
@@ -207,8 +229,9 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
 
   Future<void> _save() async {
     if (_saving || !_formKey.currentState!.validate()) return;
-    final nutricion = _nutricion;
-    if (!await _confirmAvisos(nutricion.avisos)) return;
+    final esAlimento = _esAlimento;
+    final nutricion = esAlimento ? _nutricion : NutritionFacts.vacia;
+    if (esAlimento && !await _confirmAvisos(nutricion.avisos)) return;
 
     final base = widget.food ?? const Food(nombre: '');
     final cambioTabla = nutricion != (widget.food?.nutricion);
@@ -227,6 +250,7 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
           ? NutritionSource.manual
           : (_origen ?? NutritionSource.manual),
       notas: _notesCtrl.text.trim(),
+      esAlimento: esAlimento,
     );
 
     setState(() => _saving = true);
@@ -322,9 +346,16 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
   @override
   Widget build(BuildContext context) {
     final faltan = _nutricion.faltantes;
+    final esAlimento = _esAlimento;
+    final foodId = widget.food?.id;
+    final receta = foodId == null
+        ? null
+        : ref.watch(recipeByFoodProvider(foodId)).valueOrNull;
     final title = widget.completar
         ? 'Completar tabla nutricional'
-        : (_isNew ? 'Nuevo alimento' : 'Editar alimento');
+        : (_isNew
+              ? (esAlimento ? 'Nuevo alimento' : 'Nuevo artículo')
+              : (esAlimento ? 'Editar alimento' : 'Editar artículo'));
 
     return Scaffold(
       appBar: AppBar(
@@ -344,13 +375,25 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
         child: ListView(
           padding: const EdgeInsets.all(AppStyles.paddingMedium),
           children: [
+            if (receta != null)
+              InfoBanner(
+                color: AppStyles.semaphBlue,
+                icon: Icons.menu_book_outlined,
+                text:
+                    'Es el alimento de la receta «${receta.nombre}»: su nombre '
+                    'y su tabla se calculan desde la receta y se actualizan '
+                    'solos, así que lo que cambies aquí se sobrescribirá. '
+                    'Cambia la receta.',
+              ),
             TextFormField(
               controller: _nameCtrl,
               autofocus: _isNew && _nameCtrl.text.isEmpty,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(labelText: 'Nombre *'),
               onChanged: (_) {
-                if (!_categoriaElegida) setState(() {});
+                if (!_categoriaElegida || _esAlimentoElegido == null) {
+                  setState(() {});
+                }
               },
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Escribe un nombre' : null,
@@ -363,6 +406,19 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
                 labelText: 'Marca (vacío = genérico)',
               ),
             ),
+            if (!widget.soloAlimento && !widget.completar)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Es un alimento'),
+                subtitle: Text(
+                  esAlimento
+                      ? 'Tiene tabla nutricional y se cuenta en el día.'
+                      : 'Limpieza, higiene, hogar...: se compra y guarda su '
+                            'historial de precios, sin tabla nutricional.',
+                ),
+                value: esAlimento,
+                onChanged: (v) => setState(() => _esAlimentoElegido = v),
+              ),
             const SizedBox(height: 12),
             SegmentedButton<FoodType>(
               segments: [
@@ -388,7 +444,7 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
               children: [
                 Expanded(
                   child: Text(
-                    'Tabla nutricional',
+                    esAlimento ? 'Tabla nutricional' : 'Se mide en',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -403,23 +459,25 @@ class _FoodFormViewState extends ConsumerState<FoodFormView> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: _readLabel,
-              icon: const Icon(Icons.document_scanner_outlined),
-              label: const Text('Leer la etiqueta con la cámara'),
-            ),
-            if (faltan.isNotEmpty)
-              InfoBanner(
-                color: AppStyles.semaphOrange,
-                icon: Icons.info_outline,
-                text:
-                    'Faltan: ${faltan.map((n) => n.etiqueta.toLowerCase()).join(', ')}. '
-                    'Puedes guardar igualmente: quedará pendiente y no se '
-                    'podrá registrar en el contador hasta completarlo.',
+            if (esAlimento) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: _readLabel,
+                icon: const Icon(Icons.document_scanner_outlined),
+                label: const Text('Leer la etiqueta con la cámara'),
               ),
-            const SizedBox(height: 12),
-            for (final n in Nutrient.values) _nutrientField(n),
+              if (faltan.isNotEmpty)
+                InfoBanner(
+                  color: AppStyles.semaphOrange,
+                  icon: Icons.info_outline,
+                  text:
+                      'Faltan: ${faltan.map((n) => n.etiqueta.toLowerCase()).join(', ')}. '
+                      'Puedes guardar igualmente: quedará pendiente y no se '
+                      'podrá registrar en el contador hasta completarlo.',
+                ),
+              const SizedBox(height: 12),
+              for (final n in Nutrient.values) _nutrientField(n),
+            ],
             if (_isNew) ...[
               const SizedBox(height: 12),
               Text(

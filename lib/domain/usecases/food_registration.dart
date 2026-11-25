@@ -3,6 +3,7 @@ import '../errors/domain_errors.dart';
 import '../repositories/food_repository.dart';
 import '../repositories/transaction_runner.dart';
 import '../services/barcode.dart';
+import '../services/category_guesser.dart';
 
 /// Datos de la presentación con la que se da de alta un alimento.
 class PackageDraft {
@@ -41,6 +42,7 @@ class RegisterFoodInStore {
     FoodUnit unidad = FoodUnit.g,
     PackageDraft presentacion = const PackageDraft(),
     int? alimentoExistenteId,
+    bool? esAlimento,
   }) {
     return tx(() async {
       int alimentoId;
@@ -58,6 +60,7 @@ class RegisterFoodInStore {
               ? FoodType.envasado
               : FoodType.generico,
           unidad: unidad,
+          esAlimento: esAlimento ?? !pareceNoAlimentario(nombre),
         );
         try {
           alimentoId = await foods.saveFood(food);

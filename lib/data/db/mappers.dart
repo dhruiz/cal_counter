@@ -21,6 +21,13 @@ String nowIso() => DateTime.now().toIso8601String();
 
 DateTime? parseIso(String? s) => s == null ? null : DateTime.tryParse(s);
 
+/// Fecha 'YYYY-MM-DD' → DateTime local (medianoche), o null.
+DateTime? parseDateKey(String? s) {
+  if (s == null || s.isEmpty) return null;
+  final d = DateTime.tryParse(s);
+  return d == null ? null : DateTime(d.year, d.month, d.day);
+}
+
 /// Fecha `YYYY-MM-DD` → DateTime (medianoche local).
 DateTime parseDay(String s) {
   final p = s.split('-');
@@ -57,6 +64,8 @@ Food foodFromRow(AlimentoRow r) => Food(
   archivado: r.archivado,
   creado: parseIso(r.creado),
   actualizado: parseIso(r.actualizado),
+  aproximado: r.nutricionAproximada,
+  esAlimento: r.esAlimento,
 );
 
 /// Campos editables del alimento (sin uuid, uso ni fechas).
@@ -80,6 +89,8 @@ AlimentosCompanion foodToCompanion(Food f) {
     nutricionOrigen: Value(n.estaVacia ? null : f.origenNutricion?.clave),
     notas: Value((notas == null || notas.isEmpty) ? null : notas),
     archivado: Value(f.archivado),
+    nutricionAproximada: Value(f.aproximado),
+    esAlimento: Value(f.esAlimento),
   );
 }
 
@@ -131,6 +142,7 @@ RecipeIngredient ingredientFromRow(IngredienteRecetaRow r) => RecipeIngredient(
   cantidad: r.cantidad,
   unidad: r.unidad,
   opcional: r.opcional,
+  nota: r.nota,
 );
 
 Recipe recipeFromRow(RecetaRow r, List<RecipeIngredient> ingredientes) =>
@@ -147,6 +159,7 @@ Recipe recipeFromRow(RecetaRow r, List<RecipeIngredient> ingredientes) =>
       favorita: r.favorita,
       pesoFinalG: r.pesoFinalG,
       alimentoId: r.alimentoId,
+      ultimaPreparacion: parseDateKey(r.ultimaPreparacion),
     );
 
 // Comidas --------------------------------------------------------------------

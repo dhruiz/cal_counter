@@ -9,6 +9,7 @@ import '../providers/foods_provider.dart';
 import '../widgets/add_food_popup.dart';
 import 'food_form_view.dart';
 import 'food_picker_view.dart';
+import 'recipe_detail_view.dart';
 
 /// Flujos compartidos "en casa" sobre alimentos: completar pendientes,
 /// resolver un código de barras y registrar en el contador.
@@ -24,6 +25,45 @@ class FoodFlows {
     Food food,
   ) async {
     if (!food.pendiente) return food;
+    // El alimento de una receta se completa en la receta (su tabla se
+    // calcula de los ingredientes y se sobrescribiría).
+    final receta = food.id == null
+        ? null
+        : await ref.read(recipeRepositoryProvider).watchByFood(food.id!).first;
+    if (receta != null) {
+      if (!context.mounted) return null;
+      final ver = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Faltan datos de la receta'),
+          content: Text(
+            '«${food.nombreCompleto}» es el alimento de la receta '
+            '«${receta.nombre}» y aún no se puede contar: añade sus '
+            'ingredientes con su cantidad.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Ahora no'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Ver receta'),
+            ),
+          ],
+        ),
+      );
+      if (ver == true && context.mounted) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RecipeDetailView(recipeId: receta.id!),
+          ),
+        );
+      }
+      return null;
+    }
+    if (!context.mounted) return null;
     final faltan = food.nutricion.faltantes
         .map((n) => n.etiqueta.toLowerCase())
         .join(', ');
@@ -72,6 +112,16 @@ class FoodFlows {
     Food food, {
     double? initialQuantity,
   }) async {
+    if (!food.esAlimento) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '«${food.nombreCompleto}» no es un alimento: no se cuenta en el día.',
+          ),
+        ),
+      );
+      return false;
+    }
     final complete = await ensureComplete(context, ref, food);
     if (complete == null || !context.mounted) return false;
     return AddFoodPopup.showForToday(

@@ -3,7 +3,8 @@
 
 import 'package:drift/drift.dart';
 
-// Esquema v1 de la base de datos (ver docs/PLAN_REDISENO_BD.md, sección 4).
+// Esquema de la base de datos (v1 en docs/PLAN_REDISENO_BD.md, sección 4;
+// v2 y v3 añaden las columnas marcadas).
 // Las claves foráneas se activan en cada apertura (`PRAGMA foreign_keys`).
 // Los días se guardan como TEXT 'YYYY-MM-DD'; las marcas de tiempo como
 // ISO 8601. El dinero, en céntimos (INTEGER).
@@ -63,6 +64,13 @@ class Alimentos extends Table {
   BoolColumn get archivado => boolean().withDefault(const Constant(false))();
   TextColumn get creado => text()();
   TextColumn get actualizado => text()();
+  // v3: la tabla es una aproximación (receta sin peso final o con
+  // ingredientes sin datos).
+  BoolColumn get nutricionAproximada =>
+      boolean().withDefault(const Constant(false))();
+  // v3: false = artículo que no es un alimento (limpieza, higiene...): se
+  // compra y se lleva su historial, pero no tiene tabla nutricional.
+  BoolColumn get esAlimento => boolean().withDefault(const Constant(true))();
 
   @override
   List<Set<Column>> get uniqueKeys => [
@@ -205,6 +213,10 @@ class ItemsLista extends Table {
     #id,
     onDelete: KeyAction.setNull,
   )();
+  // v3: cantidad mínima que hace falta (g o ml del alimento), p. ej. la suma
+  // de lo que piden las recetas. [cantidad] es el texto que se muestra.
+  RealColumn get cantidadMinima =>
+      real().nullable().check(cantidadMinima.isBiggerThanValue(0))();
 }
 
 @DataClassName('RecetaRow')
@@ -228,6 +240,8 @@ class Recetas extends Table {
   )();
   TextColumn get creada => text()();
   TextColumn get actualizada => text()();
+  // v3: último día en que se preparó ('YYYY-MM-DD').
+  TextColumn get ultimaPreparacion => text().nullable()();
 }
 
 @DataClassName('IngredienteRecetaRow')
@@ -246,6 +260,8 @@ class IngredientesReceta extends Table {
       real().nullable().check(cantidad.isBiggerThanValue(0))();
   TextColumn get unidad => text().nullable()();
   BoolColumn get opcional => boolean().withDefault(const Constant(false))();
+  // v3: nota de la línea ("picada", "en dados").
+  TextColumn get nota => text().nullable()();
 }
 
 @DataClassName('ComidaRow')

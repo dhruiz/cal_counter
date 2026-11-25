@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/styles.dart';
 import '../../core/utils.dart';
 import '../../domain/entities/purchase.dart';
+import '../../domain/services/category_guesser.dart';
 import '../../domain/services/money.dart';
 import 'food_widgets.dart';
 
@@ -317,6 +318,9 @@ class NewProductResult {
   final int precioCent;
   final int unidades;
 
+  /// false = artículo que no es un alimento (limpieza, higiene...).
+  final bool esAlimento;
+
   /// El usuario indicó que es otra presentación de un alimento que ya tiene:
   /// hay que elegirlo (nombre y marca se ignoran).
   final bool otraPresentacion;
@@ -329,6 +333,7 @@ class NewProductResult {
     this.unidad = 'g',
     required this.precioCent,
     required this.unidades,
+    this.esAlimento = true,
     this.otraPresentacion = false,
   });
 }
@@ -363,6 +368,12 @@ class _NewProductSheetState extends State<NewProductSheet> {
   final _priceCtrl = TextEditingController();
   String _unidad = 'g';
   int _unidades = 1;
+
+  /// Elección del usuario (null = lo que sugiere el nombre).
+  bool? _esAlimentoElegido;
+
+  bool get _esAlimento =>
+      _esAlimentoElegido ?? !pareceNoAlimentario(_nameCtrl.text);
 
   @override
   void dispose() {
@@ -413,6 +424,7 @@ class _NewProductSheetState extends State<NewProductSheet> {
         unidad: _unidad,
         precioCent: precio!,
         unidades: _unidades,
+        esAlimento: _esAlimento,
       ),
     );
   }
@@ -438,13 +450,15 @@ class _NewProductSheetState extends State<NewProductSheet> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Text('Código ${widget.codigo}', style: AppStyles.labelText),
-              const InfoBanner(
+              InfoBanner(
                 color: AppStyles.semaphOrange,
                 icon: Icons.info_outline,
-                text:
-                    'Este código no está en tus alimentos. Indica lo básico y '
-                    'el precio; la tabla nutricional se completa luego en '
-                    'casa.',
+                text: _esAlimento
+                    ? 'Este código no está en tus alimentos. Indica lo básico '
+                          'y el precio; la tabla nutricional se completa luego '
+                          'en casa.'
+                    : 'Este código no está registrado. Indica lo básico y el '
+                          'precio.',
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -458,8 +472,21 @@ class _NewProductSheetState extends State<NewProductSheet> {
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Escribe un nombre'
                     : null,
+                onChanged: (_) {
+                  if (_esAlimentoElegido == null) setState(() {});
+                },
               ),
-              const SizedBox(height: 12),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Es un alimento'),
+                subtitle: _esAlimento
+                    ? null
+                    : const Text(
+                        'Limpieza, higiene, hogar...: sin tabla nutricional.',
+                      ),
+                value: _esAlimento,
+                onChanged: (v) => setState(() => _esAlimentoElegido = v),
+              ),
               TextFormField(
                 controller: _brandCtrl,
                 textCapitalization: TextCapitalization.words,

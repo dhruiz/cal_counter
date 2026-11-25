@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/db/app_database.dart';
 import '../../data/ocr/mlkit_text_recognizer.dart';
 import '../../data/repositories/category_repository_impl.dart';
+import '../../data/repositories/cooking_pot_repository_impl.dart';
 import '../../data/repositories/drift_transaction_runner.dart';
 import '../../data/repositories/food_repository_impl.dart';
 import '../../data/repositories/meal_repository_impl.dart';
@@ -11,6 +12,7 @@ import '../../data/repositories/recipe_repository_impl.dart';
 import '../../data/repositories/scale_repository_impl.dart';
 import '../../data/repositories/shopping_list_repository_impl.dart';
 import '../../domain/repositories/category_repository.dart';
+import '../../domain/repositories/cooking_pot_repository.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../../domain/repositories/meal_repository.dart';
 import '../../domain/repositories/purchase_repository.dart';
@@ -66,6 +68,10 @@ final mealRepositoryProvider = Provider<MealRepository>(
 
 final categoryRepositoryProvider = Provider<CategoryRepository>(
   (ref) => CategoryRepositoryImpl(ref.watch(appDatabaseProvider)),
+);
+
+final cookingPotRepositoryProvider = Provider<CookingPotRepository>(
+  (ref) => CookingPotRepositoryImpl(),
 );
 
 final scaleRepositoryProvider = Provider<ScaleRepository>(
@@ -150,6 +156,7 @@ final addIngredientsToShoppingListProvider =
     Provider<AddIngredientsToShoppingList>(
       (ref) => AddIngredientsToShoppingList(
         ref.watch(shoppingListRepositoryProvider),
+        ref.watch(foodRepositoryProvider),
       ),
     );
 

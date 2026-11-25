@@ -66,7 +66,11 @@ class _SearchViewState extends ConsumerState<SearchView> {
   }
 
   Future<void> _create(String nombre) async {
-    final id = await FoodFormView.open(context, nombreInicial: nombre);
+    final id = await FoodFormView.open(
+      context,
+      nombreInicial: nombre,
+      soloAlimento: true,
+    );
     if (id == null || !mounted) return;
     final food = await ref.read(foodRepositoryProvider).getFood(id);
     if (food != null && mounted) await _register(food);
@@ -148,6 +152,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
         onSelect: _register,
         onLongPress: _actions,
         onCreate: _create,
+        soloAlimentos: true,
       ),
     );
   }

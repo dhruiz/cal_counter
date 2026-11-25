@@ -18,22 +18,37 @@ class FoodPickerView extends ConsumerStatefulWidget {
   final String initialQuery;
   final String title;
 
+  /// Solo alimentos (ingredientes de recetas): sin artículos de limpieza,
+  /// higiene...; lo que se cree aquí es un alimento.
+  final bool soloAlimentos;
+
+  /// Alimentos que no se ofrecen (p. ej. el de la propia receta).
+  final Set<int> excluir;
+
   const FoodPickerView({
     super.key,
     this.initialQuery = '',
     this.title = 'Elegir alimento',
+    this.soloAlimentos = false,
+    this.excluir = const {},
   });
 
   static Future<Food?> pick(
     BuildContext context, {
     String initialQuery = '',
     String title = 'Elegir alimento',
+    bool soloAlimentos = false,
+    Set<int> excluir = const {},
   }) {
     return Navigator.push<Food>(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            FoodPickerView(initialQuery: initialQuery, title: title),
+        builder: (_) => FoodPickerView(
+          initialQuery: initialQuery,
+          title: title,
+          soloAlimentos: soloAlimentos,
+          excluir: excluir,
+        ),
       ),
     );
   }
@@ -72,11 +87,22 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
     final code = await BarcodeScannerView.scan(context);
     if (code == null || !mounted) return;
     final food = await FoodFlows.foodForBarcode(context, ref, code);
-    if (food != null && mounted) Navigator.pop(context, food);
+    if (food == null || !mounted) return;
+    if (widget.soloAlimentos && !food.esAlimento) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('«${food.nombreCompleto}» no es un alimento.')),
+      );
+      return;
+    }
+    Navigator.pop(context, food);
   }
 
   Future<void> _create(String nombre) async {
-    final id = await FoodFormView.open(context, nombreInicial: nombre);
+    final id = await FoodFormView.open(
+      context,
+      nombreInicial: nombre,
+      soloAlimento: widget.soloAlimentos,
+    );
     if (id == null || !mounted) return;
     final food = await ref.read(foodRepositoryProvider).getFood(id);
     if (food != null && mounted) Navigator.pop(context, food);
@@ -119,6 +145,8 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
         query: _query,
         onSelect: (f) => Navigator.pop(context, f),
         onCreate: _create,
+        soloAlimentos: widget.soloAlimentos,
+        excluir: widget.excluir,
       ),
     );
   }

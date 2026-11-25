@@ -466,3 +466,14 @@ String? guessCategoryName(String nombre) {
   }
   return mejor;
 }
+
+/// Categorías por defecto de artículos que no son alimentos.
+const Set<String> kCategoriasNoAlimentarias = {
+  'Limpieza',
+  'Higiene y cuidado personal',
+};
+
+/// El nombre parece de un artículo que no es un alimento ("Detergente",
+/// "Papel higiénico", "Champú"): se propone marcarlo así al darlo de alta.
+bool pareceNoAlimentario(String nombre) =>
+    kCategoriasNoAlimentarias.contains(guessCategoryName(nombre));

@@ -164,6 +164,8 @@ class ImportRepertoire {
                     ? null
                     : (imp.origenNutricion ?? NutritionSource.importado),
                 notas: imp.notas,
+                aproximado: imp.aproximado,
+                esAlimento: imp.esAlimento,
               ),
             );
           } on DuplicateFoodException catch (e) {
@@ -289,13 +291,18 @@ class ImportRepertoire {
           final alimentoId = uuid == null ? null : idPorUuid[uuid];
           ingredientes.add(
             alimentoId == null
-                ? RecipeIngredient(texto: ing.texto, opcional: ing.opcional)
+                ? RecipeIngredient(
+                    texto: ing.texto,
+                    opcional: ing.opcional,
+                    nota: ing.nota,
+                  )
                 : RecipeIngredient(
                     texto: ing.texto,
                     alimentoId: alimentoId,
                     cantidad: ing.cantidad,
                     unidad: ing.unidad,
                     opcional: ing.opcional,
+                    nota: ing.nota,
                   ),
           );
         }

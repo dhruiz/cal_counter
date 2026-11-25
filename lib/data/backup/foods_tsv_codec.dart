@@ -7,9 +7,11 @@ import '../../domain/services/barcode.dart';
 /// Alimentos en TSV (separador TAB) para hojas de cálculo.
 ///
 /// Cabecera actual:
-/// `uuid	nombre	marca	tipo	unidad	codigos	kcal	grasas	grasas_saturadas	carbohidratos	azucares	fibra	proteinas	sal	categoria`
+/// `uuid	nombre	marca	tipo	unidad	codigos	kcal	grasas	grasas_saturadas	carbohidratos	azucares	fibra	proteinas	sal	categoria	es_alimento`
 /// (`codigos`: códigos de barras separados por comas; celdas vacías =
-/// desconocido). Al importar también se acepta la cabecera antigua de
+/// desconocido; `es_alimento`: `no` en los artículos que no son alimentos,
+/// vacío en el resto). Las columnas se leen por nombre: los archivos sin
+/// las últimas columnas siguen valiendo. Al importar también se acepta la cabecera antigua de
 /// 6 columnas `id	alimento	kCal	grasas	carbohidratos	proteinas` (el id se
 /// ignora).
 class FoodsTsvCodec {
@@ -31,6 +33,7 @@ class FoodsTsvCodec {
     'proteinas',
     'sal',
     'categoria',
+    'es_alimento',
   ];
 
   static const List<String> columnasLegado = [
@@ -80,6 +83,7 @@ class FoodsTsvCodec {
           for (final c in columnas.skip(6).take(8))
             _num(f.nutricion[_nutrientes[c]!]),
           _clean(rf.categoria ?? ''),
+          f.esAlimento ? '' : 'no',
         ].join('\t'),
       );
     }
@@ -155,6 +159,11 @@ class FoodsTsvCodec {
             unidad: FoodUnit.fromClave(cell(cols, 'unidad')),
             nutricion: n,
             origenNutricion: n.estaVacia ? null : NutritionSource.importado,
+            esAlimento: !const {
+              'no',
+              '0',
+              'false',
+            }.contains(cell(cols, 'es_alimento').toLowerCase()),
           ),
           presentaciones: [
             for (final c in cell(cols, 'codigos').split(','))

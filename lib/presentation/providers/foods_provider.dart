@@ -19,14 +19,18 @@ class FoodQuery extends Equatable {
   /// Null = todas; [kSinCategoria] = sin categoría.
   final int? categoriaId;
 
+  /// Deja fuera los artículos que no son alimentos.
+  final bool soloAlimentos;
+
   const FoodQuery(
     this.texto, [
     this.filtro = FoodFilter.todos,
     this.categoriaId,
+    this.soloAlimentos = false,
   ]);
 
   @override
-  List<Object?> get props => [texto, filtro, categoriaId];
+  List<Object?> get props => [texto, filtro, categoriaId, soloAlimentos];
 }
 
 /// Resultados de búsqueda (texto o código) que se actualizan solos.
@@ -34,7 +38,12 @@ final foodSearchProvider = StreamProvider.autoDispose
     .family<List<Food>, FoodQuery>(
       (ref, q) => ref
           .watch(foodRepositoryProvider)
-          .watchSearch(q.texto, filter: q.filtro, categoriaId: q.categoriaId),
+          .watchSearch(
+            q.texto,
+            filter: q.filtro,
+            categoriaId: q.categoriaId,
+            soloAlimentos: q.soloAlimentos,
+          ),
     );
 
 final foodProvider = StreamProvider.autoDispose.family<Food?, int>(

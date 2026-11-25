@@ -2,25 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/styles.dart';
+import '../../core/utils.dart';
+import '../../domain/entities/food.dart';
+import '../../domain/entities/recipe.dart';
+import '../../domain/services/ingredient_text.dart';
 import '../providers/recipes_provider.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/final_weight_dialog.dart';
 import '../widgets/food_widgets.dart';
 import '../widgets/recipe_nutrition_card.dart';
 
 /// Modo cocina: la receta paso a paso con letra grande. La primera página
 /// reúne los ingredientes y, si falta algún dato nutricional, lo pide sin
 /// bloquear (es el momento ideal: el envase está en la mano para leer la
-/// etiqueta). Al terminar se puede registrar una porción.
+/// etiqueta). Al terminar pide el peso final (descontando la olla) y marca
+/// la receta como preparada hoy. Con [factor] muestra las cantidades
+/// escaladas.
 class CookModeView extends ConsumerStatefulWidget {
   final int recipeId;
 
-  const CookModeView({super.key, required this.recipeId});
+  /// Escala de las cantidades (×2 = el doble de todo).
+  final double factor;
 
-  static Future<void> open(BuildContext context, int recipeId) =>
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => CookModeView(recipeId: recipeId)),
-      );
+  const CookModeView({super.key, required this.recipeId, this.factor = 1});
+
+  static Future<void> open(
+    BuildContext context,
+    int recipeId, {
+    double factor = 1,
+  }) => Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => CookModeView(recipeId: recipeId, factor: factor),
+    ),
+  );
 
   @override
   ConsumerState<CookModeView> createState() => _CookModeViewState();
@@ -35,6 +50,27 @@ class _CookModeViewState extends ConsumerState<CookModeView> {
   void dispose() {
     _pages.dispose();
     super.dispose();
+  }
+
+  /// Al cerrar desde la última página: preparada hoy.
+  Future<void> _finish() async {
+    await ref
+        .read(recipeRepositoryProvider)
+        .setLastPrepared(widget.recipeId, DateTime.now());
+    if (mounted) Navigator.pop(context);
+  }
+
+  String _linea(RecipeIngredient ing, Map<int, Food> alimentos) {
+    final f = ing.alimentoId == null ? null : alimentos[ing.alimentoId];
+    return scaledIngredientText(
+      texto: ing.texto,
+      factor: widget.factor,
+      nombreAlimento: f?.nombre,
+      cantidad: ing.cantidad,
+      unidad: ing.unidad,
+      nota: ing.nota,
+      opcional: ing.opcional,
+    );
   }
 
   void _go(int page) => _pages.animateToPage(
@@ -75,6 +111,17 @@ class _CookModeViewState extends ConsumerState<CookModeView> {
               ),
             ),
           RecipeNutritionCard(analisis: analisis, acciones: false),
+          if (widget.factor != 1)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: InfoBanner(
+                color: AppStyles.semaphBlue,
+                icon: Icons.tune,
+                text:
+                    'Cantidades a ×${AppUtils.formatNumero(widget.factor)} '
+                    'de la receta.',
+              ),
+            ),
           const SectionTitle('Ingredientes'),
           for (var i = 0; i < r.ingredientes.length; i++)
             CheckboxListTile(
@@ -83,7 +130,7 @@ class _CookModeViewState extends ConsumerState<CookModeView> {
                 () => v == true ? _preparados.add(i) : _preparados.remove(i),
               ),
               title: Text(
-                r.ingredientes[i].texto,
+                _linea(r.ingredientes[i], analisis.alimentos),
                 style: TextStyle(
                   fontSize: 18,
                   decoration: _preparados.contains(i)
@@ -133,7 +180,33 @@ class _CookModeViewState extends ConsumerState<CookModeView> {
             style: theme.textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
-          RecipeNutritionCard(analisis: analisis),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: FilledButton.icon(
+              onPressed: () => FinalWeightDialog.askAndSave(
+                context,
+                ref,
+                r,
+                factor: widget.factor,
+              ),
+              icon: const Icon(Icons.scale_outlined),
+              label: Text(
+                analisis.nutricion.pesoFinalConocido
+                    ? 'Volver a pesar la preparación'
+                    : 'Pesar la preparación',
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
+            child: Text(
+              'Pésala recién hecha (descontando la olla): así la tabla de su '
+              'alimento es exacta.',
+              textAlign: TextAlign.center,
+              style: AppStyles.labelText,
+            ),
+          ),
+          RecipeNutritionCard(analisis: analisis, factor: widget.factor),
         ],
       ),
     ];
@@ -176,9 +249,7 @@ class _CookModeViewState extends ConsumerState<CookModeView> {
               ),
               const Spacer(),
               FilledButton.icon(
-                onPressed: _page >= total - 1
-                    ? () => Navigator.pop(context)
-                    : () => _go(_page + 1),
+                onPressed: _page >= total - 1 ? _finish : () => _go(_page + 1),
                 icon: Icon(
                   _page >= total - 1 ? Icons.check : Icons.chevron_right,
                 ),

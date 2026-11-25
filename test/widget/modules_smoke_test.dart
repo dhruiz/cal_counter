@@ -321,7 +321,14 @@ void main() {
     await tester.tap(find.text('Vincular 3 ingredientes'));
     await tester.pumpAndSettle();
     expect(find.text('Para calcular las calorías faltan:'), findsNothing);
-    expect(find.text('Registrar porción'), findsOneWidget);
+    // Sin peso final la tabla es aproximada, pero ya es un alimento más.
+    expect(find.text('Nutrición (aproximada)'), findsOneWidget);
+    expect(find.textContaining('falta el peso final'), findsOneWidget);
+    expect(
+      find.text('En tus alimentos como «Tortilla de patatas · Receta»'),
+      findsOneWidget,
+    );
+    expect(find.text('Registrar en el día'), findsOneWidget);
     expect(find.textContaining('Por porción'), findsOneWidget);
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -354,14 +361,44 @@ void main() {
       find.widgetWithText(TextFormField, 'Nombre de la receta *'),
       'Batido',
     );
+    // Ingrediente desde el buscador, como en el contador.
+    await tester.tap(find.byKey(const Key('anadir_ingrediente')));
+    await tester.pumpAndSettle();
+    expect(find.text('Añadir ingrediente'), findsWidgets);
+    await tester.enterText(find.byType(TextField).first, 'platano');
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Plátano'));
+    await tester.pumpAndSettle();
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Ingredientes * (uno por línea)'),
-      '1 plátano\n250 ml de leche',
+      find.byKey(const Key('cantidad_ingrediente')),
+      '120',
     );
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('guardar_ingrediente')));
+    await tester.pumpAndSettle();
+    expect(find.text('120 g de plátano'), findsOneWidget);
+
+    // Lista pegada: entra por vincular y se propone el alimento.
+    await tester.tap(find.text('Pegar lista'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '250 ml de leche');
+    await tester.tap(find.widgetWithText(FilledButton, 'Añadir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Vincular ingredientes'), findsOneWidget);
+    await tester.tap(find.text('Vincular 1 ingrediente'));
+    await tester.pumpAndSettle();
+    expect(find.text('→ Leche entera · Vaca'), findsOneWidget);
+
     await tester.tap(find.byTooltip('Guardar'));
     await tester.pumpAndSettle();
     var all = (await tester.runAsync(recipes.getAll))!;
-    expect(all.any((r) => r.nombre == 'Batido'), isTrue);
+    final batido = all.singleWhere((r) => r.nombre == 'Batido');
+    expect(
+      batido.ingredientes.map((i) => i.alimentoId),
+      everyElement(isNotNull),
+    );
+    expect(batido.ingredientes.first.cantidad, 120);
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
 
@@ -379,7 +416,9 @@ void main() {
     );
     await tester.tap(find.text('Guardar 1 receta'));
     await tester.pumpAndSettle();
-    expect(find.text('1 receta importada'), findsOneWidget);
+    expect(find.textContaining('1 receta importada'), findsOneWidget);
+    // Se pasa directamente a vincular sus ingredientes.
+    expect(find.text('Vincular ingredientes'), findsOneWidget);
     all = (await tester.runAsync(recipes.getAll))!;
     expect(all.length, 5);
     await unmount(tester);

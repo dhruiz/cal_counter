@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/errors/domain_errors.dart';
 import '../../domain/repositories/recipe_repository.dart';
+import '../../domain/services/dates.dart';
 import '../db/app_database.dart';
 import '../db/mappers.dart';
 
@@ -85,6 +86,11 @@ class RecipeRepositoryImpl implements RecipeRepository {
           (recipe.pesoFinalG ?? 0) > 0 ? recipe.pesoFinalG : null,
         ),
         alimentoId: Value(recipe.alimentoId),
+        ultimaPreparacion: Value(
+          recipe.ultimaPreparacion == null
+              ? null
+              : dateKey(recipe.ultimaPreparacion!),
+        ),
         actualizada: Value(now),
       );
       final int id;
@@ -128,6 +134,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
                   ing.alimentoId == null ? null : emptyToNull(ing.unidad),
                 ),
                 opcional: Value(ing.opcional),
+                nota: Value(emptyToNull(ing.nota)),
               ),
             );
       }
@@ -145,6 +152,66 @@ class RecipeRepositoryImpl implements RecipeRepository {
     await (db.update(db.recetas)..where((r) => r.id.equals(id))).write(
       RecetasCompanion(favorita: Value(favorita)),
     );
+  }
+
+  @override
+  Stream<Recipe?> watchByFood(int alimentoId) => db
+      .customSelect(
+        'SELECT * FROM recetas WHERE alimento_id = ? ORDER BY id LIMIT 1',
+        variables: [Variable.withInt(alimentoId)],
+        readsFrom: {db.recetas, db.ingredientesReceta},
+      )
+      .map((r) => db.recetas.map(r.data))
+      .watchSingleOrNull()
+      .asyncMap(
+        (row) async =>
+            row == null ? null : (await _conIngredientes([row])).first,
+      );
+
+  @override
+  Future<void> setFoodLink(int recipeId, int? alimentoId) async {
+    await (db.update(db.recetas)..where((r) => r.id.equals(recipeId))).write(
+      RecetasCompanion(alimentoId: Value(alimentoId)),
+    );
+  }
+
+  @override
+  Future<void> setFinalWeight(
+    int recipeId,
+    double? pesoFinalG, {
+    DateTime? preparadaEl,
+  }) async {
+    await (db.update(db.recetas)..where((r) => r.id.equals(recipeId))).write(
+      RecetasCompanion(
+        pesoFinalG: Value((pesoFinalG ?? 0) > 0 ? pesoFinalG : null),
+        ultimaPreparacion: preparadaEl == null
+            ? const Value.absent()
+            : Value(dateKey(preparadaEl)),
+        actualizada: Value(nowIso()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> setLastPrepared(int recipeId, DateTime fecha) async {
+    await (db.update(db.recetas)..where((r) => r.id.equals(recipeId))).write(
+      RecetasCompanion(ultimaPreparacion: Value(dateKey(fecha))),
+    );
+  }
+
+  @override
+  Stream<void> watchNutritionInputs() async* {
+    yield null;
+    yield* db
+        .tableUpdates(
+          TableUpdateQuery.onAllTables([
+            db.recetas,
+            db.ingredientesReceta,
+            db.alimentos,
+            db.porciones,
+          ]),
+        )
+        .map((_) {});
   }
 
   @override

@@ -10,6 +10,7 @@ enum FoodFilter {
   envasados('Envasados'),
   genericos('Genéricos'),
   preparados('Preparados'),
+  otrosProductos('No alimentarios'),
   archivados('Archivados');
 
   final String etiqueta;
@@ -33,11 +34,14 @@ abstract class FoodRepository {
   /// [filter]. Los archivados solo aparecen con [FoodFilter.archivados].
   ///
   /// Con [categoriaId] filtra por sección ([kSinCategoria] = sin categoría).
+  /// Con [soloAlimentos] deja fuera los artículos que no son alimentos
+  /// (contador de calorías, ingredientes de recetas).
   Stream<List<Food>> watchSearch(
     String query, {
     FoodFilter filter = FoodFilter.todos,
     int? categoriaId,
     int limit = 200,
+    bool soloAlimentos = false,
   });
 
   Future<List<Food>> search(
@@ -45,6 +49,7 @@ abstract class FoodRepository {
     FoodFilter filter = FoodFilter.todos,
     int? categoriaId,
     int limit = 200,
+    bool soloAlimentos = false,
   });
 
   Future<Food?> getFood(int id);
@@ -86,6 +91,8 @@ abstract class FoodRepository {
 
   /// Fija el contador de uso (migración desde versiones anteriores).
   Future<void> setUsage(int id, int count, DateTime? ultimoUso);
+
+  /// Más usados en el contador (solo alimentos).
   Stream<List<Food>> watchMostUsed({int limit = 20});
 
   /// Pendientes de completar, por prioridad: usados en recetas, comprados

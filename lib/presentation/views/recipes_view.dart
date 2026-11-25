@@ -9,6 +9,7 @@ import '../../core/styles.dart';
 import '../../core/utils.dart';
 import '../../data/parsers/recipe_text_codec.dart';
 import '../../domain/entities/recipe.dart';
+import '../../domain/services/recipe_ideas.dart';
 import '../providers/recipes_provider.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/recipe_card.dart';
@@ -207,6 +208,26 @@ class _RecipesViewState extends ConsumerState<RecipesView> {
     );
   }
 
+  /// Propone una receta al azar (favoritas y las que hace tiempo que no
+  /// preparas salen más), de la categoría elegida si hay una.
+  Future<void> _suggest() async {
+    final s = ref.read(recipesProvider);
+    final pool = s.mode == RecipeSearchMode.nombre
+        ? s.deLaCategoria
+        : s.recipes;
+    if (pool.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aún no tienes recetas que sugerir.')),
+      );
+      return;
+    }
+    final elegida = await showDialog<Recipe>(
+      context: context,
+      builder: (_) => _SuggestDialog(recetas: pool),
+    );
+    if (elegida != null && mounted) _openRecipe(elegida);
+  }
+
   void _onMenu(String v) {
     switch (v) {
       case 'file':
@@ -299,6 +320,12 @@ class _RecipesViewState extends ConsumerState<RecipesView> {
         backgroundColor: AppStyles.primary,
         foregroundColor: Colors.white,
         actions: [
+          if (s.recipes.isNotEmpty)
+            IconButton(
+              tooltip: 'Sugiéreme algo',
+              icon: const Icon(Icons.lightbulb_outline),
+              onPressed: _suggest,
+            ),
           PopupMenuButton<String>(
             onSelected: _onMenu,
             itemBuilder: (_) => const [
@@ -443,9 +470,158 @@ class _RecipesViewState extends ConsumerState<RecipesView> {
                       ),
                     ),
                 ],
+                if (!byIngredients && s.recipes.isNotEmpty)
+                  _OrderAndCategoryRow(state: s, notifier: _notifier),
                 Expanded(child: _buildList(s)),
               ],
             ),
+    );
+  }
+}
+
+/// Orden de la lista y filtro por categoría (modo por nombre).
+class _OrderAndCategoryRow extends StatelessWidget {
+  final RecipesState state;
+  final RecipesNotifier notifier;
+
+  const _OrderAndCategoryRow({required this.state, required this.notifier});
+
+  @override
+  Widget build(BuildContext context) {
+    final cats = recipeCategories(state.recipes);
+    return SizedBox(
+      height: 44,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        children: [
+          PopupMenuButton<RecipeOrder>(
+            tooltip: 'Ordenar',
+            initialValue: state.orden,
+            onSelected: notifier.setOrden,
+            itemBuilder: (_) => [
+              for (final o in RecipeOrder.values)
+                PopupMenuItem(value: o, child: Text(o.etiqueta)),
+            ],
+            child: Chip(
+              avatar: const Icon(Icons.sort, size: 18),
+              label: Text(state.orden.etiqueta),
+            ),
+          ),
+          if (cats.isNotEmpty) ...[
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: ChoiceChip(
+                label: const Text('Todas'),
+                selected: state.categoria == null,
+                onSelected: (_) => notifier.setCategoria(null),
+              ),
+            ),
+            for (final c in cats)
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: ChoiceChip(
+                  label: Text(c),
+                  selected:
+                      state.categoria != null &&
+                      state.categoria!.toLowerCase() == c.toLowerCase(),
+                  onSelected: (_) => notifier.setCategoria(c),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// «¿Qué cocino hoy?»: una receta al azar con «Otra» para pedir otra.
+class _SuggestDialog extends StatefulWidget {
+  final List<Recipe> recetas;
+
+  const _SuggestDialog({required this.recetas});
+
+  @override
+  State<_SuggestDialog> createState() => _SuggestDialogState();
+}
+
+class _SuggestDialogState extends State<_SuggestDialog> {
+  final _vistas = <int>{};
+  late Recipe _receta;
+
+  @override
+  void initState() {
+    super.initState();
+    _receta = _siguiente()!;
+  }
+
+  Recipe? _siguiente() {
+    final hoy = DateTime.now();
+    var r = suggestRecipe(widget.recetas, hoy: hoy, excluir: _vistas);
+    if (r == null) {
+      // Ya salieron todas: se vuelve a empezar.
+      _vistas.clear();
+      r = suggestRecipe(widget.recetas, hoy: hoy);
+    }
+    if (r?.id != null) _vistas.add(r!.id!);
+    return r;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = _receta;
+    final dias = daysSincePrepared(r, DateTime.now());
+    final theme = Theme.of(context);
+    return AlertDialog(
+      title: const Text('¿Qué tal esta?'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (r.favorita)
+                const Padding(
+                  padding: EdgeInsets.only(right: 6),
+                  child: Icon(Icons.star, color: Colors.amber),
+                ),
+              Expanded(
+                child: Text(r.nombre, style: theme.textTheme.headlineSmall),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          if ((r.categoria ?? '').isNotEmpty)
+            Text(r.categoria!, style: AppStyles.labelText),
+          Text(
+            dias == null
+                ? 'Aún no la has marcado como preparada.'
+                : 'La preparaste por última vez ${preparedAgo(dias)}.',
+          ),
+          if (r.tiempoMin != null)
+            Text(
+              'Tiempo: ${RecipeTextCodec.formatMinutes(r.tiempoMin!)}',
+              style: AppStyles.labelText,
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: widget.recetas.length < 2
+              ? null
+              : () => setState(() => _receta = _siguiente() ?? _receta),
+          child: const Text('Otra'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cerrar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, r),
+          child: const Text('Ver receta'),
+        ),
+      ],
     );
   }
 }
